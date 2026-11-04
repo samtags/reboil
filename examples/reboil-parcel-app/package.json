@@ -1,0 +1,22 @@
+{
+  "name": "reboil-parcel-app",
+  "private": true,
+  "scripts": {
+    "dev": "parcel src/index.html",
+    "build": "parcel build src/index.html",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "reboil": "file:../../packages/reboil",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@parcel/transformer-typescript-tsc": "^2.15.4",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "parcel": "^2.15.4",
+    "typescript": "^5.9.0"
+  }
+}
+

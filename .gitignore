@@ -1,0 +1,6 @@
+IDEA.md
+node_modules/
+dist/
+coverage/
+.parcel-cache/
+*.tsbuildinfo

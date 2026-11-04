@@ -1,0 +1,63 @@
+{
+  "name": "reboil",
+  "version": "0.1.0",
+  "description": "Typed string-path state access with synchronous persistence.",
+  "type": "module",
+  "bin": {
+    "reboil": "dist/cli.cjs"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "react-native": "./dist/index.cjs",
+      "browser": "./dist/index.mjs",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.mjs"
+    },
+    "./react": {
+      "types": "./dist/react.d.ts",
+      "react-native": "./dist/react.cjs",
+      "browser": "./dist/react.mjs",
+      "import": "./dist/react.mjs",
+      "require": "./dist/react.cjs",
+      "default": "./dist/react.mjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=17",
+    "react-native-mmkv": ">=4",
+    "react-native-nitro-modules": ">=0.30"
+  },
+  "peerDependenciesMeta": {
+    "react-native-mmkv": { "optional": true },
+    "react-native-nitro-modules": { "optional": true }
+  },
+  "dependencies": {
+    "use-sync-external-store": "^1.5.0"
+  },
+  "devDependencies": {
+    "@babel/parser": "^7.28.0",
+    "@babel/types": "^7.28.0",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/use-sync-external-store": "^0.0.6",
+    "recast": "^0.23.11",
+    "react": "^19.0.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.0",
+    "vitest": "^3.2.0"
+  }
+}

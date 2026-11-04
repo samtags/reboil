@@ -1,0 +1,14 @@
+{
+  "name": "reboil-vanilla-app",
+  "private": true,
+  "scripts": {
+    "dev": "parcel src/index.html",
+    "build": "parcel build src/index.html"
+  },
+  "dependencies": {
+    "reboil": "file:../../packages/reboil"
+  },
+  "devDependencies": {
+    "parcel": "^2.15.4"
+  }
+}

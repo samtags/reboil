@@ -1,0 +1,16 @@
+{
+  "name": "reboil-workspace",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace reboil",
+    "test": "npm run test --workspace reboil",
+    "typecheck": "npm run typecheck --workspace reboil"
+  },
+  "@parcel/resolver-default": {
+    "packageExports": true
+  }
+}
