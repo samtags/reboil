@@ -10,5 +10,4 @@ npm install
 npm run dev --workspace reboil-parcel-app
 ```
 
-Open the local Parcel URL, click the actions, and watch the browser console for Reboil’s development logs. The counter, action label, and theme are independent path subscriptions; writes use `store.set` from `src/store.ts`.
-
+Open the local Parcel URL, click the actions, and watch the browser console for Reboil’s development logs. The counter, action label, and theme are independent path subscriptions; writes use `setStore` from `reboil/react`.

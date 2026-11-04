@@ -11,11 +11,18 @@ npm run typecheck --workspace reboil-parcel-config-app
 npm run dev --workspace reboil-parcel-config-app
 ```
 
-`reboil init` creates `reboil.config.ts` and patches `src/main.tsx` so the config runs before the application imports. The app imports `store` from `reboil` and the React hook from `reboil/react`:
+`reboil init` creates `reboil.config.ts` and patches `src/main.tsx` so the config runs before the application imports. The app imports `store` from `reboil`, and the React bindings from `reboil/react`:
 
 ```tsx
 import { store } from 'reboil'
-import { useStore } from 'reboil/react'
+import { setStore, useStore } from 'reboil/react'
+```
+
+Writes can use a direct value or a previous-value updater:
+
+```tsx
+setStore('count', 2)
+setStore('count', (previous) => previous + 1)
 ```
 
 The workspace enables Parcel package exports so the `reboil/react` subpath resolves through Reboil's export map.

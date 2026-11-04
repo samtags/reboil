@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="./assets/boil.png" />
     <title>Reboil — Vanilla JavaScript</title>
   </head>
   <body>
@@ -21,7 +22,7 @@
             <div class="window-dots" aria-hidden="true">
               <i></i><i></i><i></i>
             </div>
-            <span>src/main.js</span>
+            <span id="code-filename">src/main.jsx</span>
           </div>
           <pre><code id="code-example"></code></pre>
           <template id="javascript-example"><span class="keyword">import</span> { <span class="imported">createStore</span> } <span class="keyword">from</span> <span class="string">'reboil'</span>
@@ -65,8 +66,8 @@
         <div class="code-controls">
           <label class="sr-only" for="language">Code language</label>
           <select id="language">
-            <option value="javascript">JavaScript</option>
             <option value="typescript">TypeScript</option>
+            <option value="javascript">JavaScript</option>
           </select>
           <button id="copy-code" class="copy-button" type="button" aria-label="Copy code" title="Copy code">
             <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">

@@ -13,12 +13,14 @@ const lastChangeElement = document.querySelector('#last-change')
 const incrementButton = document.querySelector('#increment')
 const resetButton = document.querySelector('#reset')
 const codeElement = document.querySelector('#code-example')
+const codeFilename = document.querySelector('#code-filename')
 const languageSelect = document.querySelector('#language')
 const copyButton = document.querySelector('#copy-code')
 
 function renderCode(language) {
   const template = document.querySelector(`#${language}-example`)
   codeElement.replaceChildren(template.content.cloneNode(true))
+  codeFilename.textContent = `src/main.${language === 'javascript' ? 'jsx' : 'tsx'}`
 }
 
 function activeCode() {

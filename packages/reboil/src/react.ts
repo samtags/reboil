@@ -1,1 +1,1 @@
-export { useStore } from './config'
+export { setStore, useStore } from './config'

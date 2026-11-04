@@ -33,3 +33,10 @@ export const store: Store<RegisteredState> = {
 export function useStore<PathName extends Path<RegisteredState>>(path: PathName): PathValue<RegisteredState, PathName> {
   return getRegisteredRuntime().use(path as never) as PathValue<RegisteredState, PathName>
 }
+
+export function setStore<PathName extends Path<RegisteredState>>(
+  path: PathName,
+  value: import('./types').PathUpdater<PathValue<RegisteredState, PathName>>,
+): PathValue<RegisteredState, PathName> {
+  return store.set(path, value)
+}

@@ -61,7 +61,7 @@ The documentation website will provide:
 - A concise landing page explaining Reboil's positioning and current release status.
 - A five-minute quick start for the default typed application-store workflow.
 - A separate guide for optional `reboil init` config registration.
-- API reference pages for `createStore`, `store.get`, `store.set`, `store.subscribe`, `store.reset`, and `useStore`.
+- API reference pages for `createStore`, `store.get`, `store.set`, `store.subscribe`, `store.reset`, `useStore`, and `setStore`.
 - Guides for typed paths, arrays, persistence, exclusions, migrations, logging, errors, and Fast Refresh.
 - Expo, React Native, Expo Web, and browser React compatibility notes.
 - Copyable TypeScript examples with clear expected types.
@@ -345,6 +345,19 @@ const version = useStore("settings.runTimeVersion");
 
 The hook will use `useSyncExternalStore`. A component rerenders only when its selected value changes according to `Object.is`. Updating one sibling path must not rerender subscribers of an unchanged sibling.
 
+### `setStore(path, valueOrUpdater)`
+
+Writes a value at a typed path from React components or other module code. The value may be passed directly or derived from the previous value with an updater function.
+
+```tsx
+import { setStore } from "reboil/react";
+
+setStore("count", 2);
+setStore("nested.key", (previous) => previous);
+```
+
+The direct `setStore` binding uses the same registered runtime as `useStore` and validates the path and value before committing the update.
+
 ## Typed String Paths
 
 V1 paths use dot notation and support nested plain objects and numeric array indices.
@@ -471,7 +484,7 @@ declare module "reboil" {
 }
 ```
 
-Reboil will expose an augmentable named `Register` interface. The direct `store` export and the `useStore` export from `reboil/react` derive their path and value types from `Register['state']`. The augmentation references the state value rather than copying its shape, so ordinary TypeScript analysis updates IntelliSense whenever the state changes.
+Reboil will expose an augmentable named `Register` interface. The direct `store` export and the `useStore` and `setStore` exports from `reboil/react` derive their path and value types from `Register['state']`. The augmentation references the state value rather than copying its shape, so ordinary TypeScript analysis updates IntelliSense whenever the state changes.
 
 The config uses `.ts` rather than `.js` because it contains TypeScript module augmentation. A JavaScript config would require a separate declaration file and provide no DX advantage.
 

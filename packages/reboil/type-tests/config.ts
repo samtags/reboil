@@ -1,5 +1,5 @@
 import { store } from '../src'
-import { useStore } from '../src/react'
+import { setStore, useStore } from '../src/react'
 import type { PathValue, Register } from '../src'
 
 declare module '../src' {
@@ -14,6 +14,8 @@ declare module '../src' {
 if (false) {
   const theme: 'light' | 'dark' = store.get('settings.theme')
   const count: number = useStore('count')
+  setStore('count', 2)
+  setStore('count', (previous) => previous + 1)
   const typed: PathValue<Register['state'], 'count'> = 1
   const unsubscribe = store.subscribe('count', (value, lastValue) => {
     const next: number = value
