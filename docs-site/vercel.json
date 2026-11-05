@@ -1,0 +1,5 @@
+{
+  "installCommand": "npm ci --include=dev && npm ci --include=dev --prefix ..",
+  "buildCommand": "npm run build --prefix ../packages/reboil && npm run build",
+  "outputDirectory": "build"
+}
