@@ -9,7 +9,9 @@ Invalid mutation attempts are logged in development and then throw without chang
 
 Development logging is enabled by default and production logging is disabled by default. Successful mutation logs include the operation, path, previous state, attempted value or updater result, next state, and whether the value changed.
 
-The runtime rejects missing intermediate properties, out-of-range array indices, unsupported persisted values, failed migrations, and persistence failures.
+The runtime rejects missing intermediate properties, out-of-range array indices, unsupported persisted values, failed migrations, persistence failures, multiple unparented roots, reparenting an active store, synchronous access to an unloaded lazy store, and lazy modules that do not default-export a `createStore()` result.
+
+Outside React, an unloaded lazy path throws `ReboilStoreNotLoadedError` with the `store.load(path)` call needed before retrying. Inside `useStore`, Reboil throws the cached loader promise so the nearest Suspense boundary handles the wait.
 
 ## Successful mutation logs
 

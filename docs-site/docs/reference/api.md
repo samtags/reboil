@@ -7,7 +7,7 @@ sidebar_position: 1
 
 ## `createStore(initialState, options?)`
 
-Creates the application store and returns typed `store` and `useStore` bindings. See [store creation](../concepts/store-creation) for options.
+Creates a composable store node and returns typed `store` and `useStore` bindings. See [store creation](../concepts/store-creation) for options.
 
 ```ts title="reboil.config.ts"
 import { createStore } from 'reboil'
@@ -63,7 +63,7 @@ unsubscribe()
 
 ## `store.reset(path?)`
 
-Restores a path or the complete store from the original defaults, persists the result, notifies affected subscribers, and returns the restored value.
+`store.reset(path)` restores and returns one value. No-argument `store.reset()` returns `void`, resets loaded partitions, and invalidates persisted unloaded partitions without importing them.
 
 ```ts
 import '../reboil.config'
@@ -72,6 +72,31 @@ import { store } from 'reboil'
 const initialCount = store.reset('count')
 store.reset() // restore the complete counter state
 ```
+
+## `lazy(loader)`
+
+Creates a typed lazy store handle from a dynamic import. The imported module must default-export a `createStore()` result. Reboil's helper is unrelated to React's component-only `lazy()`.
+
+```ts
+import { createStore, lazy } from 'reboil'
+
+export const reports = lazy(() => import('./reports/state'))
+export const { store, useStore } = createStore({ reports })
+```
+
+## `store.load(path)` and `lazyStore.load()`
+
+Loads a lazy store for synchronous vanilla access. Calls are idempotent and the loaded partition remains cached for the session.
+
+```ts
+await store.load('reports')
+store.get('reports.count')
+
+await reports.load()
+reports.store.get('count')
+```
+
+`useStore('reports.count')` starts the same loader automatically and suspends until it finishes.
 
 ## `useStore(path)`
 

@@ -6,6 +6,10 @@ export type JsonObject = { [key: string]: JsonValue }
 
 export type StateShape = JsonObject
 
+export declare const storeStateType: unique symbol
+export declare const storePathType: unique symbol
+export declare const lazyPathType: unique symbol
+
 type StringKey<T> = Extract<keyof T, string>
 type IsTuple<T extends readonly unknown[]> = number extends T['length'] ? false : true
 type TupleKey<T extends readonly unknown[]> = Exclude<keyof T, keyof unknown[]> & string
@@ -76,16 +80,104 @@ export interface StoreOptions<State extends StateShape> {
   logger?: boolean | MutationLogger<State>
 }
 
-export interface Store<State extends StateShape> {
-  get<PathName extends Path<State>>(path: PathName): PathValue<State, PathName>
-  set<PathName extends Path<State>>(
+export interface Store<
+  State extends StateShape,
+  ValidPath extends string = Path<State>,
+  LoadPath extends string = never,
+> {
+  get<PathName extends ValidPath>(path: PathName): PathValue<State, PathName>
+  set<PathName extends ValidPath>(
     path: PathName,
     value: PathUpdater<PathValue<State, PathName>>,
   ): PathValue<State, PathName>
-  subscribe<PathName extends Path<State>>(
+  subscribe<PathName extends ValidPath>(
     path: PathName,
     listener: StoreSubscriber<PathValue<State, PathName>>,
   ): () => void
-  reset<PathName extends Path<State>>(path: PathName): PathValue<State, PathName>
-  reset(): State
+  reset<PathName extends ValidPath>(path: PathName): PathValue<State, PathName>
+  reset(): void
+  load(path: LoadPath): Promise<void>
+}
+
+export interface StoreBindings<
+  State extends StateShape,
+  ValidPath extends string = Path<State>,
+  LoadPath extends string = never,
+> {
+  readonly [storeStateType]: State
+  readonly [storePathType]: ValidPath
+  readonly [lazyPathType]: LoadPath
+  store: Store<State, ValidPath, LoadPath>
+  useStore<PathName extends ValidPath>(path: PathName): PathValue<State, PathName>
+}
+
+export interface LazyStore<
+  State extends StateShape,
+  ValidPath extends string = Path<State>,
+  LoadPath extends string = never,
+> extends StoreBindings<State, ValidPath, LoadPath> {
+  load(): Promise<void>
+}
+
+export interface StoreTypeMarker {
+  readonly [storeStateType]: StateShape
+  readonly [storePathType]: string
+  readonly [lazyPathType]: string
+}
+
+export type StateOf<Value> = Value extends { readonly [storeStateType]: infer State extends StateShape } ? State : never
+export type StorePathsOf<Value> = Value extends { readonly [storePathType]: infer ValidPath extends string }
+  ? ValidPath
+  : never
+export type LazyPathsOf<Value> = Value extends { readonly [lazyPathType]: infer LoadPath extends string }
+  ? LoadPath
+  : never
+
+export type ResolveState<Value> = Value extends { readonly [storeStateType]: infer State extends StateShape }
+  ? State
+  : Value extends readonly unknown[]
+    ? Value
+    : Value extends object
+      ? { [Key in keyof Value]: ResolveState<Value[Key]> }
+      : Value
+
+export type ResolvedState<Definition extends Record<string, unknown>> = ResolveState<Definition> & StateShape
+
+type DefinitionValuePaths<Key extends string, Value> = Value extends {
+  readonly [storePathType]: infer ValidPath extends string
+}
+  ? `${Key}.${ValidPath}`
+  : Value extends object
+    ? Key | `${Key}.${Paths<Value>}`
+    : Key
+
+export type DefinitionPaths<Definition extends Record<string, unknown>> = {
+  [Key in StringKey<Definition>]: DefinitionValuePaths<Key, Definition[Key]>
+}[StringKey<Definition>]
+
+type ChildLazyPaths<Key extends string, Value> = Value extends {
+  readonly [lazyPathType]: infer NestedLoadPath extends string
+  load(): Promise<void>
+}
+  ? Key | (NestedLoadPath extends string ? `${Key}.${NestedLoadPath}` : never)
+  : Value extends { readonly [lazyPathType]: infer NestedLoadPath extends string }
+    ? NestedLoadPath extends string
+      ? `${Key}.${NestedLoadPath}`
+      : never
+    : never
+
+export type DefinitionLazyPaths<Definition extends Record<string, unknown>> = {
+  [Key in StringKey<Definition>]: ChildLazyPaths<Key, Definition[Key]>
+}[StringKey<Definition>]
+
+export type OwnState<Definition extends Record<string, unknown>> = {
+  [Key in keyof Definition as Definition[Key] extends StoreTypeMarker ? never : Key]: Definition[Key]
+} & StateShape
+
+export type ValidStoreDefinition<Definition extends Record<string, unknown>> = {
+  [Key in keyof Definition]: Definition[Key] extends StoreTypeMarker
+    ? Definition[Key]
+    : Definition[Key] extends JsonValue
+      ? Definition[Key]
+      : never
 }

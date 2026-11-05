@@ -15,6 +15,7 @@ const sidebars: SidebarsConfig = {
         'concepts/store-creation',
         'concepts/typed-paths',
         'concepts/react-subscriptions',
+        'concepts/lazy-stores',
         'concepts/persistence',
       ],
     },

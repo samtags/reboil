@@ -19,12 +19,12 @@
     {
       "id": "installation",
       "url": "/docs/getting-started/installation",
-      "summary": "Planned browser, Expo, and React Native installation requirements."
+      "summary": "Browser, Expo, and React Native installation plus required one-time config registration."
     },
     {
       "id": "quick-start",
       "url": "/docs/getting-started/quick-start",
-      "summary": "Default typed store module and its inferred bindings."
+      "summary": "Standard config registration and inferred direct package bindings."
     },
     {
       "id": "platform-support",
@@ -34,7 +34,7 @@
     {
       "id": "store-creation",
       "url": "/docs/concepts/store-creation",
-      "summary": "Store options, initialization, and Fast Refresh behavior."
+      "summary": "Store options, initialization, config binding registration, and Fast Refresh behavior."
     },
     {
       "id": "typed-paths",
@@ -47,14 +47,19 @@
       "summary": "Path-level React and vanilla subscriptions without Context."
     },
     {
+      "id": "lazy-stores",
+      "url": "/docs/concepts/lazy-stores",
+      "summary": "Composable eager stores, code-split lazy stores, Suspense, and explicit vanilla loading."
+    },
+    {
       "id": "persistence",
       "url": "/docs/concepts/persistence",
-      "summary": "Synchronous adapters, atomic mutations, exclusions, and JSON-safe values."
+      "summary": "Synchronous partitioned adapters, reset epochs, legacy conversion, exclusions, and JSON-safe values."
     },
     {
       "id": "api",
       "url": "/docs/reference/api",
-      "summary": "Public factory, store, hook, subscription, reset, and direct-binding API."
+      "summary": "Public factory, composition, lazy loading, store, hook, subscription, reset, and direct-binding API."
     },
     {
       "id": "runtime-errors",

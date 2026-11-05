@@ -22,11 +22,7 @@ const { store: homeStore, useStore: useHomeStore } = createStore<HomeState>(
 
 const codeExamples: Record<Language, { source: string; markup: string }> = {
   javascript: {
-    source: `import { createStore } from 'reboil'
-
-const { store } = createStore({
-  count: 1,
-})
+    source: `import { store } from 'reboil'
 
 const count = document.querySelector('#count')
 const increment = document.querySelector('#increment')
@@ -38,11 +34,7 @@ store.subscribe('count', (value, lastValue) => {
 increment.onclick = () => {
   store.set('count', value => value + 1)
 }`,
-    markup: `<span class="keyword">import</span> { <span class="imported">createStore</span> } <span class="keyword">from</span> <span class="string">'reboil'</span>
-
-<span class="keyword">const</span> { <span class="variable">store</span> } = <span class="function">createStore</span>({
-  <span class="property">count</span>: <span class="number">1</span>,
-})
+    markup: `<span class="keyword">import</span> { <span class="imported">store</span> } <span class="keyword">from</span> <span class="string">'reboil'</span>
 
 <span class="keyword">const</span> <span class="variable">count</span> = document.<span class="function">querySelector</span>(<span class="string">'#count'</span>)
 <span class="keyword">const</span> <span class="variable">increment</span> = document.<span class="function">querySelector</span>(<span class="string">'#increment'</span>)
@@ -56,12 +48,7 @@ increment.onclick = () => {
 }`,
   },
   jsx: {
-    source: `import {createStore} from 'reboil'
-import {setStore, useStore} from 'reboil/react'
-
-createStore({
-  count: 1,
-})
+    source: `import {setStore, useStore} from 'reboil/react'
 
 function Counter() {
   const count = useStore('count')
@@ -72,12 +59,7 @@ function Counter() {
     </button>
   )
 }`,
-    markup: `<span class="keyword">import</span> { <span class="imported">createStore</span> } <span class="keyword">from</span> <span class="string">'reboil'</span>
-<span class="keyword">import</span> { <span class="imported">setStore</span>, <span class="imported">useStore</span> } <span class="keyword">from</span> <span class="string">'reboil/react'</span>
-
-<span class="function">createStore</span>({
-  <span class="property">count</span>: <span class="number">1</span>,
-})
+    markup: `<span class="keyword">import</span> { <span class="imported">setStore</span>, <span class="imported">useStore</span> } <span class="keyword">from</span> <span class="string">'reboil/react'</span>
 
 <span class="keyword">function</span> <span class="function">Counter</span>() {
   <span class="keyword">const</span> <span class="variable">count</span> = <span class="function">useStore</span>(<span class="string">'count'</span>)
@@ -90,16 +72,7 @@ function Counter() {
 }`,
   },
   tsx: {
-    source: `import {createStore} from 'reboil'
-import {setStore, useStore} from 'reboil/react'
-
-type Store = {
-  count: number
-}
-
-createStore<Store>({
-  count: 1,
-})
+    source: `import {setStore, useStore} from 'reboil/react'
 
 function Counter() {
   const count = useStore('count')
@@ -110,16 +83,7 @@ function Counter() {
     </button>
   )
 }`,
-    markup: `<span class="keyword">import</span> { <span class="imported">createStore</span> } <span class="keyword">from</span> <span class="string">'reboil'</span>
-<span class="keyword">import</span> { <span class="imported">setStore</span>, <span class="imported">useStore</span> } <span class="keyword">from</span> <span class="string">'reboil/react'</span>
-
-<span class="keyword">type</span> <span class="type">Store</span> = {
-  <span class="property">count</span>: <span class="type">number</span>
-}
-
-<span class="function">createStore</span>&lt;<span class="type">Store</span>&gt;({
-  <span class="property">count</span>: <span class="number">1</span>,
-})
+    markup: `<span class="keyword">import</span> { <span class="imported">setStore</span>, <span class="imported">useStore</span> } <span class="keyword">from</span> <span class="string">'reboil/react'</span>
 
 <span class="keyword">function</span> <span class="function">Counter</span>() {
   <span class="keyword">const</span> <span class="variable">count</span> = <span class="function">useStore</span>(<span class="string">'count'</span>)

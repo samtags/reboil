@@ -2,32 +2,43 @@
 
 ## Scope
 
-Reboil is one client-side application store for Expo, React Native, Expo Web, and browser React. It uses typed dot-separated paths, synchronous persistence, path-level subscriptions, and development logging. It never uses React Context or a Provider. V1 excludes multiple stores, async persistence, server mutations, dynamic record-key autocomplete, non-JSON state, and native Expo Go support.
+Reboil is one composable client-side application-store tree for Expo, React Native, Expo Web, and browser React. It uses typed dot-separated paths, synchronous partitioned persistence, lazy feature-state loading, path-level subscriptions, and development logging. It never uses React Context or a Provider. Independent roots, async persistence, server mutations, dynamic record-key autocomplete, non-JSON state, and native Expo Go support are excluded.
 
 ## Recommended workflow
 
-Create a typed store in the application and export its inferred bindings:
+After installing Reboil, run the standard one-time initializer:
 
-```ts
-import { createStore } from "reboil";
-
-const initialState = { user: { name: "Ada" } };
-export const { store, useStore } = createStore(initialState);
+```sh
+npx reboil init
 ```
 
-Import `store` and `useStore` from that module. This needs no Provider, registration import, code generator, or watcher. The optional `npx reboil init` workflow exists only for direct package imports. It creates a TypeScript config that augments `Register` with `typeof initialState` and must load before application modules.
+The initializer creates or links the state file, generates `reboil.config.ts`, augments `Register` with `typeof initialState`, and imports the config before application modules. Consumers then use the registered direct package bindings:
+
+```ts
+import { store } from "reboil";
+import { useStore } from "reboil/react";
+
+const name = store.get("user.name");
+const selectedName = useStore("user.name");
+```
+
+Config registration is part of installation and is the standard integration path. It needs no Provider, recurring code generator, or watcher. A customized config that composes feature stores registers `bindings: typeof app` so direct imports retain resolved root paths and typed lazy load paths. `createStore()` still returns local typed bindings for composition, scoped access, and explicit low-level integrations.
+
+`createStore()` results may be fields in another store. Exactly one node must remain unparented as the application root. Parent paths and scoped child bindings address the same partition.
+
+Use Reboil's `lazy()` with a dynamic import whose module default-exports a `createStore()` result. React hook access automatically loads and suspends. Vanilla code first awaits `store.load(featurePath)` or the lazy handle's `load()`. `React.lazy()` is for components and is not a valid store field.
 
 ## API and paths
 
-`createStore(initialState, options?)` returns `store` and `useStore`. Options are `id`, `version`, `persist.exclude`, `migrate`, and `logger`. `store.get(path)` reads; `store.set(path, valueOrUpdater)` writes; `store.subscribe(path, listener)` listens outside React; `store.reset(path?)` restores defaults; `useStore(path)` subscribes a component with `useSyncExternalStore`; and `setStore` from `reboil/react` writes through optional direct registration.
+`createStore(initialState, options?)` returns `store` and `useStore`. Options are `id`, `version`, `persist.exclude`, `migrate`, and `logger`. `store.get(path)` reads; `store.set(path, valueOrUpdater)` writes; `store.subscribe(path, listener)` listens outside React; `store.reset(path)` restores one value; no-argument `store.reset()` returns `void` and invalidates all partitions; `store.load(path)` loads lazy state; `useStore(path)` subscribes a component with `useSyncExternalStore`; and `setStore` from `reboil/react` writes through the config-registered runtime.
 
 Paths use dots. Object keys are segments and arrays use numeric segments such as `todos.0.title`; tuple indices can be precise. Dots in object keys are unsupported. Missing path segments and out-of-range indices throw. Literal invalid paths and values must fail TypeScript checking.
 
 ## Persistence and failure guarantees
 
-Native iOS and Android use synchronous MMKV with Nitro Modules and require an Expo development or production build. Browser React and Expo Web use synchronous `localStorage`; unavailable browser storage falls back to memory with a development warning. Persisted state is a versioned envelope. Objects deep-merge over new defaults; arrays replace defaults; excluded paths persist as defaults.
+Native iOS and Android use synchronous MMKV with Nitro Modules and require an Expo development or production build. Browser React and Expo Web use synchronous `localStorage`; unavailable browser storage falls back to memory with a development warning. Persistence uses a reset-epoch manifest and one versioned envelope per store node. Objects deep-merge over new defaults; arrays replace defaults; excluded paths persist as defaults. Legacy monolithic envelopes convert once without discarding child values.
 
-Each mutation validates its path and JSON-safe next state, serializes and persists it synchronously, commits memory, notifies changed selections, logs, then returns. Any validation, serialization, migration, or persistence failure preserves the previous memory and stored data, logs the rejection in development, and throws. No-op sets log but do not persist or notify.
+Each mutation validates its path and JSON-safe next partition, serializes and persists that partition synchronously, commits memory, notifies changed selections, logs, then returns. Any validation, serialization, migration, or persistence failure preserves the previous memory and stored data, logs the rejection in development, and throws. No-op sets log but do not persist or notify.
 
 Allowed persisted values are strings, finite numbers, booleans, `null`, plain objects, and arrays. Reject `undefined`, non-finite numbers, `BigInt`, symbols, functions, cycles, dates, maps, sets, and class instances.
 

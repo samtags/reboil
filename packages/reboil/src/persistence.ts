@@ -4,6 +4,7 @@ import type { JsonValue, StateShape } from './types'
 export interface PersistenceAdapter {
   read(key: string): string | null
   write(key: string, value: string): void
+  remove(key: string): void
 }
 
 class MemoryAdapter implements PersistenceAdapter {
@@ -12,6 +13,10 @@ class MemoryAdapter implements PersistenceAdapter {
   }
 
   write(): void {
+    // Server state is intentionally not persisted.
+  }
+
+  remove(): void {
     // Server state is intentionally not persisted.
   }
 }
@@ -26,11 +31,19 @@ class BrowserAdapter implements PersistenceAdapter {
   write(key: string, value: string): void {
     this.storage.setItem(key, value)
   }
+
+  remove(key: string): void {
+    this.storage.removeItem(key)
+  }
 }
 
 class MMKVAdapter implements PersistenceAdapter {
   constructor(
-    private readonly storage: { getString(key: string): string | undefined; set(key: string, value: string): unknown },
+    private readonly storage: {
+      getString(key: string): string | undefined
+      set(key: string, value: string): unknown
+      remove(key: string): unknown
+    },
   ) {}
 
   read(key: string): string | null {
@@ -39,6 +52,10 @@ class MMKVAdapter implements PersistenceAdapter {
 
   write(key: string, value: string): void {
     this.storage.set(key, value)
+  }
+
+  remove(key: string): void {
+    this.storage.remove(key)
   }
 }
 
@@ -75,6 +92,7 @@ function hasCreateMMKV(value: unknown): value is {
   createMMKV(options: { id: string }): {
     getString(key: string): string | undefined
     set(key: string, value: string): unknown
+    remove(key: string): unknown
   }
 } {
   return typeof value === 'object' && value !== null && 'createMMKV' in value && typeof value.createMMKV === 'function'
@@ -108,6 +126,7 @@ export function createPersistenceAdapter(onWarning: (message: string) => void, i
 export interface PersistedEnvelope {
   version: number
   state: StateShape
+  epoch?: number
 }
 
 export function parseEnvelope(raw: string): PersistedEnvelope {
@@ -127,7 +146,11 @@ export function parseEnvelope(raw: string): PersistedEnvelope {
     throw new ReboilError('Persisted Reboil data has an invalid versioned envelope.')
   }
 
-  return { version: parsed.version, state: parsed.state as StateShape }
+  if (parsed.epoch !== undefined && (typeof parsed.epoch !== 'number' || !Number.isInteger(parsed.epoch))) {
+    throw new ReboilError('Persisted Reboil data has an invalid reset epoch.')
+  }
+
+  return { version: parsed.version, state: parsed.state as StateShape, epoch: parsed.epoch as number | undefined }
 }
 
 export function serializeEnvelope(envelope: PersistedEnvelope): string {

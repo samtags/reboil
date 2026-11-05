@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { createRegisteredStore, resetRegistryForTests } from '../src/registry'
+import { createLazyStore, createRegisteredStore, resetRegistryForTests } from '../src/registry'
 import { StoreRuntime } from '../src/runtime'
+import type { StoreBindings } from '../src/types'
 
 function installStorage() {
   const values = new Map<string, string>()
@@ -42,7 +43,8 @@ describe('Reboil runtime', () => {
     const { store } = createRegisteredStore(state(), { id: `reset-${Math.random()}` })
     expect(store.set('session.transient', (value) => value + 1)).toBe(1)
     expect(store.reset('session.transient')).toBe(0)
-    expect(store.reset()).toEqual(state())
+    expect(store.reset()).toBeUndefined()
+    expect(store.get('session.transient')).toBe(0)
   })
 
   it('rejects invalid paths without changing state', () => {
@@ -71,7 +73,7 @@ describe('Reboil runtime', () => {
     const values = installStorage()
     const first = createRegisteredStore(state(), { id: 'exclude', persist: { exclude: ['session.transient'] } })
     first.store.set('session.transient', 42)
-    const raw = JSON.parse(values.get('exclude')!)
+    const raw = JSON.parse(values.get('exclude:$root')!)
     expect(raw.state.session.transient).toBe(0)
   })
 
@@ -132,20 +134,134 @@ describe('Reboil runtime', () => {
     expect(store.get('user.name')).toBe('Grace')
     expect(store.get('user.active')).toBe(true)
     expect(store.get('session.transient')).toBe(7)
-    expect(JSON.parse(values.get('migration')!).version).toBe(2)
+    expect(JSON.parse(values.get('migration:$root')!).version).toBe(2)
   })
 
   it('keeps memory and persisted data unchanged when a write fails', () => {
     const values = installStorage()
     values.set('atomic', JSON.stringify({ version: 1, state: state() }))
     const { store } = createRegisteredStore(state(), { id: 'atomic' })
+    expect(store.get('user.name')).toBe('Ada')
     const originalSet = window.localStorage.setItem.bind(window.localStorage)
     window.localStorage.setItem = () => {
       throw new Error('disk full')
     }
     expect(() => store.set('user.name', 'Grace')).toThrow('disk full')
     expect(store.get('user.name')).toBe('Ada')
-    expect(JSON.parse(values.get('atomic')!).state.user.name).toBe('Ada')
+    expect(JSON.parse(values.get('atomic:$root')!).state.user.name).toBe('Ada')
     window.localStorage.setItem = originalSet
+  })
+
+  it('composes eager stores into one typed runtime with separate persistence partitions', () => {
+    const values = installStorage()
+    const reports = createRegisteredStore({ count: 1 })
+    const app = createRegisteredStore({ session: { ready: true }, reports }, { id: 'composed' })
+
+    expect(app.store.get('reports.count')).toBe(1)
+    expect(reports.store.set('count', 2)).toBe(2)
+    app.store.set('session.ready', false)
+    expect(app.store.get('reports.count')).toBe(2)
+    expect(JSON.parse(values.get('composed:$part:reports')!).state.count).toBe(2)
+    expect(JSON.parse(values.get('composed:$root')!).state).toEqual({ session: { ready: false } })
+  })
+
+  it('requires one unparented application root', () => {
+    const first = createRegisteredStore({ count: 1 })
+    createRegisteredStore({ other: true })
+    expect(() => first.store.get('count')).toThrow(/multiple unparented stores/i)
+  })
+
+  it('preserves state and refreshes eager defaults across development re-registration', () => {
+    const reports = createRegisteredStore({ count: 1 })
+    const app = createRegisteredStore({ version: 1, reports }, { id: 'fast-refresh' })
+    app.store.set('version', 2)
+    reports.store.set('count', 5)
+
+    const refreshedReports = createRegisteredStore({ count: 7 })
+    const refreshedApp = createRegisteredStore({ version: 9, reports: refreshedReports }, { id: 'fast-refresh' })
+
+    expect(refreshedApp.store.get('version')).toBe(2)
+    expect(refreshedReports.store.get('count')).toBe(5)
+    expect(refreshedApp.store.reset('version')).toBe(9)
+    expect(refreshedReports.store.reset('count')).toBe(7)
+  })
+
+  it('loads a lazy store once and shares it between root and scoped bindings', async () => {
+    const loader = vi.fn(async () => ({ default: createRegisteredStore({ count: 1 }) }))
+    const reports = createLazyStore(loader)
+    const app = createRegisteredStore({ ready: true, reports }, { id: 'lazy' })
+
+    expect(app.store.get('ready')).toBe(true)
+    expect(() => app.store.get('reports.count')).toThrow(/not loaded/i)
+    await Promise.all([reports.load(), app.store.load('reports')])
+    expect(loader).toHaveBeenCalledTimes(1)
+    expect(app.store.get('reports.count')).toBe(1)
+    reports.store.set('count', 3)
+    expect(app.store.get('reports.count')).toBe(3)
+  })
+
+  it('caches a rejected lazy loader', async () => {
+    const failure = new Error('feature unavailable')
+    const loader = vi.fn(async () => {
+      throw failure
+    })
+    const reports = createLazyStore(loader)
+    const app = createRegisteredStore({ reports }, { id: 'lazy-error' })
+
+    await expect(app.store.load('reports')).rejects.toBe(failure)
+    await expect(reports.load()).rejects.toBe(failure)
+    expect(loader).toHaveBeenCalledTimes(1)
+  })
+
+  it('throws the lazy loading promise from useStore for React Suspense', async () => {
+    type ReportStore = StoreBindings<{ count: number }>
+    let resolveModule!: (value: { default: ReportStore }) => void
+    const reports = createLazyStore(
+      () =>
+        new Promise<{ default: ReportStore }>((resolve) => {
+          resolveModule = resolve
+        }),
+    )
+    const app = createRegisteredStore({ reports }, { id: 'suspense' })
+
+    let suspended: unknown
+    try {
+      app.useStore('reports.count')
+    } catch (error) {
+      suspended = error
+    }
+    expect(suspended).toBeInstanceOf(Promise)
+    resolveModule({ default: createRegisteredStore({ count: 1 }) })
+    await suspended
+    expect(app.store.get('reports.count')).toBe(1)
+  })
+
+  it('preserves legacy nested state when the lazy partition loads', async () => {
+    const values = installStorage()
+    values.set('legacy-composed', JSON.stringify({ version: 1, state: { ready: true, reports: { count: 42 } } }))
+    const reports = createLazyStore(async () => ({ default: createRegisteredStore({ count: 1 }) }))
+    const app = createRegisteredStore({ ready: false, reports }, { id: 'legacy-composed' })
+
+    expect(app.store.get('ready')).toBe(true)
+    expect(values.has('legacy-composed')).toBe(false)
+    await reports.load()
+    expect(reports.store.get('count')).toBe(42)
+  })
+
+  it('invalidates loaded and unloaded partitions through a reset epoch', async () => {
+    installStorage()
+    const reports = createLazyStore(async () => ({ default: createRegisteredStore({ count: 1 }) }))
+    const app = createRegisteredStore({ ready: true, reports }, { id: 'epoch-reset' })
+    await reports.load()
+    app.store.set('reports.count', 9)
+    app.store.reset()
+    expect(app.store.get('reports.count')).toBe(1)
+
+    resetRegistryForTests()
+    const nextReports = createLazyStore(async () => ({ default: createRegisteredStore({ count: 1 }) }))
+    const nextApp = createRegisteredStore({ ready: true, reports: nextReports }, { id: 'epoch-reset' })
+    expect(nextApp.store.get('ready')).toBe(true)
+    await nextReports.load()
+    expect(nextReports.store.get('count')).toBe(1)
   })
 })

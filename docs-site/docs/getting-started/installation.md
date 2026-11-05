@@ -26,12 +26,14 @@ MMKV contains native code, so Reboil requires an Expo development or production 
 
 See the [platform support guide](./platform-support) for adapter and hydration behavior.
 
-Browser consumers use `localStorage`
+Browser consumers use `localStorage`.
 
-## Initialize state
+## Register the application state
 
-Initialize your global store by running this command:
+Config registration is part of the standard installation. From the application package, run:
 
 ```sh
 npx reboil init
 ```
+
+The initializer creates or links `src/state.ts`, generates `reboil.config.ts`, registers the state type, and wires the config into the application entry point. Run it once during setup; state edits do not require regeneration or a watcher.

@@ -6,6 +6,5 @@ const initialState = {
 }
 
 export const { store, useStore } = createStore(initialState, {
-  id: 'reboil-parcel-app',
   logger: true,
 })

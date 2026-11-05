@@ -5,27 +5,29 @@ description: Implement, integrate, review, or document Reboil typed synchronous 
 
 # Reboil for Claude Code
 
-This project skill is automatically discoverable by Claude Code and can also be invoked as `/reboil`. Use Reboil’s default typed application-store module unless the request explicitly requires direct package imports. Treat the public contract as a specification until the requested package version is verified; do not represent planned behavior as released functionality.
+This project skill is automatically discoverable by Claude Code and can also be invoked as `/reboil`. Use Reboil’s standard config-registration workflow for application integrations. Treat the public contract as a specification until the requested package version is verified; do not represent planned behavior as released functionality.
 
-## Choose the integration workflow
+## Apply the integration standard
 
-- **Default:** create the store in the application’s own typed module and export its `store` and `useStore` bindings. Consumers import those bindings from that module. This needs no provider, registration import, generator, or watcher.
-- **Optional config registration:** use only when direct imports such as `useStore` from `reboil/react` are requested. It requires one-time `reboil init` setup, `reboil.config.ts`, module augmentation, and an entry import that runs before application modules.
+- **Standard config registration:** run `reboil init`, keep the generated `reboil.config.ts` and module augmentation, and ensure its entry import runs before application modules. Consumers use direct bindings from `reboil` and `reboil/react`.
+- **Local factory bindings:** `createStore()` returns scoped `store` and `useStore` bindings for composition and explicit low-level use cases. Do not present them as a replacement for standard installation and config registration.
 
 Read [the contract](references/contract.md) before implementing or reviewing runtime behavior, types, persistence, migrations, logging, initialization, or public documentation. For a narrow application integration, read the workflow and platform sections first.
 
 ## Non-negotiable invariants
 
 - Do not introduce React Context, a Provider, a store prop, asynchronous hydration, or recurring code generation.
+- `createStore()` results may compose into one application-store tree. Require one unparented root; do not model composed nodes as independent application roots.
+- Use Reboil's `lazy()` for feature stores. Do not substitute React's component-only `lazy()` or synchronously access a lazy partition before `load()` outside React.
 - Native persistence uses synchronous MMKV and requires an Expo development or production build; it does not work in Expo Go. Browser persistence uses synchronous `localStorage`.
-- Validate a mutation, persist its complete next state, then commit in-memory state and notify only affected subscribers. Rejected writes must not persist, mutate memory, or notify subscribers.
+- Validate a mutation, persist its complete next partition, then commit in-memory state and notify only affected subscribers. Rejected writes must not persist, mutate memory, or notify subscribers.
 - Persisted state is limited to the documented JSON-safe values. Invalid paths and invalid values are logged in development and then throw.
 - Default logging is on in development and off in production. No-op writes are logged but do not persist or notify.
 - Keep `docs/roadmap.md`, human documentation, `/llms*.txt`, `/docs.json`, and both agent-skill release copies aligned when public behavior changes.
 
 ## Task workflow
 
-1. Establish whether the task affects the default workflow, optional registration, runtime behavior, or documentation.
+1. Establish whether the task affects standard config registration, local factory bindings, runtime behavior, or documentation.
 2. Check the contract and the closest tests or examples before changing public behavior.
 3. Preserve the failure and ordering guarantees; add or update tests when behavior changes.
 4. For documentation changes, update the canonical skill sources, regenerate the website release copies with `node scripts/release-reboil-skill.mjs`, then run its `--check` mode.

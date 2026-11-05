@@ -14,6 +14,7 @@ Tiny, fast and scalable String-path state access with zero boilerplate and synch
 - String-path access for reads and writes.
 - Full TypeScript autocomplete for the state paths.
 - Synchronous hydration and persistence.
+- Composable eager stores and code-split lazy feature stores.
 - Expo native and React web compatibility.
 - State observability out of the box.
 
@@ -22,4 +23,5 @@ Tiny, fast and scalable String-path state access with zero boilerplate and synch
 - [Install Reboil](./getting-started/installation)
 - [Build your first store](./getting-started/quick-start)
 - [Understand typed paths](./concepts/typed-paths)
+- [Load feature state lazily](./concepts/lazy-stores)
 - [Browse the public API](./reference/api)

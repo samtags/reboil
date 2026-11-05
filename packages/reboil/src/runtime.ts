@@ -18,19 +18,26 @@ import type {
   PathUpdater,
   StateShape,
   Store,
+  StoreBindings,
   StoreOptions,
   StoreSubscriber,
 } from './types'
 
 type Listener = () => void
 type ChangeListener = StoreSubscriber<JsonValue>
+type RootChangeListener<State extends StateShape> = (value: State, lastValue: State) => void
 
-export interface RuntimeBindings<State extends StateShape> {
-  store: Store<State>
-  useStore: <PathName extends Path<State>>(path: PathName) => import('./types').PathValue<State, PathName>
+export type RuntimeBindings<State extends StateShape> = StoreBindings<State>
+
+export interface RuntimePersistence {
+  adapter: PersistenceAdapter
+  key: string
+  epoch: number
+  pathPrefix?: string
+  inheritedLogger?: StoreOptions<StateShape>['logger']
 }
 
-function pathSegments(path: string): string[] {
+export function pathSegments(path: string): string[] {
   if (!path || path.startsWith('.') || path.endsWith('.') || path.includes('..')) {
     throw new ReboilPathError(path, path || '<empty>')
   }
@@ -42,7 +49,7 @@ function arrayIndex(segment: string): number | null {
   return Number(segment)
 }
 
-function readAt(root: JsonValue, path: string): JsonValue {
+export function readAt(root: JsonValue, path: string): JsonValue {
   const segments = pathSegments(path)
   let current: JsonValue = root
   for (const segment of segments) {
@@ -59,7 +66,7 @@ function readAt(root: JsonValue, path: string): JsonValue {
   return current
 }
 
-function writeAt(root: JsonValue, path: string, value: JsonValue): JsonValue {
+export function writeAt(root: JsonValue, path: string, value: JsonValue): JsonValue {
   const segments = pathSegments(path)
   const containers: JsonValue[] = [root]
   let current: JsonValue = root
@@ -94,34 +101,40 @@ function safeActionValue(value: unknown): unknown {
   return '[unprintable value]'
 }
 
-function isSameValue(a: unknown, b: unknown): boolean {
-  return Object.is(a, b)
-}
-
 export class StoreRuntime<State extends StateShape> {
   readonly id: string
   private state: State
   private defaults: State
-  private version: number
-  private exclude: string[]
-  private migrate: StoreOptions<State>['migrate']
-  private logger
-  private adapter: PersistenceAdapter
-  private listeners = new Map<string, Set<ChangeListener>>()
+  private readonly version: number
+  private readonly exclude: string[]
+  private readonly migrate: StoreOptions<State>['migrate']
+  private readonly logger
+  private readonly adapter: PersistenceAdapter
+  private readonly persistenceKey: string
+  private epoch?: number
+  private readonly pathPrefix?: string
+  private readonly listeners = new Map<string, Set<ChangeListener>>()
+  private readonly rootListeners = new Set<RootChangeListener<State>>()
 
   constructor(
     initialState: State,
     private readonly options: StoreOptions<State>,
+    persistence?: RuntimePersistence,
   ) {
     this.id = options.id ?? 'reboil'
     this.version = options.version ?? 1
     this.exclude = options.persist?.exclude?.map(String) ?? []
     this.migrate = options.migrate
-    this.logger = resolveLogger(options.logger)
+    this.logger = resolveLogger(options.logger ?? (persistence?.inheritedLogger as StoreOptions<State>['logger']))
     this.defaults = this.validateState(initialState, 'initial state')
-    this.adapter = createPersistenceAdapter((message) => {
-      if (typeof console !== 'undefined' && !this.isProduction()) console.warn(`[reboil] ${message}`)
-    }, this.id)
+    this.adapter =
+      persistence?.adapter ??
+      createPersistenceAdapter((message) => {
+        if (typeof console !== 'undefined' && !this.isProduction()) console.warn(`[reboil] ${message}`)
+      }, this.id)
+    this.persistenceKey = persistence?.key ?? this.id
+    this.epoch = persistence?.epoch
+    this.pathPrefix = persistence?.pathPrefix
     this.state = this.hydrate()
   }
 
@@ -130,12 +143,21 @@ export class StoreRuntime<State extends StateShape> {
       get: (path) => this.get(path),
       set: (path, value) => this.set(path, value),
       subscribe: (path, listener) => this.subscribe(path, listener),
-      reset: (path?: never) => (path === undefined ? this.reset() : this.reset(path)),
+      reset: (path?: never) => (path === undefined ? this.reset() : this.reset(path)) as never,
+      load: async () => undefined,
     } as Store<State>
     return {
       store,
       useStore: (path) => this.use(path),
-    }
+    } as RuntimeBindings<State>
+  }
+
+  get snapshot(): State {
+    return this.state
+  }
+
+  get defaultSnapshot(): State {
+    return this.defaults
   }
 
   refreshDefaults(initialState: State): void {
@@ -155,20 +177,23 @@ export class StoreRuntime<State extends StateShape> {
     try {
       const previousValue = readAt(previous, pathName)
       const attempted = typeof value === 'function' ? (value as (previous: unknown) => unknown)(previousValue) : value
-      if (!isJsonSafe(attempted)) throw new ReboilError(`Value at "${pathName}" is not JSON-safe.`)
-      const next = this.validateState(writeAt(previous, pathName, attempted as JsonValue) as State, 'next state')
-      const changed = !isSameValue(previousValue, attempted)
-      if (changed) {
-        this.persist(next)
-        this.state = next
-        this.notify(previous, next)
-      }
+      if (!isJsonSafe(attempted)) throw new ReboilError(`Value at "${this.fullPath(pathName)}" is not JSON-safe.`)
+      const storedValue = cloneJson(attempted)
+      const next = writeAt(previous, pathName, storedValue) as State
+      if (!isJsonSafe(next) || !isPlainObject(next))
+        throw new ReboilError('Reboil next state must be a JSON-safe plain object.')
+      const changed = !Object.is(previousValue, attempted)
+      if (changed) this.commit(previous, next)
       this.emit({
         kind: 'mutation',
         operation: 'set',
-        path: pathName,
+        path: this.fullPath(pathName),
         previousState: previous,
-        action: { path: pathName, value: safeActionValue(attempted), updater: typeof value === 'function' },
+        action: {
+          path: this.fullPath(pathName),
+          value: safeActionValue(attempted),
+          updater: typeof value === 'function',
+        },
         nextState: changed ? next : previous,
         changed,
       })
@@ -179,44 +204,72 @@ export class StoreRuntime<State extends StateShape> {
     }
   }
 
-  reset<PathName extends Path<State>>(path?: PathName): State | import('./types').PathValue<State, PathName> {
+  replace(nextValue: State): void {
+    const previous = this.state
+    const next = this.validateState(nextValue, 'replacement state')
+    if (Object.is(previous, nextValue)) return
+    this.commit(previous, next)
+  }
+
+  reset<PathName extends Path<State>>(path?: PathName): void | import('./types').PathValue<State, PathName> {
     const previous = this.state
     try {
       if (path === undefined) {
         const next = cloneJson(this.defaults)
-        if (!isSameValue(previous, next)) this.persist(next)
-        this.state = next
-        this.notify(previous, next)
+        const changed = JSON.stringify(previous) !== JSON.stringify(next)
+        if (changed) this.commit(previous, next)
         this.emit({
           kind: 'mutation',
           operation: 'reset',
           previousState: previous,
-          nextState: next,
-          changed: !isSameValue(previous, next),
+          nextState: changed ? next : previous,
+          changed,
         })
-        return next
+        return
       }
 
       const pathName = String(path)
       const restored = readAt(this.defaults, pathName)
-      const next = this.validateState(writeAt(previous, pathName, cloneJson(restored)) as State, 'reset state')
-      const changed = !isSameValue(readAt(previous, pathName), restored)
-      if (changed) this.persist(next)
-      this.state = next
-      this.notify(previous, next)
-      this.emit({
-        kind: 'mutation',
-        operation: 'reset',
-        path: pathName,
-        previousState: previous,
-        nextState: next,
-        changed,
-      })
-      return restored as import('./types').PathValue<State, PathName>
+      const previousValue = readAt(previous, pathName)
+      const changed = !Object.is(previousValue, restored)
+      if (changed) {
+        const next = writeAt(previous, pathName, cloneJson(restored)) as State
+        this.commit(previous, next)
+        this.emit({
+          kind: 'mutation',
+          operation: 'reset',
+          path: this.fullPath(pathName),
+          previousState: previous,
+          nextState: next,
+          changed: true,
+        })
+      } else {
+        this.emit({
+          kind: 'mutation',
+          operation: 'reset',
+          path: this.fullPath(pathName),
+          previousState: previous,
+          nextState: previous,
+          changed: false,
+        })
+      }
+      return cloneJson(restored) as import('./types').PathValue<State, PathName>
     } catch (error) {
       this.reject('reset', path === undefined ? undefined : String(path), undefined, previous, error)
       throw error
     }
+  }
+
+  resetInMemory(): void {
+    const previous = this.state
+    const next = cloneJson(this.defaults)
+    this.state = next
+    this.notify(previous, next)
+  }
+
+  resetForEpoch(epoch: number): void {
+    this.epoch = epoch
+    this.resetInMemory()
   }
 
   subscribe<PathName extends Path<State>>(
@@ -224,6 +277,7 @@ export class StoreRuntime<State extends StateShape> {
     listener: StoreSubscriber<import('./types').PathValue<State, PathName>>,
   ): () => void {
     const pathName = String(path)
+    readAt(this.state, pathName)
     const changeListener = listener as ChangeListener
     const listeners = this.listeners.get(pathName) ?? new Set<ChangeListener>()
     listeners.add(changeListener)
@@ -234,19 +288,24 @@ export class StoreRuntime<State extends StateShape> {
     }
   }
 
+  subscribeRoot(listener: RootChangeListener<State>): () => void {
+    this.rootListeners.add(listener)
+    return () => this.rootListeners.delete(listener)
+  }
+
   use<PathName extends Path<State>>(path: PathName): import('./types').PathValue<State, PathName> {
-    const pathName = String(path)
-    const subscribe = (listener: Listener) => this.subscribe(pathName as PathName, () => listener())
+    const subscribe = (listener: Listener) => this.subscribe(path, () => listener())
     const getSnapshot = () => this.get(path)
     return useSyncExternalStore(subscribe, getSnapshot, getSnapshot) as import('./types').PathValue<State, PathName>
   }
 
   private hydrate(): State {
-    const raw = this.adapter.read(this.id)
+    const raw = this.adapter.read(this.persistenceKey)
     if (raw === null) return cloneJson(this.defaults)
 
     try {
       const envelope = parseEnvelope(raw)
+      if (this.epoch !== undefined && envelope.epoch !== this.epoch) return cloneJson(this.defaults)
       let persisted: StateShape = envelope.state
       let migrated = false
       if (envelope.version !== this.version) {
@@ -255,15 +314,17 @@ export class StoreRuntime<State extends StateShape> {
             `Persisted Reboil schema version ${envelope.version} is newer than application version ${this.version}.`,
           )
         }
-        if (!this.migrate)
+        if (!this.migrate) {
           throw new ReboilError(
             `Persisted Reboil schema version ${envelope.version} requires a migration to version ${this.version}.`,
           )
+        }
         persisted = this.migrate(cloneJson(persisted), envelope.version)
         migrated = true
       }
-      if (!isJsonSafe(persisted) || !isPlainObject(persisted))
+      if (!isJsonSafe(persisted) || !isPlainObject(persisted)) {
         throw new ReboilError('Migrated or persisted Reboil state is not JSON-safe.')
+      }
       const merged = deepMergeDefaults(this.defaults, persisted) as State
       const hydrated = this.restoreExcludedDefaults(merged)
       if (migrated) this.writeEnvelope(hydrated)
@@ -279,12 +340,17 @@ export class StoreRuntime<State extends StateShape> {
     }
   }
 
-  private persist(next: State): void {
+  private commit(previous: State, next: State): void {
     this.writeEnvelope(this.restoreExcludedDefaults(cloneJson(next)))
+    this.state = next
+    this.notify(previous, next)
   }
 
   private writeEnvelope(state: State): void {
-    this.adapter.write(this.id, serializeEnvelope({ version: this.version, state }))
+    this.adapter.write(
+      this.persistenceKey,
+      serializeEnvelope({ version: this.version, state, ...(this.epoch === undefined ? {} : { epoch: this.epoch }) }),
+    )
   }
 
   private restoreExcludedDefaults(state: State): State {
@@ -301,8 +367,9 @@ export class StoreRuntime<State extends StateShape> {
   }
 
   private validateState(value: unknown, label: string): State {
-    if (!isJsonSafe(value) || !isPlainObject(value))
+    if (!isJsonSafe(value) || !isPlainObject(value)) {
       throw new ReboilError(`Reboil ${label} must be a JSON-safe plain object.`)
+    }
     return cloneJson(value as State)
   }
 
@@ -310,9 +377,12 @@ export class StoreRuntime<State extends StateShape> {
     for (const [path, listeners] of this.listeners) {
       const lastValue = readAt(previous, path)
       const value = readAt(next, path)
-      if (!isSameValue(lastValue, value)) {
+      if (!Object.is(lastValue, value)) {
         for (const listener of [...listeners]) listener(value, lastValue)
       }
+    }
+    if (previous !== next) {
+      for (const listener of [...this.rootListeners]) listener(next, previous)
     }
   }
 
@@ -326,11 +396,19 @@ export class StoreRuntime<State extends StateShape> {
     this.emit({
       kind: 'rejected',
       operation,
-      path,
+      path: path === undefined ? this.pathPrefix : this.fullPath(path),
       currentState,
-      action: { path, value: safeActionValue(value), updater: typeof value === 'function' },
+      action: {
+        path: path === undefined ? this.pathPrefix : this.fullPath(path),
+        value: safeActionValue(value),
+        updater: typeof value === 'function',
+      },
       error: error instanceof Error ? error : new Error(String(error)),
     })
+  }
+
+  private fullPath(path: string): string {
+    return this.pathPrefix ? `${this.pathPrefix}.${path}` : path
   }
 
   private emit(event: MutationEvent<State>): void {

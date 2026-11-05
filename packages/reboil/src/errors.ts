@@ -12,3 +12,10 @@ export class ReboilPathError extends ReboilError {
     this.name = 'ReboilPathError'
   }
 }
+
+export class ReboilStoreNotLoadedError extends ReboilError {
+  constructor(path: string) {
+    super(`Lazy Reboil store "${path}" is not loaded. Call await store.load("${path}") before synchronous access.`)
+    this.name = 'ReboilStoreNotLoadedError'
+  }
+}

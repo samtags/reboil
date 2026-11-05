@@ -5,7 +5,7 @@ sidebar_position: 1
 
 # Store creation
 
-`createStore(initialState, options?)` creates the application store, synchronously restores persisted state, and returns typed `store` and `useStore` bindings.
+`createStore(initialState, options?)` creates a composable store node and returns typed `store` and `useStore` bindings. A standalone root restores persistence synchronously on first access; an eager child restores when its parent mounts it.
 
 ```ts
 export const { store, useStore } = createStore(app, {
@@ -27,9 +27,27 @@ export const { store, useStore } = createStore(app, {
 | `persist.exclude` | `[]`               | Typed paths that remain reactive but are not persisted. |
 | `logger`          | Development logger | Enables, disables, or replaces mutation logging.        |
 
+## Compose eager stores
+
+A `createStore()` result is a valid field in another store. Reboil identifies the single unparented node as the application root and gives every child its own persistence partition.
+
+```ts
+const reports = createStore({ count: 1 })
+
+export const { store, useStore } = createStore({
+  session: { userId: null as string | null },
+  reports,
+})
+
+store.get('reports.count')
+reports.store.get('count')
+```
+
+Do not access a child independently before composing it. Once a node has activated as a standalone root, Reboil will reject reparenting it under another store.
+
 ## Initialization
 
-The typed application store module is the default workflow. The planned initializer also supports direct imports:
+Config registration is the standard workflow. Run `npx reboil init` after installing Reboil, then use the registered direct imports:
 
 ```tsx
 import { useStore } from 'reboil/react'
@@ -40,4 +58,24 @@ export function Component() {
 }
 ```
 
-`npx reboil init` creates a TypeScript config, links it to the state export, and safely wires the application entry point. It is designed to be idempotent and does not create a recurring watcher or generator.
+The initializer creates a TypeScript config, links it to the state export, and safely wires the application entry point. It is idempotent and does not create a recurring watcher or generator.
+
+If that config later composes feature stores, register the inferred bindings so direct imports retain root paths and lazy load paths:
+
+```ts title="reboil.config.ts"
+import { createStore, defineConfig, lazy } from 'reboil'
+import { initialState } from './src/state'
+
+const reports = lazy(() => import('./src/reports-state'))
+export const app = createStore({ ...initialState, reports })
+
+export default defineConfig({ stateFile: './src/state.ts' })
+
+declare module 'reboil' {
+  interface Register {
+    bindings: typeof app
+  }
+}
+```
+
+The generated `state: typeof initialState` registration remains sufficient until the config composes another store.
