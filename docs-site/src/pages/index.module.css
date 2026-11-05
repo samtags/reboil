@@ -2,10 +2,74 @@
   --reboil-serif: 'Maragsa Display', serif;
   --reboil-nav: 'Libre Franklin', sans-serif;
   --reboil-body: 'Helvena', sans-serif;
+  --hero-background: #fbf8f2;
+  --hero-text: #303230;
+  --hero-border: #e6e0d5;
+  --hero-heading: #252526;
+  --hero-muted: #59605d;
+  --code-background: #f1eee8;
+  --code-border: #dcd7ce;
+  --code-bar-background: #ebe7df;
+  --code-bar-text: #6e736f;
+  --code-text: #303330;
+  --code-select-arrow: #5a605d;
+  --code-keyword: #a626a4;
+  --code-imported: #4078f2;
+  --code-variable: #383a42;
+  --code-property: #e45649;
+  --code-function: #4078f2;
+  --code-type: #0184bc;
+  --code-string: #50a14f;
+  --code-number: #986801;
+  --code-tag: #e45649;
+  --code-attribute: #986801;
+  --counter-background: #fffaf3;
+  --counter-border: #ded8ce;
+  --counter-text: #404542;
+  --counter-label: #32789e;
+  --counter-note: #737976;
+  --counter-value: #252526;
+  --button-background: #007CFD;
+  --button-hover: #006FE6;
+  --reset-text: #737976;
+  --reset-hover: #3d4642;
   padding: 5rem 0 7rem;
-  color: #d4d4d4;
-  background: #252526;
-  border-bottom: 1px solid #333;
+  color: var(--hero-text);
+  background: var(--hero-background);
+  border-bottom: 1px solid var(--hero-border);
+}
+:global(html[data-theme='dark']) .hero {
+  --hero-background: #252526;
+  --hero-text: #d4d4d4;
+  --hero-border: #333333;
+  --hero-heading: #f6f8f4;
+  --hero-muted: #abb6aa;
+  --code-background: #333333;
+  --code-border: #444444;
+  --code-bar-background: #333333;
+  --code-bar-text: #858585;
+  --code-text: #f0eee6;
+  --code-select-arrow: #d4d4d4;
+  --code-keyword: #c586c0;
+  --code-imported: #dcdcaa;
+  --code-variable: #dcdcaa;
+  --code-property: #dcdcaa;
+  --code-function: #9cdcfe;
+  --code-type: #4ec9b0;
+  --code-string: #ce9178;
+  --code-number: #b5cea8;
+  --code-tag: #569cd6;
+  --code-attribute: #569cd6;
+  --counter-background: #333333;
+  --counter-border: #4f4f4f;
+  --counter-text: #d4d4d4;
+  --counter-label: #9cdcfe;
+  --counter-note: #858585;
+  --counter-value: #f6f8f4;
+  --button-background: #007CFD;
+  --button-hover: #006FE6;
+  --reset-text: #858585;
+  --reset-hover: #d4d4d4;
 }
 .heroIntro {
   text-align: center;
@@ -20,7 +84,7 @@
 .heroIntro h1 {
   max-width: 48rem;
   margin: 1.25rem auto 0.9rem;
-  color: #f6f8f4;
+  color: var(--hero-heading);
   font-family: var(--reboil-body);
   font-size: clamp(3rem, 6vw, 5.8rem);
   font-weight: 400;
@@ -35,7 +99,7 @@
 .heroIntro p {
   max-width: 48rem;
   margin: 0 auto;
-  color: #abb6aa;
+  color: var(--hero-muted);
   font-family: var(--reboil-body);
   font-size: 1rem;
   line-height: 1.55;
@@ -52,8 +116,8 @@
   max-width: 64rem;
   margin: 0 auto;
   overflow: hidden;
-  background: #333333;
-  border: 1px solid #444444;
+  background: var(--code-background);
+  border: 1px solid var(--code-border);
   border-radius: 0.9rem;
   box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.28);
 }
@@ -62,9 +126,9 @@
   align-items: center;
   gap: 0.7rem;
   padding: 0.8rem 1rem;
-  color: #858585;
-  background: #333333;
-  border-bottom: 1px solid #4a4a4a;
+  color: var(--code-bar-text);
+  background: var(--code-bar-background);
+  border-bottom: 1px solid var(--code-border);
   font-family: var(--reboil-nav);
   font-size: 0.72rem;
 }
@@ -92,8 +156,8 @@
   margin: 0;
   padding: 1.8rem 2rem 2rem;
   overflow-x: auto;
-  color: #f0eee6;
-  background: #333333;
+  color: var(--code-text);
+  background: var(--code-background);
   font:
     0.9rem/1.75 'SFMono-Regular',
     Consolas,
@@ -101,30 +165,36 @@
     monospace;
 }
 .codeBody :global(.keyword) {
-  color: #c586c0;
+  color: var(--code-keyword);
 }
-.codeBody :global(.imported),
-.codeBody :global(.property),
+.codeBody :global(.imported) {
+  color: var(--code-imported);
+}
 .codeBody :global(.variable) {
-  color: #dcdcaa;
+  color: var(--code-variable);
+}
+.codeBody :global(.property) {
+  color: var(--code-property);
 }
 .codeBody :global(.function),
 .codeBody :global(.object) {
-  color: #9cdcfe;
+  color: var(--code-function);
 }
 .codeBody :global(.type) {
-  color: #4ec9b0;
+  color: var(--code-type);
 }
 .codeBody :global(.string) {
-  color: #ce9178;
+  color: var(--code-string);
 }
 .codeBody :global(.number),
 .codeBody :global(.boolean) {
-  color: #b5cea8;
+  color: var(--code-number);
 }
-.codeBody :global(.tag),
+.codeBody :global(.tag) {
+  color: var(--code-tag);
+}
 .codeBody :global(.attribute) {
-  color: #569cd6;
+  color: var(--code-attribute);
 }
 .codeControls {
   display: flex;
@@ -138,17 +208,18 @@
 .codeControls select {
   appearance: none;
   padding: 0.65rem 2.25rem 0.65rem 0.9rem;
-  color: #f0eee6;
+  color: var(--code-text);
   cursor: pointer;
-  background-color: #333333;
+  background-color: var(--code-background);
   background-image:
-    linear-gradient(45deg, transparent 50%, #d4d4d4 50%), linear-gradient(135deg, #d4d4d4 50%, transparent 50%);
+    linear-gradient(45deg, transparent 50%, var(--code-select-arrow) 50%),
+    linear-gradient(135deg, var(--code-select-arrow) 50%, transparent 50%);
   background-position:
     calc(100% - 1rem) 50%,
     calc(100% - 0.7rem) 50%;
   background-repeat: no-repeat;
   background-size: 0.3rem 0.3rem;
-  border: 1px solid #4a4a4a;
+  border: 1px solid var(--code-border);
   border-radius: 0.7rem;
   font-family: var(--reboil-nav);
   font-size: 0.72rem;
@@ -163,16 +234,16 @@
   justify-content: center;
   width: auto;
   padding: 0.65rem 0.75rem;
-  color: #f0eee6;
+  color: var(--code-text);
   cursor: pointer;
-  background: #333333;
-  border: 1px solid #4a4a4a;
+  background: var(--code-background);
+  border: 1px solid var(--code-border);
   border-radius: 0.7rem;
 }
 .copyButton:hover,
 .copied {
-  color: #4ec9b0;
-  background: #3d3d3d;
+  color: var(--code-type);
+  background: var(--code-bar-background);
 }
 .copyButton svg {
   width: 1.05rem;
@@ -192,9 +263,9 @@
   width: 11rem;
   min-width: 10rem;
   padding: 1.4rem;
-  color: #d4d4d4;
-  background: #333;
-  border: 1px solid #4f4f4f;
+  color: var(--counter-text);
+  background: var(--counter-background);
+  border: 1px solid var(--counter-border);
   border-radius: 0.8rem;
   box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.3);
 }
@@ -205,18 +276,18 @@
   margin-bottom: 0.7rem;
 }
 .counterLabel {
-  color: #9cdcfe;
+  color: var(--counter-label);
   font: 0.72rem/1 var(--reboil-nav);
 }
 .counterNote {
-  color: #858585;
+  color: var(--counter-note);
   font: 0.7rem/1 var(--reboil-nav);
   text-align: right;
 }
 .counterCard strong {
   width: 100%;
   margin-bottom: 1.15rem;
-  color: #f6f8f4;
+  color: var(--counter-value);
   font-family: var(--reboil-body);
   font-size: 3.4rem;
   font-weight: 500;
@@ -229,7 +300,7 @@
   padding: 0.7rem 1rem;
   color: #fff;
   cursor: pointer;
-  background: #0e639c;
+  background: var(--button-background);
   border: 0;
   border-radius: 0.45rem;
   font-family: var(--reboil-nav);
@@ -240,7 +311,7 @@
     background 160ms ease;
 }
 .counterCard button:hover {
-  background: #1177bb;
+  background: var(--button-hover);
   transform: translateY(-1px);
 }
 .counterCard .resetLink {
@@ -248,12 +319,12 @@
   width: auto;
   padding: 0;
   margin-top: 0.85rem;
-  color: #858585;
+  color: var(--reset-text);
   background: transparent;
   font-size: 0.72rem;
 }
 .counterCard .resetLink:hover {
-  color: #d4d4d4;
+  color: var(--reset-hover);
   background: transparent;
   transform: none;
 }
