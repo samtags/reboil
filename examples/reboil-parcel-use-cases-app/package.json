@@ -1,0 +1,31 @@
+{
+  "name": "reboil-parcel-use-cases-app",
+  "private": true,
+  "scripts": {
+    "dev": "parcel src/index.html --port 4173",
+    "e2e:server": "parcel src/index.html --port 4174 --no-cache",
+    "build": "parcel build src/index.html",
+    "typecheck": "tsc --noEmit",
+    "cy:run": "cypress run",
+    "cy:run:e2e": "cypress run --config baseUrl=http://127.0.0.1:4174",
+    "cy:open": "cypress open",
+    "test:e2e": "start-server-and-test e2e:server http://127.0.0.1:4174 cy:run:e2e"
+  },
+  "dependencies": {
+    "reboil": "file:../../packages/reboil",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@parcel/transformer-typescript-tsc": "^2.15.4",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "cypress": "^16.2.1",
+    "parcel": "^2.15.4",
+    "start-server-and-test": "^3.0.13",
+    "typescript": "^5.9.0"
+  },
+  "@parcel/resolver-default": {
+    "packageExports": true
+  }
+}

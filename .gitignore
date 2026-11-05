@@ -3,3 +3,4 @@ dist/
 coverage/
 .parcel-cache/
 *.tsbuildinfo
+screenshots/

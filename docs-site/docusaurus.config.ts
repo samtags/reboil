@@ -44,6 +44,11 @@ const config: Config = {
           position: 'left',
         },
         { to: '/docs/agents', label: 'For agents', position: 'left' },
+        {
+          href: 'https://github.com/samtags/reboil',
+          label: 'GitHub',
+          position: 'right',
+        },
       ],
     },
     footer: {

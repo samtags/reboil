@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+set -eu
+
+printf '\nRunning Cypress E2E checks before commit...\n\n'
+npm run test:e2e --workspace reboil-parcel-use-cases-app
+
+printf '\nCypress E2E checks passed. Commit may continue.\n'
