@@ -1,9 +1,38 @@
 # Reboil public contract
 
-Reboil uses one typed application store created with createStore(initialState, options?). The factory returns store and useStore bindings. State is accessed with typed dot-separated paths, including numeric array indices. store.get reads; store.set accepts a value or updater; store.subscribe listens outside React; store.reset restores defaults; useStore subscribes React components; setStore from reboil/react writes through the registered runtime.
+## Scope
 
-Persistence is synchronous. Expo and React Native use MMKV and require a development or production build, not Expo Go. Browser React uses localStorage. Mutations validate, serialize and persist, commit memory, notify subscribers, log, and return the committed value. Failures preserve the previous authoritative state.
+Reboil is one client-side application store for Expo, React Native, Expo Web, and browser React. It uses typed dot-separated paths, synchronous persistence, path-level subscriptions, and development logging. It never uses React Context or a Provider. V1 excludes multiple stores, async persistence, server mutations, dynamic record-key autocomplete, non-JSON state, and native Expo Go support.
 
-Supported persisted values are strings, finite numbers, booleans, null, plain objects, and arrays. Functions, dates, maps, sets, cycles, undefined, non-finite numbers, symbols, BigInt, and class instances are rejected. Development logging is on by default; production logging is off by default.
+## Recommended workflow
 
-The default workflow exports inferred bindings from the application store module and requires no Provider, registration import, generator, or watcher. The optional reboil init workflow is one-time setup for direct package imports.
+Create a typed store in the application and export its inferred bindings:
+
+```ts
+import { createStore } from "reboil";
+
+const initialState = { user: { name: "Ada" } };
+export const { store, useStore } = createStore(initialState);
+```
+
+Import `store` and `useStore` from that module. This needs no Provider, registration import, code generator, or watcher. The optional `npx reboil init` workflow exists only for direct package imports. It creates a TypeScript config that augments `Register` with `typeof initialState` and must load before application modules.
+
+## API and paths
+
+`createStore(initialState, options?)` returns `store` and `useStore`. Options are `id`, `version`, `persist.exclude`, `migrate`, and `logger`. `store.get(path)` reads; `store.set(path, valueOrUpdater)` writes; `store.subscribe(path, listener)` listens outside React; `store.reset(path?)` restores defaults; `useStore(path)` subscribes a component with `useSyncExternalStore`; and `setStore` from `reboil/react` writes through optional direct registration.
+
+Paths use dots. Object keys are segments and arrays use numeric segments such as `todos.0.title`; tuple indices can be precise. Dots in object keys are unsupported. Missing path segments and out-of-range indices throw. Literal invalid paths and values must fail TypeScript checking.
+
+## Persistence and failure guarantees
+
+Native iOS and Android use synchronous MMKV with Nitro Modules and require an Expo development or production build. Browser React and Expo Web use synchronous `localStorage`; unavailable browser storage falls back to memory with a development warning. Persisted state is a versioned envelope. Objects deep-merge over new defaults; arrays replace defaults; excluded paths persist as defaults.
+
+Each mutation validates its path and JSON-safe next state, serializes and persists it synchronously, commits memory, notifies changed selections, logs, then returns. Any validation, serialization, migration, or persistence failure preserves the previous memory and stored data, logs the rejection in development, and throws. No-op sets log but do not persist or notify.
+
+Allowed persisted values are strings, finite numbers, booleans, `null`, plain objects, and arrays. Reject `undefined`, non-finite numbers, `BigInt`, symbols, functions, cycles, dates, maps, sets, and class instances.
+
+## Versions and logging
+
+The default schema version is `1`. Additive changes merge defaults; breaking changes increment the version and supply a synchronous migration. Missing, failed, incompatible, or downgrade migrations preserve storage and throw. Development logging defaults on; production logging defaults off. Invalid mutations are logged as rejected before throwing.
+
+For detailed integration, implementation, and review instructions, use the Codex release at `/skills/reboil/SKILL.md` or the Claude Code release at `/skills/claude-code/reboil/SKILL.md`. Their contracts are checked for byte-identical behavior guidance before publication.

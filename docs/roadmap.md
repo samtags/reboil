@@ -6,8 +6,6 @@ Reboil is a planned TypeScript state library for Expo, React Native, and client-
 
 ## Project Status
 
-Reboil is currently in the specification stage. The API and behavior below describe the agreed v1 design; they have not been implemented yet.
-
 This README is the living source of truth for product requirements, public API decisions, technical constraints, and implementation scope.
 
 The developer documentation website and Reboil agent skill are also specified below but have not been implemented or published.
@@ -29,11 +27,11 @@ The core promise is:
 
 Reboil examples should use the supplied brand typography and boil-mark favicon so they feel like one coherent product. The font source paths below are authoring references on the design workstation; projects must copy the files into their own assets directory and reference the copied files at runtime.
 
-| Use | Font family | Source file |
-| --- | --- | --- |
-| Headings and titles | `Maragsa Display` | `/Users/russtagalog/Downloads/Maragsa_Font_Family_(Fontmirror)/Maragsa Display 400.otf` |
-| Subheadings and navigation | `Libre Franklin` | `/Users/russtagalog/Documents/Aptly/ASTAF U19 - Brand Guideline/Fonts/Primary Typefaces/Subheadings/LibreFranklin-VariableFont_wght.ttf` |
-| Body copy | `Helvena` | `/Users/russtagalog/Documents/Aptly/ASTAF U19 - Brand Guideline/Fonts/Primary Typefaces/Body Copy/WOFF2/Helvena-Regular.woff2` |
+| Use                        | Font family       | Source file                                                                                                                              |
+| -------------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Headings and titles        | `Maragsa Display` | `/Users/russtagalog/Downloads/Maragsa_Font_Family_(Fontmirror)/Maragsa Display 400.otf`                                                  |
+| Subheadings and navigation | `Libre Franklin`  | `/Users/russtagalog/Documents/Aptly/ASTAF U19 - Brand Guideline/Fonts/Primary Typefaces/Subheadings/LibreFranklin-VariableFont_wght.ttf` |
+| Body copy                  | `Helvena`         | `/Users/russtagalog/Documents/Aptly/ASTAF U19 - Brand Guideline/Fonts/Primary Typefaces/Body Copy/WOFF2/Helvena-Regular.woff2`           |
 
 Register the copied font files with `@font-face` and apply them by role:
 
@@ -164,7 +162,7 @@ Reference
 Agents
 ├── Agent documentation index
 ├── Machine-readable contract
-└── Downloadable Reboil skill
+└── Downloadable Codex and Claude Code skills
 ```
 
 ### Agent-ready documentation
@@ -175,6 +173,7 @@ The website will expose first-class machine-readable surfaces rather than asking
 - `/llms-full.txt` with the complete public contract in plain text or Markdown.
 - `/docs.json` with version, status, topic metadata, stable identifiers, URLs, and concise section summaries.
 - `/skills/reboil/SKILL.md` as the canonical downloadable Reboil skill entrypoint.
+- `/skills/claude-code/reboil/SKILL.md` as the downloadable Claude Code skill, packaged for installation at `.claude/skills/reboil/` in a project or `~/.claude/skills/reboil/` for personal use.
 - Stable semantic headings and anchors that match the machine-readable topic identifiers.
 - Structured metadata identifying Reboil as software documentation and marking unreleased features accurately.
 - A sitemap and crawler policy that expose public documentation and machine-readable resources.
@@ -209,6 +208,11 @@ skills/reboil/
 ├── SKILL.md
 ├── agents/
 │   └── openai.yaml
+└── references/
+    └── contract.md
+
+.claude/skills/reboil/
+├── SKILL.md
 └── references/
     └── contract.md
 ```
@@ -246,7 +250,7 @@ The skill will instruct agents to preserve these invariants:
 
 `SKILL.md` will contain only the routing rules, essential invariants, and task workflow. Detailed API behavior and examples will live in `references/contract.md`, which agents read when implementing or reviewing runtime behavior, types, persistence, or the initializer.
 
-The website will provide a downloadable copy of the complete skill folder. The repository copy remains canonical during development.
+The website will provide downloadable copies of both complete skill folders: `/skills/reboil/` for Codex and `/skills/claude-code/reboil/` for Claude Code. The repository copies remain canonical during development. Their shared contract must be byte-identical, while each `SKILL.md` may contain agent-specific discovery and invocation guidance.
 
 ### Skill validation
 
@@ -257,6 +261,7 @@ Before release, the skill must:
 - Correctly choose between the default typed-module workflow and optional config registration.
 - Avoid suggesting Expo Go, asynchronous hydration, React Context, or recurring code generation.
 - Point agents to the current contract instead of embedding stale duplicated specifications.
+- Verify both website release copies match their canonical repository folders and that the Codex and Claude Code contracts remain byte-identical.
 
 ## Planned Installation
 

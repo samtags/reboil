@@ -1,12 +1,30 @@
 {
+  "schema_version": 1,
   "name": "Reboil",
-  "version": "1",
+  "package": "reboil",
+  "version": "0.1.0",
   "status": "specification",
+  "canonical_specification": "/docs/overview",
+  "resources": {
+    "summary": "/llms.txt",
+    "full_contract": "/llms-full.txt",
+    "skill": "/skills/reboil/SKILL.md",
+    "skill_metadata": "/skills/reboil/agents/openai.yaml",
+    "skill_contract": "/skills/reboil/references/contract.md",
+    "claude_code_skill": "/skills/claude-code/reboil/SKILL.md",
+    "claude_code_skill_contract": "/skills/claude-code/reboil/references/contract.md"
+  },
   "topics": [
-    {"id": "overview", "url": "/docs/overview", "summary": "Typed synchronous state for Expo, React Native, and web."},
-    {"id": "quick-start", "url": "/docs/getting-started/quick-start", "summary": "Create one typed store module and consume its bindings."},
+    {"id": "overview", "url": "/docs/overview", "summary": "Positioning, scope, and specification-stage status."},
+    {"id": "installation", "url": "/docs/getting-started/installation", "summary": "Planned browser, Expo, and React Native installation requirements."},
+    {"id": "quick-start", "url": "/docs/getting-started/quick-start", "summary": "Default typed store module and its inferred bindings."},
+    {"id": "platform-support", "url": "/docs/getting-started/platform-support", "summary": "Synchronous persistence adapters and native build constraints."},
+    {"id": "store-creation", "url": "/docs/concepts/store-creation", "summary": "Store options, initialization, and Fast Refresh behavior."},
     {"id": "typed-paths", "url": "/docs/concepts/typed-paths", "summary": "Read and write nested state with inferred dot paths."},
-    {"id": "persistence", "url": "/docs/concepts/persistence", "summary": "Synchronous adapters, atomic mutations, and JSON-safe values."},
-    {"id": "api", "url": "/docs/reference/api", "summary": "Public factory, store, hook, subscription, and reset API."}
+    {"id": "react-subscriptions", "url": "/docs/concepts/react-subscriptions", "summary": "Path-level React and vanilla subscriptions without Context."},
+    {"id": "persistence", "url": "/docs/concepts/persistence", "summary": "Synchronous adapters, atomic mutations, exclusions, and JSON-safe values."},
+    {"id": "api", "url": "/docs/reference/api", "summary": "Public factory, store, hook, subscription, reset, and direct-binding API."},
+    {"id": "runtime-errors", "url": "/docs/reference/errors", "summary": "Logging, migrations, and thrown runtime errors."},
+    {"id": "agents", "url": "/docs/agents", "summary": "Machine-readable resources and the downloadable Reboil skill."}
   ]
 }
