@@ -2,6 +2,7 @@
   "name": "reboil",
   "version": "0.1.0",
   "description": "Typed string-path state access with synchronous persistence.",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "reboil": "dist/cli.cjs"
