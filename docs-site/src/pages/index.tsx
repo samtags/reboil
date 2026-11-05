@@ -5,7 +5,7 @@ import Layout from '@theme/Layout'
 import Heading from '@theme/Heading'
 import styles from './index.module.css'
 
-type Language = 'javascript' | 'jsx' | 'tsx'
+type Language = 'javascript' | 'tsx'
 
 type HomeState = {
   count: number
@@ -47,32 +47,16 @@ increment.onclick = () => {
   <span class="variable">store</span>.<span class="function">set</span>(<span class="string">'count'</span>, value =&gt; value + <span class="number">1</span>)
 }`,
   },
-  jsx: {
-    source: `import {setStore, useStore} from 'reboil/react'
-
-function Counter() {
-  const count = useStore('count')
-
-  return (
-    <button onClick={() => setStore('count', value => value + 1)}>
-      {count}
-    </button>
-  )
-}`,
-    markup: `<span class="keyword">import</span> { <span class="imported">setStore</span>, <span class="imported">useStore</span> } <span class="keyword">from</span> <span class="string">'reboil/react'</span>
-
-<span class="keyword">function</span> <span class="function">Counter</span>() {
-  <span class="keyword">const</span> <span class="variable">count</span> = <span class="function">useStore</span>(<span class="string">'count'</span>)
-
-  <span class="keyword">return</span> (
-    &lt;<span class="tag">button</span> <span class="attribute">onClick</span>={() =&gt; <span class="function">setStore</span>(<span class="string">'count'</span>, value =&gt; value + <span class="number">1</span>)}&gt;
-      {<span class="variable">count</span>}
-    &lt;/<span class="tag">button</span>&gt;
-  )
-}`,
-  },
   tsx: {
-    source: `import {setStore, useStore} from 'reboil/react'
+    source: `// state.ts
+import { createStore } from 'reboil'
+
+createStore({
+  count: 1,
+})
+
+// main.tsx
+import { setStore, useStore } from 'reboil/react'
 
 function Counter() {
   const count = useStore('count')
@@ -83,7 +67,15 @@ function Counter() {
     </button>
   )
 }`,
-    markup: `<span class="keyword">import</span> { <span class="imported">setStore</span>, <span class="imported">useStore</span> } <span class="keyword">from</span> <span class="string">'reboil/react'</span>
+    markup: `<span class="comment">// state.ts</span>
+<span class="keyword">import</span> { <span class="imported">createStore</span> } <span class="keyword">from</span> <span class="string">'reboil'</span>
+
+<span class="function">createStore</span>({
+  <span class="property">count</span>: <span class="number">1</span>,
+})
+
+<span class="comment">// main.tsx</span>
+<span class="keyword">import</span> { <span class="imported">setStore</span>, <span class="imported">useStore</span> } <span class="keyword">from</span> <span class="string">'reboil/react'</span>
 
 <span class="keyword">function</span> <span class="function">Counter</span>() {
   <span class="keyword">const</span> <span class="variable">count</span> = <span class="function">useStore</span>(<span class="string">'count'</span>)
@@ -130,7 +122,6 @@ function CodeWindow(): ReactNode {
         </label>
         <select id="language" value={language} onChange={(event) => setLanguage(event.target.value as Language)}>
           <option value="javascript">JavaScript</option>
-          <option value="jsx">JSX</option>
           <option value="tsx">TSX</option>
         </select>
         <button

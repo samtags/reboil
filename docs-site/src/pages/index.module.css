@@ -13,6 +13,7 @@
   --code-bar-text: #6e736f;
   --code-text: #303330;
   --code-select-arrow: #5a605d;
+  --code-comment: #a0a1a7;
   --code-keyword: #a626a4;
   --code-imported: #4078f2;
   --code-variable: #383a42;
@@ -50,6 +51,7 @@
   --code-bar-text: #858585;
   --code-text: #f0eee6;
   --code-select-arrow: #d4d4d4;
+  --code-comment: #858585;
   --code-keyword: #c586c0;
   --code-imported: #dcdcaa;
   --code-variable: #dcdcaa;
@@ -166,6 +168,9 @@
 }
 .codeBody :global(.keyword) {
   color: var(--code-keyword);
+}
+.codeBody :global(.comment) {
+  color: var(--code-comment);
 }
 .codeBody :global(.imported) {
   color: var(--code-imported);
