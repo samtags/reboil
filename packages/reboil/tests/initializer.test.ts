@@ -7,7 +7,10 @@ import { describe, expect, it } from 'vitest'
 function fixture() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'reboil-init-'))
   fs.mkdirSync(path.join(root, 'src'))
-  fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify({ name: 'fixture', main: 'src/main.tsx', dependencies: { react: '^19.0.0' } }, null, 2))
+  fs.writeFileSync(
+    path.join(root, 'package.json'),
+    JSON.stringify({ name: 'fixture', main: 'src/main.tsx', dependencies: { react: '^19.0.0' } }, null, 2),
+  )
   fs.writeFileSync(path.join(root, 'src/state.ts'), 'export const initialState = { count: 0 }\n')
   fs.writeFileSync(path.join(root, 'src/main.tsx'), '// existing comment\nimport App from "./App"\n')
   return root
@@ -24,4 +27,3 @@ describe('reboil init', () => {
     expect(fs.existsSync(path.join(root, 'reboil.config.ts'))).toBe(true)
   })
 })
-

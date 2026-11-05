@@ -37,41 +37,41 @@ Register the copied font files with `@font-face` and apply them by role:
 
 ```css
 @font-face {
-  font-family: "Maragsa Display";
+  font-family: 'Maragsa Display';
   font-style: normal;
   font-weight: 400;
-  src: url("./assets/fonts/Maragsa-Display-400.otf") format("opentype");
+  src: url('./assets/fonts/Maragsa-Display-400.otf') format('opentype');
 }
 
 @font-face {
-  font-family: "Libre Franklin";
+  font-family: 'Libre Franklin';
   font-style: normal;
   font-weight: 100 900;
-  src: url("./assets/fonts/LibreFranklin-Variable.ttf") format("truetype");
+  src: url('./assets/fonts/LibreFranklin-Variable.ttf') format('truetype');
 }
 
 @font-face {
-  font-family: "Helvena";
+  font-family: 'Helvena';
   font-style: normal;
   font-weight: 400;
-  src: url("./assets/fonts/Helvena-Regular.woff2") format("woff2");
+  src: url('./assets/fonts/Helvena-Regular.woff2') format('woff2');
 }
 
 h1,
 h2,
 h3,
 .title {
-  font-family: "Maragsa Display", serif;
+  font-family: 'Maragsa Display', serif;
   font-weight: 400;
 }
 
 .subtitle,
 nav {
-  font-family: "Libre Franklin", sans-serif;
+  font-family: 'Libre Franklin', sans-serif;
 }
 
 body {
-  font-family: "Helvena", sans-serif;
+  font-family: 'Helvena', sans-serif;
 }
 ```
 
@@ -284,29 +284,29 @@ Define the application state and export its inferred bindings from one module:
 
 ```ts
 // store.ts
-import { createStore } from "reboil";
+import { createStore } from 'reboil'
 
 const app = {
-  foo: "bar",
+  foo: 'bar',
   baz: true,
   settings: {
-    runTimeVersion: "3.14.15",
+    runTimeVersion: '3.14.15',
   },
-};
+}
 
-export const { store, useStore } = createStore(app);
+export const { store, useStore } = createStore(app)
 ```
 
 Components import the typed hook from the application's store module:
 
 ```tsx
-import { useStore } from "@/store";
+import { useStore } from '@/store'
 
 export function Component() {
-  const foo = useStore("foo");
-  const runTimeVersion = useStore("settings.runTimeVersion");
+  const foo = useStore('foo')
+  const runTimeVersion = useStore('settings.runTimeVersion')
 
-  return null;
+  return null
 }
 ```
 
@@ -320,16 +320,16 @@ Creates the application store, synchronously restores its persisted state, and r
 
 ```ts
 export const { store, useStore } = createStore(app, {
-  id: "reboil",
+  id: 'reboil',
   version: 1,
   persist: {
-    exclude: ["session.transientValue"],
+    exclude: ['session.transientValue'],
   },
   migrate(persisted, fromVersion) {
-    return migrateToCurrentState(persisted, fromVersion);
+    return migrateToCurrentState(persisted, fromVersion)
   },
   logger: true,
-});
+})
 ```
 
 Planned options:
@@ -349,10 +349,10 @@ V1 is designed around one exported application store module. A repeated creation
 Returns the current value at a typed path.
 
 ```ts
-const foo = store.get("foo");
+const foo = store.get('foo')
 //    ^? string
 
-const version = store.get("settings.runTimeVersion");
+const version = store.get('settings.runTimeVersion')
 //    ^? string
 ```
 
@@ -363,13 +363,13 @@ Typing `store.get('settings.` should suggest `runTimeVersion`. Invalid literal p
 Synchronously validates, persists, commits, and returns a new value.
 
 ```ts
-const foo = store.set("foo", "bars");
+const foo = store.set('foo', 'bars')
 //    ^? string
 
-const nextFoo = store.set("foo", (previous) => `${previous}!`);
+const nextFoo = store.set('foo', (previous) => `${previous}!`)
 //    ^? string
 
-store.set("settings.runTimeVersion", "3.14.16");
+store.set('settings.runTimeVersion', '3.14.16')
 ```
 
 The provided value and updater return value must match the type at the selected path. A separate `update` method is unnecessary; functional updates use `set`.
@@ -381,11 +381,11 @@ Mutations are immutable. Reboil clones only the affected object and array contai
 Subscribes vanilla JavaScript or other non-React code to a typed path. The listener receives the new value first and the previous value second, and runs only when that selected value changes. The returned function removes the subscription.
 
 ```ts
-const unsubscribe = store.subscribe("nested.key.or.not", (value, lastValue) => {
-  console.log({ value, lastValue });
-});
+const unsubscribe = store.subscribe('nested.key.or.not', (value, lastValue) => {
+  console.log({ value, lastValue })
+})
 
-unsubscribe();
+unsubscribe()
 ```
 
 Subscriptions also receive updates caused by `store.reset(path)` or `store.reset()` when their selected value changes.
@@ -395,8 +395,8 @@ Subscriptions also receive updates caused by `store.reset(path)` or `store.reset
 Restores a path or the complete store from the original defaults, persists the result, notifies affected subscribers, and returns the restored value.
 
 ```ts
-const foo = store.reset("foo");
-const initialState = store.reset();
+const foo = store.reset('foo')
+const initialState = store.reset()
 ```
 
 ### `useStore(path)`
@@ -404,8 +404,8 @@ const initialState = store.reset();
 Subscribes a React component to the value at one typed path.
 
 ```tsx
-const foo = useStore("foo");
-const version = useStore("settings.runTimeVersion");
+const foo = useStore('foo')
+const version = useStore('settings.runTimeVersion')
 ```
 
 The hook will use `useSyncExternalStore`. A component rerenders only when its selected value changes according to `Object.is`. Updating one sibling path must not rerender subscribers of an unchanged sibling.
@@ -415,10 +415,10 @@ The hook will use `useSyncExternalStore`. A component rerenders only when its se
 Writes a value at a typed path from React components or other module code. The value may be passed directly or derived from the previous value with an updater function.
 
 ```tsx
-import { setStore } from "reboil/react";
+import { setStore } from 'reboil/react'
 
-setStore("count", 2);
-setStore("nested.key", (previous) => previous);
+setStore('count', 2)
+setStore('nested.key', (previous) => previous)
 ```
 
 The direct `setStore` binding uses the same registered runtime as `useStore` and validates the path and value before committing the update.
@@ -428,9 +428,9 @@ The direct `setStore` binding uses the same registered runtime as `useStore` and
 V1 paths use dot notation and support nested plain objects and numeric array indices.
 
 ```ts
-store.get("settings.runTimeVersion");
-store.get("todos.0.title");
-store.set("todos.0.completed", true);
+store.get('settings.runTimeVersion')
+store.get('todos.0.title')
+store.set('todos.0.completed', true)
 ```
 
 Path rules:
@@ -448,26 +448,26 @@ Reboil will use a generic factory rather than generated declarations. `createSto
 
 ```ts
 // store.ts
-import { createStore } from "reboil";
+import { createStore } from 'reboil'
 
 const app = {
   user: {
-    name: "Ada",
+    name: 'Ada',
   },
-  todos: [{ title: "Ship Reboil", completed: false }],
-};
+  todos: [{ title: 'Ship Reboil', completed: false }],
+}
 
-export const { store, useStore } = createStore(app);
+export const { store, useStore } = createStore(app)
 ```
 
 ```tsx
 // Component.tsx
-import { store, useStore } from "@/store";
+import { store, useStore } from '@/store'
 
-const name = store.get("user.name");
+const name = store.get('user.name')
 //    ^? string
 
-const completed = useStore("todos.0.completed");
+const completed = useStore('todos.0.completed')
 //    ^? boolean
 ```
 
@@ -485,12 +485,12 @@ This requires consumers to import `store` and `useStore` from their application 
 The typed application store module remains the default and simplest workflow. Reboil will also offer an optional initializer for teams that prefer this component API:
 
 ```tsx
-import { useStore } from "reboil/react";
+import { useStore } from 'reboil/react'
 
 export function Component() {
-  const foo = useStore("foo");
+  const foo = useStore('foo')
 
-  return null;
+  return null
 }
 ```
 
@@ -533,18 +533,18 @@ The generated TypeScript config will connect the runtime state and its static ty
 
 ```ts
 // reboil.config.ts
-import { createStore, defineConfig } from "reboil";
-import { initialState } from "./src/state";
+import { createStore, defineConfig } from 'reboil'
+import { initialState } from './src/state'
 
-createStore(initialState);
+createStore(initialState)
 
 export default defineConfig({
-  stateFile: "./src/state.ts",
-});
+  stateFile: './src/state.ts',
+})
 
-declare module "reboil" {
+declare module 'reboil' {
   interface Register {
-    state: typeof initialState;
+    state: typeof initialState
   }
 }
 ```
@@ -569,8 +569,8 @@ The initializer will use framework-specific detection rather than blindly search
 For Expo Router, the resulting custom entry will follow this order:
 
 ```ts
-import "./reboil.config";
-import "expo-router/entry";
+import './reboil.config'
+import 'expo-router/entry'
 ```
 
 `expo-router/entry` remains last so Reboil initializes before route modules load.
@@ -655,12 +655,12 @@ export const { store, useStore } = createStore(app, {
   version: 2,
   migrate(persisted, fromVersion) {
     if (fromVersion === 1) {
-      return migrateVersionOne(persisted);
+      return migrateVersionOne(persisted)
     }
 
-    throw new Error(`Unsupported Reboil schema version: ${fromVersion}`);
+    throw new Error(`Unsupported Reboil schema version: ${fromVersion}`)
   },
-});
+})
 ```
 
 When persisted and configured versions differ, initialization requires a successful migration. Missing or failed migrations preserve the stored data and throw rather than silently discarding user state. A stored version newer than the application version also throws.

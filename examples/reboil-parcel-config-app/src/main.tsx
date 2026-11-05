@@ -106,18 +106,32 @@ function CodeWindow() {
     <>
       <div className="code-window">
         <div className="window-bar">
-          <div className="window-dots" aria-hidden="true"><i /><i /><i /></div>
+          <div className="window-dots" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+          </div>
           <span>{filename}</span>
         </div>
-        <pre><code dangerouslySetInnerHTML={{ __html: example.markup }} /></pre>
+        <pre>
+          <code dangerouslySetInnerHTML={{ __html: example.markup }} />
+        </pre>
       </div>
       <div className="code-controls">
-        <label className="sr-only" htmlFor="language">Code language</label>
+        <label className="sr-only" htmlFor="language">
+          Code language
+        </label>
         <select id="language" value={language} onChange={(event) => setLanguage(event.target.value as Language)}>
           <option value="javascript">JavaScript</option>
           <option value="typescript">TypeScript</option>
         </select>
-        <button className={`copy-button${copied ? ' copied' : ''}`} type="button" aria-label="Copy code" title={copied ? 'Copied' : 'Copy code'} onClick={copyCode}>
+        <button
+          className={`copy-button${copied ? ' copied' : ''}`}
+          type="button"
+          aria-label="Copy code"
+          title={copied ? 'Copied' : 'Copy code'}
+          onClick={copyCode}
+        >
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <rect x="8" y="8" width="11" height="11" rx="2" />
             <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
@@ -149,11 +163,17 @@ function CounterCard() {
     <aside className="counter-card" aria-label="Live counter">
       <div className="counter-heading">
         <span className="counter-label">count</span>
-        <span className="counter-note" aria-live="polite">{lastAction}</span>
+        <span className="counter-note" aria-live="polite">
+          {lastAction}
+        </span>
       </div>
       <strong>{count}</strong>
-      <button type="button" onClick={increment}>one up</button>
-      <button className="reset-link" type="button" onClick={reset}>reset</button>
+      <button type="button" onClick={increment}>
+        one up
+      </button>
+      <button className="reset-link" type="button" onClick={reset}>
+        reset
+      </button>
     </aside>
   )
 }
@@ -162,7 +182,9 @@ function App() {
   return (
     <>
       <header className="topbar">
-        <a className="brand" href="/">Reboil</a>
+        <a className="brand" href="/">
+          Reboil
+        </a>
         <nav aria-label="Primary navigation">
           <a href="">Documentation</a>
           <a href="">Github</a>

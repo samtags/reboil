@@ -1,0 +1,56 @@
+name: Feature request
+description: Propose a capability or improvement for Reboil
+title: 'feat: '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the problem before prescribing an API. Maintainer agreement is required before implementation of features, breaking changes, or architectural work.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What developer or user problem should Reboil solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the desired behavior. API sketches are welcome but not required.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Explain current workarounds or other approaches you considered.
+  - type: dropdown
+    id: compatibility
+    attributes:
+      label: Compatibility impact
+      options:
+        - Additive and backward compatible
+        - Potentially breaking
+        - Unsure
+    validations:
+      required: true
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Would you like to implement this?
+      options:
+        - 'Yes'
+        - 'No'
+        - Maybe, with guidance
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and discussions for a similar request.
+          required: true
+        - label: I understand that implementation should wait for maintainer agreement.
+          required: true

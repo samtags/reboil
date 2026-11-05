@@ -12,4 +12,3 @@ export class ReboilPathError extends ReboilError {
     this.name = 'ReboilPathError'
   }
 }
-

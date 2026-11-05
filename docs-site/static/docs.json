@@ -15,16 +15,56 @@
     "claude_code_skill_contract": "/skills/claude-code/reboil/references/contract.md"
   },
   "topics": [
-    {"id": "overview", "url": "/docs/overview", "summary": "Positioning, scope, and specification-stage status."},
-    {"id": "installation", "url": "/docs/getting-started/installation", "summary": "Planned browser, Expo, and React Native installation requirements."},
-    {"id": "quick-start", "url": "/docs/getting-started/quick-start", "summary": "Default typed store module and its inferred bindings."},
-    {"id": "platform-support", "url": "/docs/getting-started/platform-support", "summary": "Synchronous persistence adapters and native build constraints."},
-    {"id": "store-creation", "url": "/docs/concepts/store-creation", "summary": "Store options, initialization, and Fast Refresh behavior."},
-    {"id": "typed-paths", "url": "/docs/concepts/typed-paths", "summary": "Read and write nested state with inferred dot paths."},
-    {"id": "react-subscriptions", "url": "/docs/concepts/react-subscriptions", "summary": "Path-level React and vanilla subscriptions without Context."},
-    {"id": "persistence", "url": "/docs/concepts/persistence", "summary": "Synchronous adapters, atomic mutations, exclusions, and JSON-safe values."},
-    {"id": "api", "url": "/docs/reference/api", "summary": "Public factory, store, hook, subscription, reset, and direct-binding API."},
-    {"id": "runtime-errors", "url": "/docs/reference/errors", "summary": "Logging, migrations, and thrown runtime errors."},
-    {"id": "agents", "url": "/docs/agents", "summary": "Machine-readable resources and the downloadable Reboil skill."}
+    { "id": "overview", "url": "/docs/overview", "summary": "Positioning, scope, and specification-stage status." },
+    {
+      "id": "installation",
+      "url": "/docs/getting-started/installation",
+      "summary": "Planned browser, Expo, and React Native installation requirements."
+    },
+    {
+      "id": "quick-start",
+      "url": "/docs/getting-started/quick-start",
+      "summary": "Default typed store module and its inferred bindings."
+    },
+    {
+      "id": "platform-support",
+      "url": "/docs/getting-started/platform-support",
+      "summary": "Synchronous persistence adapters and native build constraints."
+    },
+    {
+      "id": "store-creation",
+      "url": "/docs/concepts/store-creation",
+      "summary": "Store options, initialization, and Fast Refresh behavior."
+    },
+    {
+      "id": "typed-paths",
+      "url": "/docs/concepts/typed-paths",
+      "summary": "Read and write nested state with inferred dot paths."
+    },
+    {
+      "id": "react-subscriptions",
+      "url": "/docs/concepts/react-subscriptions",
+      "summary": "Path-level React and vanilla subscriptions without Context."
+    },
+    {
+      "id": "persistence",
+      "url": "/docs/concepts/persistence",
+      "summary": "Synchronous adapters, atomic mutations, exclusions, and JSON-safe values."
+    },
+    {
+      "id": "api",
+      "url": "/docs/reference/api",
+      "summary": "Public factory, store, hook, subscription, reset, and direct-binding API."
+    },
+    {
+      "id": "runtime-errors",
+      "url": "/docs/reference/errors",
+      "summary": "Logging, migrations, and thrown runtime errors."
+    },
+    {
+      "id": "agents",
+      "url": "/docs/agents",
+      "summary": "Machine-readable resources and the downloadable Reboil skill."
+    }
   ]
 }

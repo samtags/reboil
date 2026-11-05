@@ -9,14 +9,14 @@ sidebar_position: 1
 
 ```ts
 export const { store, useStore } = createStore(app, {
-  id: "reboil",
+  id: 'reboil',
   version: 1,
-  persist: { exclude: ["session.transientValue"] },
+  persist: { exclude: ['session.transientValue'] },
   migrate(persisted, fromVersion) {
-    return migrateToCurrentState(persisted, fromVersion);
+    return migrateToCurrentState(persisted, fromVersion)
   },
   logger: true,
-});
+})
 ```
 
 | Option            | Default            | Behavior                                                |
@@ -32,11 +32,11 @@ export const { store, useStore } = createStore(app, {
 The typed application store module is the default workflow. The planned initializer also supports direct imports:
 
 ```tsx
-import { useStore } from "reboil/react";
+import { useStore } from 'reboil/react'
 
 export function Component() {
-  const foo = useStore("foo");
-  return null;
+  const foo = useStore('foo')
+  return null
 }
 ```
 

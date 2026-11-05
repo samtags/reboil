@@ -19,48 +19,69 @@
       <section class="demo" aria-label="Reboil code example">
         <div class="code-window">
           <div class="window-bar">
-            <div class="window-dots" aria-hidden="true">
-              <i></i><i></i><i></i>
-            </div>
+            <div class="window-dots" aria-hidden="true"><i></i><i></i><i></i></div>
             <span id="code-filename">src/main.jsx</span>
           </div>
           <pre><code id="code-example"></code></pre>
-          <template id="javascript-example"><span class="keyword">import</span> { <span class="imported">createStore</span> } <span class="keyword">from</span> <span class="string">'reboil'</span>
+          <template id="javascript-example"
+            ><span class="keyword">import</span> { <span class="imported">createStore</span> }
+            <span class="keyword">from</span> <span class="string">'reboil'</span>
 
-<span class="keyword">const</span> { <span class="variable">store</span> } = <span class="function">createStore</span>({
-  <span class="property">count</span>: <span class="number">1</span>,
-})
+            <span class="keyword">const</span> { <span class="variable">store</span> } =
+            <span class="function">createStore</span>({ <span class="property">count</span>:
+            <span class="number">1</span>, })
 
-<span class="keyword">const</span> <span class="variable">count</span> = <span class="object">document</span>.<span class="property">querySelector</span>(<span class="string">'#count'</span>)
-<span class="keyword">const</span> <span class="variable">increment</span> = <span class="object">document</span>.<span class="property">querySelector</span>(<span class="string">'#increment'</span>)
+            <span class="keyword">const</span> <span class="variable">count</span> =
+            <span class="object">document</span>.<span class="property">querySelector</span>(<span class="string"
+              >'#count'</span
+            >) <span class="keyword">const</span> <span class="variable">increment</span> =
+            <span class="object">document</span>.<span class="property">querySelector</span>(<span class="string"
+              >'#increment'</span
+            >)
 
-<span class="object">store</span>.<span class="property">subscribe</span>(<span class="string">'count'</span>, (<span class="variable">value</span>, <span class="variable">lastValue</span>) =&gt; {
-  <span class="variable">count</span>.<span class="property">textContent</span> = <span class="variable">value</span>
-})
+            <span class="object">store</span>.<span class="property">subscribe</span>(<span class="string">'count'</span
+            >, (<span class="variable">value</span>, <span class="variable">lastValue</span>) =&gt; {
+            <span class="variable">count</span>.<span class="property">textContent</span> =
+            <span class="variable">value</span>
+            })
 
-<span class="variable">increment</span>.<span class="property">onclick</span> = () =&gt; {
-  <span class="object">store</span>.<span class="property">set</span>(<span class="string">'count'</span>, <span class="variable">value</span> =&gt; <span class="variable">value</span> + <span class="number">1</span>)
-}</template>
-          <template id="typescript-example"><span class="keyword">import</span> { <span class="imported">createStore</span> } <span class="keyword">from</span> <span class="string">'reboil'</span>
+            <span class="variable">increment</span>.<span class="property">onclick</span> = () =&gt; {
+            <span class="object">store</span>.<span class="property">set</span>(<span class="string">'count'</span>,
+            <span class="variable">value</span> =&gt; <span class="variable">value</span> +
+            <span class="number">1</span>) }</template
+          >
+          <template id="typescript-example"
+            ><span class="keyword">import</span> { <span class="imported">createStore</span> }
+            <span class="keyword">from</span> <span class="string">'reboil'</span>
 
-<span class="keyword">type</span> State = {
-  <span class="property">count</span>: <span class="type">number</span>
-}
+            <span class="keyword">type</span> State = { <span class="property">count</span>:
+            <span class="type">number</span>
+            }
 
-<span class="keyword">const</span> { <span class="variable">store</span> } = <span class="function">createStore</span>&lt;State&gt;({
-  <span class="property">count</span>: <span class="number">1</span>,
-})
+            <span class="keyword">const</span> { <span class="variable">store</span> } =
+            <span class="function">createStore</span>&lt;State&gt;({ <span class="property">count</span>:
+            <span class="number">1</span>, })
 
-<span class="keyword">const</span> <span class="variable">count</span> = <span class="object">document</span>.<span class="property">querySelector</span>&lt;HTMLElement&gt;(<span class="string">'#count'</span>)!
-<span class="keyword">const</span> <span class="variable">increment</span> = <span class="object">document</span>.<span class="property">querySelector</span>&lt;HTMLButtonElement&gt;(<span class="string">'#increment'</span>)!
+            <span class="keyword">const</span> <span class="variable">count</span> =
+            <span class="object">document</span>.<span class="property">querySelector</span>&lt;HTMLElement&gt;(<span
+              class="string"
+              >'#count'</span
+            >)! <span class="keyword">const</span> <span class="variable">increment</span> =
+            <span class="object">document</span>.<span class="property">querySelector</span
+            >&lt;HTMLButtonElement&gt;(<span class="string">'#increment'</span>)!
 
-<span class="object">store</span>.<span class="property">subscribe</span>(<span class="string">'count'</span>, (<span class="variable">value</span>, <span class="variable">lastValue</span>) =&gt; {
-  <span class="variable">count</span>.<span class="property">textContent</span> = String(<span class="variable">value</span>)
-})
+            <span class="object">store</span>.<span class="property">subscribe</span>(<span class="string">'count'</span
+            >, (<span class="variable">value</span>, <span class="variable">lastValue</span>) =&gt; {
+            <span class="variable">count</span>.<span class="property">textContent</span> = String(<span
+              class="variable"
+              >value</span
+            >) })
 
-<span class="variable">increment</span>.<span class="property">onclick</span> = () =&gt; {
-  <span class="object">store</span>.<span class="property">set</span>(<span class="string">'count'</span>, <span class="variable">value</span> =&gt; <span class="variable">value</span> + <span class="number">1</span>)
-}</template>
+            <span class="variable">increment</span>.<span class="property">onclick</span> = () =&gt; {
+            <span class="object">store</span>.<span class="property">set</span>(<span class="string">'count'</span>,
+            <span class="variable">value</span> =&gt; <span class="variable">value</span> +
+            <span class="number">1</span>) }</template
+          >
         </div>
 
         <div class="code-controls">

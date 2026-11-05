@@ -43,8 +43,12 @@
     "react-native-nitro-modules": ">=0.30"
   },
   "peerDependenciesMeta": {
-    "react-native-mmkv": { "optional": true },
-    "react-native-nitro-modules": { "optional": true }
+    "react-native-mmkv": {
+      "optional": true
+    },
+    "react-native-nitro-modules": {
+      "optional": true
+    }
   },
   "dependencies": {
     "use-sync-external-store": "^1.5.0"

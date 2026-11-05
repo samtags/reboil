@@ -8,8 +8,8 @@ sidebar_position: 3
 `useStore(path)` uses `useSyncExternalStore` to subscribe a component to one selected value:
 
 ```tsx
-const foo = useStore('foo');
-const version = useStore('settings.runTimeVersion');
+const foo = useStore('foo')
+const version = useStore('settings.runTimeVersion')
 ```
 
 A component rerenders only when its selected value changes according to `Object.is`. Updating one sibling path does not rerender subscribers of an unchanged sibling.
@@ -19,15 +19,15 @@ For non-React code, use `store.subscribe(path, listener)`. The listener receives
 For example, a vanilla counter can update the DOM and clean up the listener when the page unloads:
 
 ```js title="src/main.js"
-import '../reboil.config';
-import { store } from 'reboil';
+import '../reboil.config'
+import { store } from 'reboil'
 
-const countElement = document.querySelector('#count');
+const countElement = document.querySelector('#count')
 
 const unsubscribe = store.subscribe('count', (value, previousValue) => {
-  countElement.textContent = String(value);
-  console.log(`count: ${previousValue} → ${value}`);
-});
+  countElement.textContent = String(value)
+  console.log(`count: ${previousValue} → ${value}`)
+})
 
-window.addEventListener('beforeunload', unsubscribe, {once: true});
+window.addEventListener('beforeunload', unsubscribe, { once: true })
 ```

@@ -53,10 +53,13 @@ describe('Reboil runtime', () => {
 
   it('hydrates synchronously, deep merges objects, and replaces arrays', async () => {
     const values = installStorage()
-    values.set('hydrate', JSON.stringify({
-      version: 1,
-      state: { user: { name: 'Grace' }, todos: [{ title: 'Persisted', completed: true }] },
-    }))
+    values.set(
+      'hydrate',
+      JSON.stringify({
+        version: 1,
+        state: { user: { name: 'Grace' }, todos: [{ title: 'Persisted', completed: true }] },
+      }),
+    )
     const { store } = createRegisteredStore(state(), { id: 'hydrate' })
     expect(store.get('user.name')).toBe('Grace')
     expect(store.get('user.active')).toBe(true)
@@ -137,7 +140,9 @@ describe('Reboil runtime', () => {
     values.set('atomic', JSON.stringify({ version: 1, state: state() }))
     const { store } = createRegisteredStore(state(), { id: 'atomic' })
     const originalSet = window.localStorage.setItem.bind(window.localStorage)
-    window.localStorage.setItem = () => { throw new Error('disk full') }
+    window.localStorage.setItem = () => {
+      throw new Error('disk full')
+    }
     expect(() => store.set('user.name', 'Grace')).toThrow('disk full')
     expect(store.get('user.name')).toBe('Ada')
     expect(JSON.parse(values.get('atomic')!).state.user.name).toBe('Ada')

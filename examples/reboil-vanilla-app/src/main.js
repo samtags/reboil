@@ -1,12 +1,15 @@
 import { createStore } from 'reboil'
 import './styles.css'
 
-const { store } = createStore({
-  count: 1,
-}, {
-  id: 'reboil-vanilla-app',
-  logger: true,
-})
+const { store } = createStore(
+  {
+    count: 1,
+  },
+  {
+    id: 'reboil-vanilla-app',
+    logger: true,
+  },
+)
 
 const countElement = document.querySelector('#count')
 const lastChangeElement = document.querySelector('#last-change')

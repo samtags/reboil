@@ -12,21 +12,24 @@ All state persists by default. A path excluded with `persist.exclude` remains us
 Pass typed state paths in `persist.exclude`. The excluded values still update and notify subscribers, but Reboil does not restore them from storage after a reload:
 
 ```ts title="src/store.ts"
-import { createStore } from 'reboil';
+import { createStore } from 'reboil'
 
-const { store } = createStore({
-  count: 1,
-  session: {
-    transientValue: 0,
+const { store } = createStore(
+  {
+    count: 1,
+    session: {
+      transientValue: 0,
+    },
   },
-}, {
-  persist: {
-    exclude: ['session.transientValue'],
+  {
+    persist: {
+      exclude: ['session.transientValue'],
+    },
   },
-});
+)
 
-store.set('count', value => value + 1); // persisted
-store.set('session.transientValue', value => value + 1); // session only
+store.set('count', (value) => value + 1) // persisted
+store.set('session.transientValue', (value) => value + 1) // session only
 ```
 
 After a reload, `count` restores its latest value, while `session.transientValue` returns to `0`. Paths in `persist.exclude` must exist in the initial state and are checked against the inferred state shape.

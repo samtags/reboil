@@ -2,6 +2,9 @@
   "name": "reboil-workspace",
   "private": true,
   "license": "MIT",
+  "engines": {
+    "node": ">=20.19.0"
+  },
   "workspaces": [
     "packages/*",
     "examples/*"
@@ -9,9 +12,28 @@
   "scripts": {
     "build": "npm run build --workspace reboil",
     "test": "npm run test --workspace reboil",
-    "typecheck": "npm run typecheck --workspace reboil"
+    "test:pr-title": "node --test scripts/check-pr-title.test.mjs",
+    "typecheck": "npm run typecheck --workspace reboil",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "check:skills": "node scripts/release-reboil-skill.mjs --check",
+    "check:workspaces": "npm run build --workspaces --if-present && npm run typecheck --workspaces --if-present",
+    "check:docs": "npm run verify:agents --prefix docs-site && npm run typecheck --prefix docs-site && npm run build --prefix docs-site",
+    "check": "npm run format:check && npm run lint && npm run check:workspaces && npm test && npm run test:pr-title && npm run check:skills",
+    "check:all": "npm run check && npm run check:docs"
   },
   "@parcel/resolver-default": {
     "packageExports": true
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^16.5.0",
+    "prettier": "^3.9.10",
+    "typescript-eslint": "^8.72.1"
   }
 }

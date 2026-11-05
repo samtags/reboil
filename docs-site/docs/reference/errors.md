@@ -16,9 +16,9 @@ The runtime rejects missing intermediate properties, out-of-range array indices,
 In development, the default logger groups each mutation and records the previous state, action, next state, and whether the selected value changed:
 
 ```ts
-import { store } from "reboil";
+import { store } from 'reboil'
 
-store.set("count", (value) => value + 1);
+store.set('count', (value) => value + 1)
 ```
 
 The console output is similar to:
@@ -36,12 +36,12 @@ The console output is similar to:
 Invalid values are logged and then thrown. The state remains unchanged:
 
 ```ts
-import { store } from "reboil";
+import { store } from 'reboil'
 
 try {
-  store.set("count", () => Number.NaN);
+  store.set('count', () => Number.NaN)
 } catch (error) {
-  console.error("Counter update failed", error);
+  console.error('Counter update failed', error)
 }
 ```
 
@@ -60,18 +60,18 @@ Counter update failed ReboilError: Value at "count" is not JSON-safe.
 Pass a logger function when you want to send structured mutation events to your own logging system:
 
 ```ts
-import { createStore } from "reboil";
+import { createStore } from 'reboil'
 
 const { store } = createStore(
   { count: 1 },
   {
     logger(event) {
-      console.info("[counter]", event.kind, event.operation, event.path);
+      console.info('[counter]', event.kind, event.operation, event.path)
     },
   },
-);
+)
 
-store.set("count", (value) => value + 1);
+store.set('count', (value) => value + 1)
 ```
 
 Example output:
@@ -86,19 +86,19 @@ Additive changes may keep the same version because persisted plain objects are m
 
 ```ts
 function migrateVersionOne(persisted: unknown) {
-  console.info("[reboil] migrateVersionOne", { fromVersion: 1 });
+  console.info('[reboil] migrateVersionOne', { fromVersion: 1 })
 
-  const previous = persisted as { count?: number };
-  return { count: previous.count ?? 1 };
+  const previous = persisted as { count?: number }
+  return { count: previous.count ?? 1 }
 }
 
 export const { store, useStore } = createStore(app, {
   version: 2,
   migrate(persisted, fromVersion) {
-    if (fromVersion === 1) return migrateVersionOne(persisted);
-    throw new Error(`Unsupported Reboil schema version: ${fromVersion}`);
+    if (fromVersion === 1) return migrateVersionOne(persisted)
+    throw new Error(`Unsupported Reboil schema version: ${fromVersion}`)
   },
-});
+})
 ```
 
 When a version-one record is migrated, the application log can show:

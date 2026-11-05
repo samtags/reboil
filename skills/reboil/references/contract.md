@@ -12,21 +12,21 @@ The recommended setup is one ordinary TypeScript module. `createStore` infers th
 
 ```ts
 // store.ts
-import { createStore } from "reboil";
+import { createStore } from 'reboil'
 
 const initialState = {
-  user: { name: "Ada" },
-  todos: [{ title: "Ship Reboil", completed: false }],
-};
+  user: { name: 'Ada' },
+  todos: [{ title: 'Ship Reboil', completed: false }],
+}
 
-export const { store, useStore } = createStore(initialState);
+export const { store, useStore } = createStore(initialState)
 ```
 
 Components and non-React code import from `./store`, not directly from the package:
 
 ```tsx
-const name = useStore("user.name");
-store.set("todos.0.completed", true);
+const name = useStore('user.name')
+store.set('todos.0.completed', true)
 ```
 
 There is no provider, registration import, generator, watch command, or schema file. Editing `initialState` updates ordinary TypeScript inference immediately.
@@ -39,15 +39,15 @@ The initializer must parse entries with an AST, be idempotent, preserve existing
 
 ## Public API
 
-| API | Contract |
-| --- | --- |
+| API                                   | Contract                                                                                                                                                                                                                          |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `createStore(initialState, options?)` | Creates and synchronously hydrates the application store. Options are `id`, `version`, `persist.exclude`, `migrate`, and `logger`. A repeated ID refreshes defaults during Fast Refresh; a second production registration throws. |
-| `store.get(path)` | Returns the current typed value at a dot path. |
-| `store.set(path, valueOrUpdater)` | Validates a direct value or updater result, persists the complete next state, commits it, notifies changed selections, logs, and returns the selected value. |
-| `store.subscribe(path, listener)` | Calls `listener(nextValue, previousValue)` only when the selected value changes and returns an unsubscribe function. |
-| `store.reset(path?)` | Restores one path or all defaults, then persists and notifies changed selections. |
-| `useStore(path)` | Uses `useSyncExternalStore`; components rerender only when their selected value changes under `Object.is`. |
-| `setStore(path, valueOrUpdater)` | Optional-registration direct binding from `reboil/react`; it writes through the registered runtime. |
+| `store.get(path)`                     | Returns the current typed value at a dot path.                                                                                                                                                                                    |
+| `store.set(path, valueOrUpdater)`     | Validates a direct value or updater result, persists the complete next state, commits it, notifies changed selections, logs, and returns the selected value.                                                                      |
+| `store.subscribe(path, listener)`     | Calls `listener(nextValue, previousValue)` only when the selected value changes and returns an unsubscribe function.                                                                                                              |
+| `store.reset(path?)`                  | Restores one path or all defaults, then persists and notifies changed selections.                                                                                                                                                 |
+| `useStore(path)`                      | Uses `useSyncExternalStore`; components rerender only when their selected value changes under `Object.is`.                                                                                                                        |
+| `setStore(path, valueOrUpdater)`      | Optional-registration direct binding from `reboil/react`; it writes through the registered runtime.                                                                                                                               |
 
 All paths use dots. Objects use string key segments; arrays use canonical numeric segments such as `todos.0.title`; tuples may expose exact indices. Keys containing `.` are unsupported. Missing intermediate keys and out-of-range indices are runtime errors. Literal invalid paths and value types must fail TypeScript checking.
 

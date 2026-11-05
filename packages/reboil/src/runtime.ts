@@ -11,7 +11,16 @@ import {
   serializeEnvelope,
   type PersistenceAdapter,
 } from './persistence'
-import type { JsonValue, MutationEvent, Path, PathUpdater, StateShape, Store, StoreOptions, StoreSubscriber } from './types'
+import type {
+  JsonValue,
+  MutationEvent,
+  Path,
+  PathUpdater,
+  StateShape,
+  Store,
+  StoreOptions,
+  StoreSubscriber,
+} from './types'
 
 type Listener = () => void
 type ChangeListener = StoreSubscriber<JsonValue>
@@ -100,7 +109,10 @@ export class StoreRuntime<State extends StateShape> {
   private adapter: PersistenceAdapter
   private listeners = new Map<string, Set<ChangeListener>>()
 
-  constructor(initialState: State, private readonly options: StoreOptions<State>) {
+  constructor(
+    initialState: State,
+    private readonly options: StoreOptions<State>,
+  ) {
     this.id = options.id ?? 'reboil'
     this.version = options.version ?? 1
     this.exclude = options.persist?.exclude?.map(String) ?? []
@@ -118,7 +130,7 @@ export class StoreRuntime<State extends StateShape> {
       get: (path) => this.get(path),
       set: (path, value) => this.set(path, value),
       subscribe: (path, listener) => this.subscribe(path, listener),
-      reset: (path?: never) => path === undefined ? this.reset() : this.reset(path),
+      reset: (path?: never) => (path === undefined ? this.reset() : this.reset(path)),
     } as Store<State>
     return {
       store,
@@ -134,7 +146,10 @@ export class StoreRuntime<State extends StateShape> {
     return readAt(this.state, String(path)) as import('./types').PathValue<State, PathName>
   }
 
-  set<PathName extends Path<State>>(path: PathName, value: PathUpdater<import('./types').PathValue<State, PathName>>): import('./types').PathValue<State, PathName> {
+  set<PathName extends Path<State>>(
+    path: PathName,
+    value: PathUpdater<import('./types').PathValue<State, PathName>>,
+  ): import('./types').PathValue<State, PathName> {
     const pathName = String(path)
     const previous = this.state
     try {
@@ -172,7 +187,13 @@ export class StoreRuntime<State extends StateShape> {
         if (!isSameValue(previous, next)) this.persist(next)
         this.state = next
         this.notify(previous, next)
-        this.emit({ kind: 'mutation', operation: 'reset', previousState: previous, nextState: next, changed: !isSameValue(previous, next) })
+        this.emit({
+          kind: 'mutation',
+          operation: 'reset',
+          previousState: previous,
+          nextState: next,
+          changed: !isSameValue(previous, next),
+        })
         return next
       }
 
@@ -183,7 +204,14 @@ export class StoreRuntime<State extends StateShape> {
       if (changed) this.persist(next)
       this.state = next
       this.notify(previous, next)
-      this.emit({ kind: 'mutation', operation: 'reset', path: pathName, previousState: previous, nextState: next, changed })
+      this.emit({
+        kind: 'mutation',
+        operation: 'reset',
+        path: pathName,
+        previousState: previous,
+        nextState: next,
+        changed,
+      })
       return restored as import('./types').PathValue<State, PathName>
     } catch (error) {
       this.reject('reset', path === undefined ? undefined : String(path), undefined, previous, error)
@@ -223,19 +251,30 @@ export class StoreRuntime<State extends StateShape> {
       let migrated = false
       if (envelope.version !== this.version) {
         if (envelope.version > this.version) {
-          throw new ReboilError(`Persisted Reboil schema version ${envelope.version} is newer than application version ${this.version}.`)
+          throw new ReboilError(
+            `Persisted Reboil schema version ${envelope.version} is newer than application version ${this.version}.`,
+          )
         }
-        if (!this.migrate) throw new ReboilError(`Persisted Reboil schema version ${envelope.version} requires a migration to version ${this.version}.`)
+        if (!this.migrate)
+          throw new ReboilError(
+            `Persisted Reboil schema version ${envelope.version} requires a migration to version ${this.version}.`,
+          )
         persisted = this.migrate(cloneJson(persisted), envelope.version)
         migrated = true
       }
-      if (!isJsonSafe(persisted) || !isPlainObject(persisted)) throw new ReboilError('Migrated or persisted Reboil state is not JSON-safe.')
+      if (!isJsonSafe(persisted) || !isPlainObject(persisted))
+        throw new ReboilError('Migrated or persisted Reboil state is not JSON-safe.')
       const merged = deepMergeDefaults(this.defaults, persisted) as State
       const hydrated = this.restoreExcludedDefaults(merged)
       if (migrated) this.writeEnvelope(hydrated)
       return hydrated
     } catch (error) {
-      this.emit({ kind: 'rejected', operation: 'reset', currentState: this.defaults, error: error instanceof Error ? error : new Error(String(error)) })
+      this.emit({
+        kind: 'rejected',
+        operation: 'reset',
+        currentState: this.defaults,
+        error: error instanceof Error ? error : new Error(String(error)),
+      })
       throw error
     }
   }
@@ -262,7 +301,8 @@ export class StoreRuntime<State extends StateShape> {
   }
 
   private validateState(value: unknown, label: string): State {
-    if (!isJsonSafe(value) || !isPlainObject(value)) throw new ReboilError(`Reboil ${label} must be a JSON-safe plain object.`)
+    if (!isJsonSafe(value) || !isPlainObject(value))
+      throw new ReboilError(`Reboil ${label} must be a JSON-safe plain object.`)
     return cloneJson(value as State)
   }
 
@@ -276,7 +316,13 @@ export class StoreRuntime<State extends StateShape> {
     }
   }
 
-  private reject(operation: 'set' | 'reset', path: string | undefined, value: unknown, currentState: State, error: unknown): void {
+  private reject(
+    operation: 'set' | 'reset',
+    path: string | undefined,
+    value: unknown,
+    currentState: State,
+    error: unknown,
+  ): void {
     this.emit({
       kind: 'rejected',
       operation,

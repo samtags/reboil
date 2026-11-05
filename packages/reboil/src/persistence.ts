@@ -29,7 +29,9 @@ class BrowserAdapter implements PersistenceAdapter {
 }
 
 class MMKVAdapter implements PersistenceAdapter {
-  constructor(private readonly storage: { getString(key: string): string | undefined; set(key: string, value: string): unknown }) {}
+  constructor(
+    private readonly storage: { getString(key: string): string | undefined; set(key: string, value: string): unknown },
+  ) {}
 
   read(key: string): string | null {
     return this.storage.getString(key) ?? null
@@ -58,22 +60,30 @@ function getBrowserStorage(): Storage | null {
   }
 }
 
-function optionalRequire(name: string): any {
+function optionalRequire(name: string): unknown {
   try {
     // Keeping this as a dynamic require prevents native-only packages from entering browser bundles.
-    const runtimeRequire = typeof require === 'function'
-      ? require
-      : (globalThis as { require?: (moduleName: string) => unknown }).require
+    const runtimeRequire =
+      typeof require === 'function' ? require : (globalThis as { require?: (moduleName: string) => unknown }).require
     return runtimeRequire ? runtimeRequire(name) : null
   } catch {
     return null
   }
 }
 
+function hasCreateMMKV(value: unknown): value is {
+  createMMKV(options: { id: string }): {
+    getString(key: string): string | undefined
+    set(key: string, value: string): unknown
+  }
+} {
+  return typeof value === 'object' && value !== null && 'createMMKV' in value && typeof value.createMMKV === 'function'
+}
+
 function createNativeAdapter(id: string): PersistenceAdapter {
   const mmkvModule = optionalRequire('react-native-mmkv')
   const nitroModule = optionalRequire('react-native-nitro-modules')
-  if (!mmkvModule || !nitroModule || typeof mmkvModule.createMMKV !== 'function') {
+  if (!hasCreateMMKV(mmkvModule) || !nitroModule) {
     throw new ReboilError(
       'Reboil native persistence requires react-native-mmkv v4 and react-native-nitro-modules. Install them and rebuild the native app; Expo Go is not supported.',
     )
@@ -108,7 +118,12 @@ export function parseEnvelope(raw: string): PersistedEnvelope {
     throw new ReboilError('Persisted Reboil data is not valid JSON.', { cause: error })
   }
 
-  if (!isPlainObject(parsed) || typeof parsed.version !== 'number' || !Number.isInteger(parsed.version) || !isPlainObject(parsed.state)) {
+  if (
+    !isPlainObject(parsed) ||
+    typeof parsed.version !== 'number' ||
+    !Number.isInteger(parsed.version) ||
+    !isPlainObject(parsed.state)
+  ) {
     throw new ReboilError('Persisted Reboil data has an invalid versioned envelope.')
   }
 
@@ -164,12 +179,12 @@ export function deepMergeDefaults<T extends JsonValue>(defaults: T, persisted: J
     const merged: Record<string, JsonValue> = cloneJson(defaults)
     for (const [key, value] of Object.entries(persisted)) {
       const defaultValue = defaults[key]
-      merged[key] = defaultValue !== undefined && isPlainObject(defaultValue) && isPlainObject(value)
-        ? deepMergeDefaults(defaultValue, value)
-        : cloneJson(value)
+      merged[key] =
+        defaultValue !== undefined && isPlainObject(defaultValue) && isPlainObject(value)
+          ? deepMergeDefaults(defaultValue, value)
+          : cloneJson(value)
     }
     return merged as T
   }
   return cloneJson(persisted) as T
 }
-

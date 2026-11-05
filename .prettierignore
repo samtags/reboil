@@ -1,0 +1,13 @@
+node_modules/
+dist/
+build/
+coverage/
+.parcel-cache/
+docs-site/.docusaurus/
+docs-site/static/skills/
+**/*.otf
+**/*.ttf
+**/*.woff
+**/*.woff2
+**/*.png
+**/*.svg

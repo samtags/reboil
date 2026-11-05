@@ -47,7 +47,10 @@ function readJson(file: string): Record<string, unknown> {
 }
 
 function relativeImport(fromFile: string, targetFile: string): string {
-  const relative = path.relative(path.dirname(fromFile), targetFile).replaceAll(path.sep, '/').replace(/\.(tsx?|jsx?)$/, '')
+  const relative = path
+    .relative(path.dirname(fromFile), targetFile)
+    .replaceAll(path.sep, '/')
+    .replace(/\.(tsx?|jsx?)$/, '')
   return relative.startsWith('.') ? relative : `./${relative}`
 }
 
@@ -56,7 +59,10 @@ function findStateFile(root: string, explicit?: string): string {
   const candidates = ['src/state.ts', 'src/store.ts', 'state.ts', 'store.ts']
   const found = candidates.map((candidate) => path.resolve(root, candidate)).filter(fs.existsSync)
   if (found.length === 1) return found[0]
-  if (found.length > 1) throw new Error(`Multiple state files found. Use --state to choose one: ${found.map((file) => path.relative(root, file)).join(', ')}`)
+  if (found.length > 1)
+    throw new Error(
+      `Multiple state files found. Use --state to choose one: ${found.map((file) => path.relative(root, file)).join(', ')}`,
+    )
   return path.resolve(root, 'src/state.ts')
 }
 
@@ -64,19 +70,34 @@ function findEntryFile(root: string, packageJson: Record<string, unknown>, expli
   if (explicit) return path.resolve(root, explicit)
   const main = typeof packageJson.main === 'string' ? packageJson.main : null
   if (main && main.startsWith('.') && fs.existsSync(path.resolve(root, main))) return path.resolve(root, main)
-  const candidates = ['src/main.tsx', 'src/main.ts', 'src/index.tsx', 'src/index.ts', 'src/index.js', 'index.tsx', 'index.ts', 'index.js']
+  const candidates = [
+    'src/main.tsx',
+    'src/main.ts',
+    'src/index.tsx',
+    'src/index.ts',
+    'src/index.js',
+    'index.tsx',
+    'index.ts',
+    'index.js',
+  ]
   const found = candidates.map((candidate) => path.resolve(root, candidate)).filter(fs.existsSync)
   if (found.length === 1) return found[0]
-  if (found.length > 1) throw new Error(`Multiple entry files found. Use --entry to choose one: ${found.map((file) => path.relative(root, file)).join(', ')}`)
+  if (found.length > 1)
+    throw new Error(
+      `Multiple entry files found. Use --entry to choose one: ${found.map((file) => path.relative(root, file)).join(', ')}`,
+    )
   return null
 }
 
 function isExpoRouter(packageJson: Record<string, unknown>): boolean {
-  const dependencies = { ...(packageJson.dependencies as Record<string, unknown> | undefined), ...(packageJson.devDependencies as Record<string, unknown> | undefined) }
+  const dependencies = {
+    ...(packageJson.dependencies as Record<string, unknown> | undefined),
+    ...(packageJson.devDependencies as Record<string, unknown> | undefined),
+  }
   return 'expo-router' in dependencies || packageJson.main === 'expo-router/entry'
 }
 
-function parseSource(source: string, file: string): any {
+function parseSource(source: string, file: string): ReturnType<typeof recast.parse> {
   const extension = path.extname(file).toLowerCase()
   const parser = extension === '.tsx' ? babelTsParser : extension === '.ts' ? typescriptParser : babelParser
   return recast.parse(source, { parser })
@@ -128,7 +149,11 @@ async function init(options: CliOptions): Promise<void> {
   if (!fs.existsSync(stateFile)) {
     changes.push({ file: stateFile, before: null, after: 'export const initialState = {}\n' })
   }
-  changes.push({ file: configFile, before: fs.existsSync(configFile) ? fs.readFileSync(configFile, 'utf8') : null, after: configSource(root, configFile, stateFile) })
+  changes.push({
+    file: configFile,
+    before: fs.existsSync(configFile) ? fs.readFileSync(configFile, 'utf8') : null,
+    after: configSource(root, configFile, stateFile),
+  })
 
   const main = typeof packageJson.main === 'string' ? packageJson.main : ''
   const routerEntry = isExpoRouter(packageJson) && (main === 'expo-router/entry' || main === '')
@@ -145,7 +170,11 @@ async function init(options: CliOptions): Promise<void> {
         : generatedEntrySource(configFile, routerEntry ? 'router' : 'expo'),
     })
     packageJson.main = './index.ts'
-    changes.push({ file: packageFile, before: fs.readFileSync(packageFile, 'utf8'), after: `${JSON.stringify(packageJson, null, 2)}\n` })
+    changes.push({
+      file: packageFile,
+      before: fs.readFileSync(packageFile, 'utf8'),
+      after: `${JSON.stringify(packageJson, null, 2)}\n`,
+    })
   } else {
     if (!entryFile) throw new Error('Could not detect an application entry point. Use --entry <path>.')
     const importPath = relativeImport(entryFile, configFile)
@@ -153,7 +182,7 @@ async function init(options: CliOptions): Promise<void> {
     changes.push({ file: entryFile, before, after: addConfigImport(before, entryFile, importPath) })
   }
 
-  const shouldApply = options.dryRun || options.yes || await confirmChanges(changes)
+  const shouldApply = options.dryRun || options.yes || (await confirmChanges(changes))
   if (!shouldApply) {
     console.log('No changes applied.')
     return
@@ -173,4 +202,3 @@ void init(parseArgs(process.argv.slice(2))).catch((error: unknown) => {
   console.error(`reboil init failed: ${error instanceof Error ? error.message : String(error)}`)
   process.exitCode = 1
 })
-

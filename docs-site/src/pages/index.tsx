@@ -1,24 +1,24 @@
-import type { ReactNode } from "react";
-import { useState } from "react";
-import { createStore } from "reboil";
-import Layout from "@theme/Layout";
-import Heading from "@theme/Heading";
-import styles from "./index.module.css";
+import type { ReactNode } from 'react'
+import { useState } from 'react'
+import { createStore } from 'reboil'
+import Layout from '@theme/Layout'
+import Heading from '@theme/Heading'
+import styles from './index.module.css'
 
-type Language = "javascript" | "jsx" | "tsx";
+type Language = 'javascript' | 'jsx' | 'tsx'
 
 type HomeState = {
-  count: number;
-  lastAction: string;
-};
+  count: number
+  lastAction: string
+}
 
 const { store: homeStore, useStore: useHomeStore } = createStore<HomeState>(
   {
     count: 1,
-    lastAction: "3 → 1",
+    lastAction: '3 → 1',
   },
-  { id: "reboil-docs-home" },
-);
+  { id: 'reboil-docs-home' },
+)
 
 const codeExamples: Record<Language, { source: string; markup: string }> = {
   javascript: {
@@ -131,18 +131,18 @@ function Counter() {
   )
 }`,
   },
-};
+}
 
 function CodeWindow(): ReactNode {
-  const [language, setLanguage] = useState<Language>("tsx");
-  const [copied, setCopied] = useState(false);
-  const example = codeExamples[language];
-  const filename = `src/main.${language}`;
+  const [language, setLanguage] = useState<Language>('tsx')
+  const [copied, setCopied] = useState(false)
+  const example = codeExamples[language]
+  const filename = `src/main.${language}`
 
   async function copyCode() {
-    await navigator.clipboard.writeText(example.source);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1400);
+    await navigator.clipboard.writeText(example.source)
+    setCopied(true)
+    window.setTimeout(() => setCopied(false), 1400)
   }
 
   return (
@@ -164,17 +164,13 @@ function CodeWindow(): ReactNode {
         <label className="sr-only" htmlFor="language">
           Code language
         </label>
-        <select
-          id="language"
-          value={language}
-          onChange={(event) => setLanguage(event.target.value as Language)}
-        >
+        <select id="language" value={language} onChange={(event) => setLanguage(event.target.value as Language)}>
           <option value="javascript">JavaScript</option>
           <option value="jsx">JSX</option>
           <option value="tsx">TSX</option>
         </select>
         <button
-          className={`${styles.copyButton} ${copied ? styles.copied : ""}`}
+          className={`${styles.copyButton} ${copied ? styles.copied : ''}`}
           type="button"
           aria-label="Copy code"
           onClick={copyCode}
@@ -186,23 +182,23 @@ function CodeWindow(): ReactNode {
         </button>
       </div>
     </>
-  );
+  )
 }
 
 function CounterCard(): ReactNode {
-  const count = useHomeStore("count");
-  const lastAction = useHomeStore("lastAction");
+  const count = useHomeStore('count')
+  const lastAction = useHomeStore('lastAction')
 
   function increment() {
-    const previous = homeStore.get("count");
-    const next = homeStore.set("count", (value) => value + 1);
-    homeStore.set("lastAction", `${previous} → ${next}`);
+    const previous = homeStore.get('count')
+    const next = homeStore.set('count', (value) => value + 1)
+    homeStore.set('lastAction', `${previous} → ${next}`)
   }
 
   function reset() {
-    const previous = homeStore.get("count");
-    const next = homeStore.reset("count");
-    if (previous !== next) homeStore.set("lastAction", `${previous} → ${next}`);
+    const previous = homeStore.get('count')
+    const next = homeStore.reset('count')
+    if (previous !== next) homeStore.set('lastAction', `${previous} → ${next}`)
   }
 
   return (
@@ -221,30 +217,23 @@ function CounterCard(): ReactNode {
         reset
       </button>
     </aside>
-  );
+  )
 }
 
 export default function Home(): ReactNode {
   return (
-    <Layout
-      title="Typed synchronous state"
-      description="Developer documentation for Reboil."
-    >
+    <Layout title="Typed synchronous state" description="Developer documentation for Reboil.">
       <main>
         <section className={styles.hero}>
           <div className="container">
             <div className={styles.heroIntro}>
               <Heading as="h1">State Simplified</Heading>
               <p>
-                Tiny, fast and scalable String-path state access with zero
-                boilerplate and synchronous persistence out of the box solution
-                using simplified recoil and zustand principles.
+                Tiny, fast and scalable String-path state access with zero boilerplate and synchronous persistence out
+                of the box solution using simplified recoil and zustand principles.
               </p>
             </div>
-            <div
-              className={styles.demo}
-              aria-label="Reboil config registration code example"
-            >
+            <div className={styles.demo} aria-label="Reboil config registration code example">
               <CodeWindow />
               <CounterCard />
             </div>
@@ -252,5 +241,5 @@ export default function Home(): ReactNode {
         </section>
       </main>
     </Layout>
-  );
+  )
 }

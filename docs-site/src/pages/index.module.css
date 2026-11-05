@@ -1,7 +1,7 @@
 .hero {
-  --reboil-serif: "Maragsa Display", serif;
-  --reboil-nav: "Libre Franklin", sans-serif;
-  --reboil-body: "Helvena", sans-serif;
+  --reboil-serif: 'Maragsa Display', serif;
+  --reboil-nav: 'Libre Franklin', sans-serif;
+  --reboil-body: 'Helvena', sans-serif;
   padding: 5rem 0 7rem;
   color: #d4d4d4;
   background: #252526;
@@ -95,9 +95,9 @@
   color: #f0eee6;
   background: #333333;
   font:
-    0.9rem/1.75 "SFMono-Regular",
+    0.9rem/1.75 'SFMono-Regular',
     Consolas,
-    "Liberation Mono",
+    'Liberation Mono',
     monospace;
 }
 .codeBody :global(.keyword) {
@@ -142,8 +142,7 @@
   cursor: pointer;
   background-color: #333333;
   background-image:
-    linear-gradient(45deg, transparent 50%, #d4d4d4 50%),
-    linear-gradient(135deg, #d4d4d4 50%, transparent 50%);
+    linear-gradient(45deg, transparent 50%, #d4d4d4 50%), linear-gradient(135deg, #d4d4d4 50%, transparent 50%);
   background-position:
     calc(100% - 1rem) 50%,
     calc(100% - 0.7rem) 50%;

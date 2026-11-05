@@ -1,10 +1,14 @@
 import { getRegisteredRuntime } from './registry'
 import type { Path, PathValue, StateShape, Store, StoreSubscriber } from './types'
 
+// Application config files augment this marker with their inferred state type.
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Register {}
 
 type RegisteredState = Register extends { state: infer State }
-  ? State extends StateShape ? State : StateShape
+  ? State extends StateShape
+    ? State
+    : StateShape
   : StateShape
 
 export interface ReboilConfig {
@@ -26,7 +30,9 @@ export const store: Store<RegisteredState> = {
     return getRegisteredRuntime().subscribe(path as never, listener as StoreSubscriber<never>)
   },
   reset(path?: never) {
-    return path === undefined ? getRegisteredRuntime().reset() as never : getRegisteredRuntime().reset(path as never) as never
+    return path === undefined
+      ? (getRegisteredRuntime().reset() as never)
+      : (getRegisteredRuntime().reset(path as never) as never)
   },
 }
 

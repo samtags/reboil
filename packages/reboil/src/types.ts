@@ -26,7 +26,11 @@ type Paths<T> = T extends object ? ChildPaths<T> : never
 
 export type Path<State extends StateShape> = Paths<State>
 
-type ArrayValue<T, Segment extends string> = Segment extends `${number}` ? T extends readonly (infer Item)[] ? Item : never : never
+type ArrayValue<T, Segment extends string> = Segment extends `${number}`
+  ? T extends readonly (infer Item)[]
+    ? Item
+    : never
+  : never
 
 export type PathValue<State, SelectedPath extends string> = SelectedPath extends `${infer Head}.${infer Tail}`
   ? Head extends keyof State

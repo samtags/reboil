@@ -15,9 +15,10 @@ export function resolveLogger<State extends StateShape>(
 
 function defaultLogger<State extends StateShape>(event: MutationEvent<State>): void {
   if (typeof console === 'undefined') return
-  const title = event.kind === 'mutation'
-    ? `[reboil] ${event.operation} ${event.path ?? '<store>'}`
-    : `[reboil] rejected ${event.operation} ${event.path ?? '<store>'}`
+  const title =
+    event.kind === 'mutation'
+      ? `[reboil] ${event.operation} ${event.path ?? '<store>'}`
+      : `[reboil] rejected ${event.operation} ${event.path ?? '<store>'}`
 
   const group = console.groupCollapsed ?? console.group
   if (group) group.call(console, title)
@@ -34,7 +35,10 @@ function defaultLogger<State extends StateShape>(event: MutationEvent<State>): v
   if (console.groupEnd) console.groupEnd()
 }
 
-export function emitLog<State extends StateShape>(logger: MutationLogger<State> | null, event: MutationEvent<State>): void {
+export function emitLog<State extends StateShape>(
+  logger: MutationLogger<State> | null,
+  event: MutationEvent<State>,
+): void {
   if (!logger) return
   try {
     logger(event)
@@ -42,4 +46,3 @@ export function emitLog<State extends StateShape>(logger: MutationLogger<State> 
     if (!isProduction()) console.warn('[reboil] custom logger failed', error)
   }
 }
-

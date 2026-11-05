@@ -1,0 +1,68 @@
+name: Bug report
+description: Report a reproducible problem in Reboil
+title: 'fix: '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Do not disclose security vulnerabilities here; use private vulnerability reporting from the Security tab.
+  - type: input
+    id: version
+    attributes:
+      label: Reboil version
+      placeholder: 0.1.0 or a commit SHA
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Include platform, runtime, framework, and relevant versions.
+      placeholder: Expo 55, React Native 0.x, iOS 18, Node 24
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Explain the observed behavior and its impact.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction
+      description: Provide a repository, runnable example, or the smallest code sample that reproduces the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      placeholder: |
+        1. Create a store with ...
+        2. Call ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or additional context
+      description: Remove credentials, tokens, persisted user data, and other sensitive information.
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I searched existing issues and discussions for this problem.
+          required: true
+        - label: This report does not contain a security vulnerability or sensitive information.
+          required: true

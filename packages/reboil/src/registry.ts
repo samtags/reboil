@@ -10,10 +10,14 @@ const registryKey = Symbol.for('reboil.registry')
 const globalRegistry = globalThis as typeof globalThis & { [registryKey]?: Registry }
 const registry: Registry = globalRegistry[registryKey] ?? (globalRegistry[registryKey] = {})
 
-export function createRegisteredStore<State extends StateShape>(initialState: State, options: StoreOptions<State> = {}): RuntimeBindings<State> {
+export function createRegisteredStore<State extends StateShape>(
+  initialState: State,
+  options: StoreOptions<State> = {},
+): RuntimeBindings<State> {
   const id = options.id ?? 'reboil'
   if (registry.runtime) {
-    if (registry.runtime.id !== id) throw new ReboilError(`Reboil supports one application store; "${registry.runtime.id}" is already registered.`)
+    if (registry.runtime.id !== id)
+      throw new ReboilError(`Reboil supports one application store; "${registry.runtime.id}" is already registered.`)
     if (isProduction()) throw new ReboilError(`Reboil store "${id}" was registered more than once in production.`)
     registry.runtime.refreshDefaults(initialState)
     return registry.runtime.bindings as unknown as RuntimeBindings<State>
@@ -25,7 +29,10 @@ export function createRegisteredStore<State extends StateShape>(initialState: St
 }
 
 export function getRegisteredRuntime(): StoreRuntime<StateShape> {
-  if (!registry.runtime) throw new ReboilError('Reboil has not been initialized. Import the generated reboil.config.ts before using direct package bindings.')
+  if (!registry.runtime)
+    throw new ReboilError(
+      'Reboil has not been initialized. Import the generated reboil.config.ts before using direct package bindings.',
+    )
   return registry.runtime
 }
 
@@ -36,4 +43,3 @@ export function resetRegistryForTests(): void {
 function isProduction(): boolean {
   return typeof process !== 'undefined' && process.env.NODE_ENV === 'production'
 }
-

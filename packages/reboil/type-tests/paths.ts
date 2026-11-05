@@ -18,6 +18,7 @@ if (false) {
   void name
   void completed
   void completedPath
+  void useStore
 
   // @ts-expect-error invalid path
   store.get('user.missing')
@@ -27,4 +28,3 @@ if (false) {
   store.set('user.active', 'yes')
   void invalidHookPath
 }
-
