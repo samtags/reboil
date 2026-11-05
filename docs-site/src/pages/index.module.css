@@ -1,0 +1,291 @@
+.hero {
+  --reboil-serif: "Maragsa Display", serif;
+  --reboil-nav: "Libre Franklin", sans-serif;
+  --reboil-body: "Helvena", sans-serif;
+  padding: 5rem 0 7rem;
+  color: #d4d4d4;
+  background: #252526;
+  border-bottom: 1px solid #333;
+}
+.heroIntro {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.kicker {
+  color: #4ec9b0;
+  font: 500 0.7rem/1 var(--reboil-nav);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.heroIntro h1 {
+  max-width: 48rem;
+  margin: 1.25rem auto 0.9rem;
+  color: #f6f8f4;
+  font-family: var(--reboil-body);
+  font-size: clamp(3rem, 6vw, 5.8rem);
+  font-weight: 400;
+  line-height: 0.96;
+  letter-spacing: -0.065em;
+}
+.heroIntro h1 em {
+  color: #52a8e0;
+  font-family: var(--reboil-body);
+  font-weight: 400;
+}
+.heroIntro p {
+  max-width: 48rem;
+  margin: 0 auto;
+  color: #abb6aa;
+  font-family: var(--reboil-body);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+.demo {
+  width: 100%;
+  max-width: 72rem;
+  min-height: 34rem;
+  position: relative;
+  padding-top: 4rem;
+  margin: 0 auto;
+}
+.codeWindow {
+  max-width: 64rem;
+  margin: 0 auto;
+  overflow: hidden;
+  background: #333333;
+  border: 1px solid #444444;
+  border-radius: 0.9rem;
+  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.28);
+}
+.windowBar {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.8rem 1rem;
+  color: #858585;
+  background: #333333;
+  border-bottom: 1px solid #4a4a4a;
+  font-family: var(--reboil-nav);
+  font-size: 0.72rem;
+}
+.windowDots {
+  display: flex;
+  gap: 0.5rem;
+}
+.windowDots i {
+  display: block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+}
+.windowDots i:nth-child(1) {
+  background: #ff5f57;
+}
+.windowDots i:nth-child(2) {
+  background: #febc2e;
+}
+.windowDots i:nth-child(3) {
+  background: #28c840;
+}
+.codeBody {
+  min-height: 29rem;
+  margin: 0;
+  padding: 1.8rem 2rem 2rem;
+  overflow-x: auto;
+  color: #f0eee6;
+  background: #333333;
+  font:
+    0.9rem/1.75 "SFMono-Regular",
+    Consolas,
+    "Liberation Mono",
+    monospace;
+}
+.codeBody :global(.keyword) {
+  color: #c586c0;
+}
+.codeBody :global(.imported),
+.codeBody :global(.property),
+.codeBody :global(.variable) {
+  color: #dcdcaa;
+}
+.codeBody :global(.function),
+.codeBody :global(.object) {
+  color: #9cdcfe;
+}
+.codeBody :global(.type) {
+  color: #4ec9b0;
+}
+.codeBody :global(.string) {
+  color: #ce9178;
+}
+.codeBody :global(.number),
+.codeBody :global(.boolean) {
+  color: #b5cea8;
+}
+.codeBody :global(.tag),
+.codeBody :global(.attribute) {
+  color: #569cd6;
+}
+.codeControls {
+  display: flex;
+  justify-content: flex-end;
+  max-width: 64rem;
+  padding-top: 0.7rem;
+  margin: 0 auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+.codeControls select {
+  appearance: none;
+  padding: 0.65rem 2.25rem 0.65rem 0.9rem;
+  color: #f0eee6;
+  cursor: pointer;
+  background-color: #333333;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #d4d4d4 50%),
+    linear-gradient(135deg, #d4d4d4 50%, transparent 50%);
+  background-position:
+    calc(100% - 1rem) 50%,
+    calc(100% - 0.7rem) 50%;
+  background-repeat: no-repeat;
+  background-size: 0.3rem 0.3rem;
+  border: 1px solid #4a4a4a;
+  border-radius: 0.7rem;
+  font-family: var(--reboil-nav);
+  font-size: 0.72rem;
+}
+.codeControls select:focus-visible {
+  outline: 2px solid #007acc;
+  outline-offset: 2px;
+}
+.copyButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  padding: 0.65rem 0.75rem;
+  color: #f0eee6;
+  cursor: pointer;
+  background: #333333;
+  border: 1px solid #4a4a4a;
+  border-radius: 0.7rem;
+}
+.copyButton:hover,
+.copied {
+  color: #4ec9b0;
+  background: #3d3d3d;
+}
+.copyButton svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+}
+.counterCard {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  width: 11rem;
+  min-width: 10rem;
+  padding: 1.4rem;
+  color: #d4d4d4;
+  background: #333;
+  border: 1px solid #4f4f4f;
+  border-radius: 0.8rem;
+  box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.3);
+}
+.counterHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.7rem;
+}
+.counterLabel {
+  color: #9cdcfe;
+  font: 0.72rem/1 var(--reboil-nav);
+}
+.counterNote {
+  color: #858585;
+  font: 0.7rem/1 var(--reboil-nav);
+  text-align: right;
+}
+.counterCard strong {
+  width: 100%;
+  margin-bottom: 1.15rem;
+  color: #f6f8f4;
+  font-family: var(--reboil-body);
+  font-size: 3.4rem;
+  font-weight: 500;
+  letter-spacing: -0.08em;
+  line-height: 1;
+  text-align: center;
+}
+.counterCard button {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  color: #fff;
+  cursor: pointer;
+  background: #0e639c;
+  border: 0;
+  border-radius: 0.45rem;
+  font-family: var(--reboil-nav);
+  font-size: 0.76rem;
+  font-weight: 500;
+  transition:
+    transform 160ms ease,
+    background 160ms ease;
+}
+.counterCard button:hover {
+  background: #1177bb;
+  transform: translateY(-1px);
+}
+.counterCard .resetLink {
+  align-self: center;
+  width: auto;
+  padding: 0;
+  margin-top: 0.85rem;
+  color: #858585;
+  background: transparent;
+  font-size: 0.72rem;
+}
+.counterCard .resetLink:hover {
+  color: #d4d4d4;
+  background: transparent;
+  transform: none;
+}
+@media (max-width: 996px) {
+  .demo {
+    padding-right: 1rem;
+    padding-left: 1rem;
+  }
+  .counterCard {
+    right: 1.5rem;
+  }
+}
+@media (max-width: 760px) {
+  .hero {
+    padding: 4rem 0 5rem;
+  }
+  .demo {
+    min-height: 31rem;
+    padding-top: 4rem;
+  }
+  .codeBody {
+    min-height: 26rem;
+    padding: 1.3rem;
+    font-size: 0.74rem;
+  }
+  .counterCard {
+    right: 0.5rem;
+    width: 9.5rem;
+    padding: 1rem;
+  }
+  .counterCard strong {
+    font-size: 2.8rem;
+  }
+}

@@ -1,0 +1,9 @@
+# Reboil public contract
+
+Reboil uses one typed application store created with createStore(initialState, options?). The factory returns store and useStore bindings. State is accessed with typed dot-separated paths, including numeric array indices. store.get reads; store.set accepts a value or updater; store.subscribe listens outside React; store.reset restores defaults; useStore subscribes React components; setStore from reboil/react writes through the registered runtime.
+
+Persistence is synchronous. Expo and React Native use MMKV and require a development or production build, not Expo Go. Browser React uses localStorage. Mutations validate, serialize and persist, commit memory, notify subscribers, log, and return the committed value. Failures preserve the previous authoritative state.
+
+Supported persisted values are strings, finite numbers, booleans, null, plain objects, and arrays. Functions, dates, maps, sets, cycles, undefined, non-finite numbers, symbols, BigInt, and class instances are rejected. Development logging is on by default; production logging is off by default.
+
+The default workflow exports inferred bindings from the application store module and requires no Provider, registration import, generator, or watcher. The optional reboil init workflow is one-time setup for direct package imports.

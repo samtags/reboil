@@ -1,0 +1,12 @@
+{
+  "name": "Reboil",
+  "version": "1",
+  "status": "specification",
+  "topics": [
+    {"id": "overview", "url": "/docs/overview", "summary": "Typed synchronous state for Expo, React Native, and web."},
+    {"id": "quick-start", "url": "/docs/getting-started/quick-start", "summary": "Create one typed store module and consume its bindings."},
+    {"id": "typed-paths", "url": "/docs/concepts/typed-paths", "summary": "Read and write nested state with inferred dot paths."},
+    {"id": "persistence", "url": "/docs/concepts/persistence", "summary": "Synchronous adapters, atomic mutations, and JSON-safe values."},
+    {"id": "api", "url": "/docs/reference/api", "summary": "Public factory, store, hook, subscription, and reset API."}
+  ]
+}

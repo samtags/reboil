@@ -11,7 +11,7 @@ const codeExamples = {
     source: `import { createStore } from 'reboil'
 import { setStore, useStore } from 'reboil/react'
 
-const { store } = createStore({
+createStore({
   count: 1,
 })
 
@@ -27,7 +27,7 @@ function Counter() {
     markup: `<span class="keyword">import</span> { <span class="imported">createStore</span> } <span class="keyword">from</span> <span class="string">'reboil'</span>
 <span class="keyword">import</span> { <span class="imported">setStore</span>, <span class="imported">useStore</span> } <span class="keyword">from</span> <span class="string">'reboil/react'</span>
 
-<span class="keyword">const</span> { <span class="variable">store</span> } = <span class="function">createStore</span>({
+<span class="function">createStore</span>({
   <span class="property">count</span>: <span class="number">1</span>,
 })
 
@@ -49,12 +49,12 @@ type Store = {
   count: number
 }
 
-const { store } = createStore<Store>({
+createStore<Store>({
   count: 1,
 })
 
 function Counter() {
-  const count: number = useStore('count')
+  const count = useStore('count')
 
   return (
     <button onClick={() => setStore('count', value => value + 1)}>
@@ -69,12 +69,12 @@ function Counter() {
   <span class="property">count</span>: <span class="type">number</span>
 }
 
-<span class="keyword">const</span> { <span class="variable">store</span> } = <span class="function">createStore</span>&lt;<span class="type">Store</span>&gt;({
+<span class="function">createStore</span>&lt;<span class="type">Store</span>&gt;({
   <span class="property">count</span>: <span class="number">1</span>,
 })
 
 <span class="keyword">function</span> <span class="function">Counter</span>() {
-  <span class="keyword">const</span> <span class="variable">count</span>: <span class="type">number</span> = <span class="function">useStore</span>(<span class="string">'count'</span>)
+  <span class="keyword">const</span> <span class="variable">count</span> = <span class="function">useStore</span>(<span class="string">'count'</span>)
 
   <span class="keyword">return</span> (
     &lt;<span class="tag">button</span> <span class="attribute">onClick</span>={() =&gt; <span class="function">setStore</span>(<span class="string">'count'</span>, value =&gt; value + <span class="number">1</span>)}&gt;

@@ -25,6 +25,66 @@ The core promise is:
 - Expo native and React web compatibility.
 - Redux-style observability during development.
 
+## Example visual style
+
+Reboil examples should use the supplied brand typography and boil-mark favicon so they feel like one coherent product. The font source paths below are authoring references on the design workstation; projects must copy the files into their own assets directory and reference the copied files at runtime.
+
+| Use | Font family | Source file |
+| --- | --- | --- |
+| Headings and titles | `Maragsa Display` | `/Users/russtagalog/Downloads/Maragsa_Font_Family_(Fontmirror)/Maragsa Display 400.otf` |
+| Subheadings and navigation | `Libre Franklin` | `/Users/russtagalog/Documents/Aptly/ASTAF U19 - Brand Guideline/Fonts/Primary Typefaces/Subheadings/LibreFranklin-VariableFont_wght.ttf` |
+| Body copy | `Helvena` | `/Users/russtagalog/Documents/Aptly/ASTAF U19 - Brand Guideline/Fonts/Primary Typefaces/Body Copy/WOFF2/Helvena-Regular.woff2` |
+
+Register the copied font files with `@font-face` and apply them by role:
+
+```css
+@font-face {
+  font-family: "Maragsa Display";
+  font-style: normal;
+  font-weight: 400;
+  src: url("./assets/fonts/Maragsa-Display-400.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Libre Franklin";
+  font-style: normal;
+  font-weight: 100 900;
+  src: url("./assets/fonts/LibreFranklin-Variable.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Helvena";
+  font-style: normal;
+  font-weight: 400;
+  src: url("./assets/fonts/Helvena-Regular.woff2") format("woff2");
+}
+
+h1,
+h2,
+h3,
+.title {
+  font-family: "Maragsa Display", serif;
+  font-weight: 400;
+}
+
+.subtitle,
+nav {
+  font-family: "Libre Franklin", sans-serif;
+}
+
+body {
+  font-family: "Helvena", sans-serif;
+}
+```
+
+Use the boil mark in `examples/reboil-vanilla-app/src/assets/boil.png` as the reference favicon. Copy it into a new project's asset or public directory and add the appropriate bundler-relative link:
+
+```html
+<link rel="icon" type="image/png" href="./assets/boil.png" />
+```
+
+For static apps that serve assets from the site root, use `/assets/boil.png` instead. The favicon and fonts are presentation guidance for examples; they do not affect Reboil's runtime API.
+
 ## Goals
 
 - Make persisted state available synchronously as soon as the store is registered.
