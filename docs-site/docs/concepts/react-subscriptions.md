@@ -15,3 +15,19 @@ const version = useStore('settings.runTimeVersion');
 A component rerenders only when its selected value changes according to `Object.is`. Updating one sibling path does not rerender subscribers of an unchanged sibling.
 
 For non-React code, use `store.subscribe(path, listener)`. The listener receives the new value first and the previous value second, and the returned function removes the subscription.
+
+For example, a vanilla counter can update the DOM and clean up the listener when the page unloads:
+
+```js title="src/main.js"
+import '../reboil.config';
+import { store } from 'reboil';
+
+const countElement = document.querySelector('#count');
+
+const unsubscribe = store.subscribe('count', (value, previousValue) => {
+  countElement.textContent = String(value);
+  console.log(`count: ${previousValue} → ${value}`);
+});
+
+window.addEventListener('beforeunload', unsubscribe, {once: true});
+```

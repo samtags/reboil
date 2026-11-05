@@ -8,10 +8,10 @@ sidebar_position: 1
 `createStore(initialState, options?)` creates the application store, synchronously restores persisted state, and returns typed `store` and `useStore` bindings.
 
 ```ts
-export const {store, useStore} = createStore(app, {
-  id: 'reboil',
+export const { store, useStore } = createStore(app, {
+  id: "reboil",
   version: 1,
-  persist: {exclude: ['session.transientValue']},
+  persist: { exclude: ["session.transientValue"] },
   migrate(persisted, fromVersion) {
     return migrateToCurrentState(persisted, fromVersion);
   },
@@ -19,23 +19,23 @@ export const {store, useStore} = createStore(app, {
 });
 ```
 
-| Option | Default | Behavior |
-| --- | --- | --- |
-| `id` | `'reboil'` | Namespaces persisted state. |
-| `version` | `1` | Identifies the current persisted schema. |
-| `migrate` | None | Synchronously converts older persisted state. |
-| `persist.exclude` | `[]` | Typed paths that remain reactive but are not persisted. |
-| `logger` | Development logger | Enables, disables, or replaces mutation logging. |
+| Option            | Default            | Behavior                                                |
+| ----------------- | ------------------ | ------------------------------------------------------- |
+| `id`              | `'reboil'`         | Namespaces persisted state.                             |
+| `version`         | `1`                | Identifies the current persisted schema.                |
+| `migrate`         | None               | Synchronously converts older persisted state.           |
+| `persist.exclude` | `[]`               | Typed paths that remain reactive but are not persisted. |
+| `logger`          | Development logger | Enables, disables, or replaces mutation logging.        |
 
-## Optional config registration
+## Initialization
 
 The typed application store module is the default workflow. The planned initializer also supports direct imports:
 
 ```tsx
-import {useStore} from 'reboil/react';
+import { useStore } from "reboil/react";
 
 export function Component() {
-  const foo = useStore('foo');
+  const foo = useStore("foo");
   return null;
 }
 ```

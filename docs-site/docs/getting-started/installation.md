@@ -7,11 +7,11 @@ sidebar_position: 1
 
 ## Browser React and Expo Web
 
+Install the package:
+
 ```sh
 npm install reboil
 ```
-
-Browser consumers use `localStorage`
 
 ## Expo and React Native
 
@@ -25,3 +25,13 @@ npx expo prebuild
 MMKV contains native code, so Reboil requires an Expo development or production build. It does not run in Expo Go.
 
 See the [platform support guide](./platform-support) for adapter and hydration behavior.
+
+Browser consumers use `localStorage`
+
+## Initialize state
+
+Initialize your global store by running this command:
+
+```sh
+npx reboil init
+```

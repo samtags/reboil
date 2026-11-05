@@ -5,15 +5,14 @@ sidebar_position: 2
 
 # Typed string paths
 
-V1 paths use dot notation and support nested plain objects and numeric array indices:
+Paths supports dot notation and nested plain objects and numeric array indices:
 
-```ts
-store.get('settings.runTimeVersion');
-store.get('todos.0.title');
-store.set('todos.0.completed', true);
-```
+- `store.get('settings.runTimeVersion');`
+- `store.get('todos.0.title');`
+- `store.set('todos.0.completed', true);`
 
-The package carries the inferred state type into reusable `Path<State>` and `PathValue<State, Path>` types. That means changing the initial state updates autocomplete and value types without generation commands.
+The package carries the inferred state type into reusable `Path<State>` and `PathValue<State, Path>` types.
+That means changing the initial state updates autocomplete and value types without generation commands.
 
 ## Rules
 
@@ -22,4 +21,4 @@ The package carries the inferred state type into reusable `Path<State>` and `Pat
 - Tuples may expose their known indices precisely.
 - Missing intermediate properties and out-of-range indices are runtime errors.
 - Invalid writes are logged in development, then throw without changing state.
-- Dynamic record-key autocomplete is outside v1.
+- Dynamic record-key autocomplete is outside the scope.
