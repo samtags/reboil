@@ -7,7 +7,7 @@ slug: /overview
 
 # Reboil
 
-Tiny, fast and scalable String-path state access with zero boilerplate and synchronous persistence out of the box solution using simplified recoil and zustand principles.
+Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box. Inspired by Recoil’s principles, Redux’s observability and scalability, and Zustand’s simplicity.
 
 ## The core features
 

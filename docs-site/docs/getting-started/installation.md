@@ -28,9 +28,9 @@ See the [platform support guide](./platform-support) for adapter and hydration b
 
 Browser consumers use `localStorage`.
 
-## Register the application state
+## Boil the project
 
-Config registration is part of the standard installation. From the application package, run:
+From the application package, run:
 
 ```sh
 npx reboil init
