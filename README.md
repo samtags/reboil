@@ -52,11 +52,13 @@ npx reboil init
 
 ## Quick start
 
-Run the standard initializer after installing the package. It creates the application state and config files, registers their types, and wires the config into the application entry point.
+Run the initializer command at your project directory after installing the package.
 
 ```sh
 npx reboil init
 ```
+
+It creates the application state and config files, registers their types, and wires the config into the application entry point.
 
 ```ts
 // src/state.ts - created by the init command
@@ -86,6 +88,8 @@ declare module 'reboil' {
   }
 }
 ```
+
+## Usage
 
 Subscribe to only the path a component needs, then update it through the same store:
 
@@ -178,24 +182,64 @@ reports.store.get('count') // 2
 
 Use `lazy` from `reboil`, not React's component-oriented `lazy`. A lazy store loads once and stays resident for the application session.
 
-## Persistence and migrations
+## Persistence
 
-Exclude session-only values from persisted state with typed paths:
+State persists by default. Exclude values that should return to their initial value whenever the page or app reloads:
 
 ```ts
-const { store } = createStore(initialState, {
-  id: 'my-app',
-  version: 2,
-  persist: {
-    exclude: ['session.transientValue'],
+const state = {
+  count: 1,
+  settings: {
+    runtimeVersion: '3.14.15',
   },
-  migrate(persisted, fromVersion) {
-    return migrateToVersionTwo(persisted, fromVersion)
+}
+
+createStore(state, {
+  persist: {
+    exclude: ['count'],
   },
 })
 ```
 
-Mutations are validated and persisted before the in-memory state is committed. Failed validation, serialization, migration, or storage writes leave the previous state authoritative and throw an error.
+Here, `count` is never persisted, so it always resets to `1` after a reload. Other state, such as `settings.runtimeVersion`, continues to persist normally.
+
+Mutations are validated and persisted before the in-memory state is committed. Failed validation, serialization, or storage writes leave the previous state authoritative and throw an error.
+
+## Migration
+
+Use a migration when a new release makes a breaking change to the shape of persisted state, such as renaming a field or changing its type. Increment the store version and synchronously convert the older state to the current shape:
+
+```ts
+const state = {
+  count: 1,
+  settings: {
+    runtimeVersion: '3.14.15',
+  },
+}
+
+createStore(state, {
+  version: 2,
+  migrate(persisted, fromVersion) {
+    if (fromVersion !== 1) {
+      throw new Error(`Unsupported schema version: ${fromVersion}`)
+    }
+
+    const previous = persisted as {
+      count?: number
+      settings?: { runtime?: string }
+    }
+
+    return {
+      count: previous.count ?? 1,
+      settings: {
+        runtimeVersion: previous.settings?.runtime ?? '3.14.15',
+      },
+    }
+  },
+})
+```
+
+This example migrates the version-one `settings.runtime` field to `settings.runtimeVersion`. Additive changes usually do not need a migration because persisted objects are merged with the current defaults. A failed or unsupported migration preserves the previously stored data and throws an error.
 
 ## API
 
@@ -220,7 +264,7 @@ packages/reboil/                  Package source, tests, and type tests
 examples/                         Public-facing examples
 prototypes/                       Internal validation apps and initializer fixtures
 docs-site/                        Docusaurus documentation site
-skills/reboil/                   Reboil skill for coding agents
+skills/reboil/                    Reboil skill for coding agents
 ```
 
 ## Development
