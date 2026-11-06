@@ -26,7 +26,7 @@ The automated verification command initializes every fixture twice, builds/bundl
 npm run verify --prefix prototypes/init
 ```
 
-Expected initializer output is `Project successfully boiled! Reboil is initialized.` on the first run and `Reboil is already boiled—no changes needed.` on the second run. Both outcomes link to the quick-start documentation.
+Expected initializer output is `Project successfully boiled! Reboil is initialized.` on the first run and `Reboil is already boiled—no changes needed.` on the second run. Both recommend `npx reboil --prepare agents` and link to the quick-start documentation.
 
 ## Verify one project at a time
 

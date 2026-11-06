@@ -1,0 +1,6 @@
+interface:
+  display_name: 'Reboil'
+  short_description: 'Build and integrate Reboil state'
+  default_prompt: 'Use $reboil to integrate typed Reboil state into this application.'
+policy:
+  allow_implicit_invocation: true

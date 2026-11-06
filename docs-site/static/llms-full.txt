@@ -24,6 +24,8 @@ const selectedName = useStore("user.name");
 
 Config registration is part of installation and is the standard integration path. It needs no Provider, recurring code generator, or watcher. A customized config that composes feature stores registers `bindings: typeof app` so direct imports retain resolved root paths and typed lazy load paths. `createStore()` still returns local typed bindings for composition, scoped access, and explicit low-level integrations.
 
+To install project-local skills for coding agents, run `npx reboil --prepare agents` and select Claude Code, Codex, or both. The command installs Claude Code at `.claude/skills/reboil/` and Codex at `.agents/skills/reboil/`; it asks before replacing customized files.
+
 `createStore()` results may be fields in another store. Exactly one node must remain unparented as the application root. Parent paths and scoped child bindings address the same partition.
 
 Use Reboil's `lazy()` with a dynamic import whose module default-exports a `createStore()` result. React hook access automatically loads and suspends. Vanilla code first awaits `store.load(featurePath)` or the lazy handle's `load()`. `React.lazy()` is for components and is not a valid store field.

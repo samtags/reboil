@@ -40,6 +40,14 @@ The initializer creates a default `src/state.ts` when one does not already exist
 
 You do not need to create or copy either file manually. Run the command once during setup; state edits do not require regeneration or a watcher.
 
+To add project-local Reboil skills for Claude Code and Codex, run:
+
+```sh
+npx reboil --prepare agents
+```
+
+Choose one or both agents in the interactive checklist. Existing customized skills are left unchanged unless you confirm their replacement.
+
 The generated state file starts empty:
 
 ```ts title="src/state.ts"

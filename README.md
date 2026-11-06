@@ -60,6 +60,12 @@ npx reboil init
 
 It creates the application state and config files, registers their types, and wires the config into the application entry point.
 
+To add the maintained project-local skills for Claude Code and Codex, run:
+
+```sh
+npx reboil --prepare agents
+```
+
 ```ts
 // src/state.ts - created by the init command
 export const initialState = {

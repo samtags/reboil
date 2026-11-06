@@ -69,7 +69,7 @@
     {
       "id": "agents",
       "url": "/docs/agents",
-      "summary": "Machine-readable resources and the downloadable Reboil skill."
+      "summary": "Machine-readable resources, downloadable Reboil skills, and project-local agent skill installation."
     }
   ]
 }

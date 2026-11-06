@@ -3,12 +3,14 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
+import { checkbox, confirm } from '@inquirer/prompts'
 import chalk from 'chalk'
 import ora, { type Ora } from 'ora'
 import * as recast from 'recast'
 import babelParser from 'recast/parsers/babel'
 import babelTsParser from 'recast/parsers/babel-ts'
 import typescriptParser from 'recast/parsers/typescript'
+import { agentSkills, prepareAgentSkills, type AgentSkill, type AgentSkillId } from './prepare-agents'
 
 interface Change {
   file: string
@@ -22,6 +24,8 @@ interface CliOptions {
   entry?: string
   dryRun: boolean
 }
+
+type CliCommand = { kind: 'init'; options: CliOptions } | { kind: 'prepare-agents' }
 
 type Framework = 'expo-router' | 'expo' | 'next' | 'cra' | 'react-native' | 'generic'
 
@@ -43,8 +47,16 @@ interface AstNode {
 
 const sourceExtensions = ['tsx', 'jsx', 'ts', 'js', 'mts', 'mjs'] as const
 const quickStartUrl = 'https://reboil.vercel.app/docs/getting-started/quick-start#subscribe-to-state-changes'
+const agentDocsUrl = 'https://reboil.vercel.app/docs/agents'
 
-function parseArgs(argv: string[]): CliOptions {
+function parseArgs(argv: string[]): CliCommand {
+  if (argv[0] === '--prepare') {
+    if (argv.length !== 2 || argv[1] !== 'agents') {
+      throw new Error('Usage: reboil --prepare agents')
+    }
+    return { kind: 'prepare-agents' }
+  }
+
   const options: CliOptions = { cwd: process.cwd(), dryRun: false }
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index]
@@ -53,13 +65,13 @@ function parseArgs(argv: string[]): CliOptions {
     else if (argument === '--dry-run') options.dryRun = true
     else if (argument === '--yes') continue
     else if (argument === '--help' || argument === '-h') {
-      console.log('Usage: reboil init [--state <path>] [--entry <path>] [--dry-run]')
+      console.log('Usage:\n  reboil init [--state <path>] [--entry <path>] [--dry-run]\n  reboil --prepare agents')
       process.exit(0)
     } else if (argument !== 'init') {
       throw new Error(`Unknown argument: ${argument}`)
     }
   }
-  return options
+  return { kind: 'init', options }
 }
 
 function readJson(file: string): Record<string, unknown> {
@@ -411,7 +423,91 @@ function generatedPagesAppSource(file: string, configFile: string): string {
 }
 
 function showNextStep(): void {
+  console.log(
+    `\n${chalk.bold.yellow('Recommended:')} Add agent skills via ${chalk.cyan.bold('npx reboil --prepare agents')}`,
+  )
   console.log(`\n${chalk.bold('Next:')} ${chalk.cyan.underline(quickStartUrl)}`)
+}
+
+function formatAgentLabels(agents: AgentSkill[]): string {
+  if (agents.length <= 1) return agents[0]?.label ?? ''
+  if (agents.length === 2) return `${agents[0].label} and ${agents[1].label}`
+  return `${agents
+    .slice(0, -1)
+    .map((agent) => agent.label)
+    .join(', ')}, and ${agents[agents.length - 1]?.label}`
+}
+
+function packagedSkillsDirectory(): string {
+  const executable = fs.realpathSync(process.argv[1])
+  return path.resolve(path.dirname(executable), '..', 'skills')
+}
+
+function isPromptCancelled(error: unknown): boolean {
+  return error instanceof Error && error.name === 'ExitPromptError'
+}
+
+async function prepareAgents(): Promise<void> {
+  let selected: AgentSkillId[]
+  try {
+    selected = await checkbox<AgentSkillId>({
+      message: 'Select agents to prepare:',
+      choices: agentSkills.map((agent) => ({ name: agent.label, value: agent.id })),
+      validate: (selection) => (selection.length > 0 ? true : 'Select at least one agent.'),
+    })
+  } catch (error) {
+    if (isPromptCancelled(error)) {
+      console.log(chalk.cyan('Agent skill setup cancelled.'))
+      return
+    }
+    throw error
+  }
+
+  let spinner: Ora | undefined
+  try {
+    const result = await prepareAgentSkills({
+      root: process.cwd(),
+      skillsDirectory: packagedSkillsDirectory(),
+      selected,
+      confirmReplacement: (agent, destination) =>
+        confirm({
+          message: `Replace the existing ${agent.label} skill at ${path.relative(process.cwd(), destination)}?`,
+          default: false,
+        }),
+      onInstallStart: () => {
+        spinner = ora({
+          text: chalk.cyan('Adding Reboil agent skills...'),
+          color: 'yellow',
+          stream: process.stdout,
+        }).start()
+      },
+    })
+    const available = [...result.installed, ...result.ready]
+    if (spinner) {
+      spinner.succeed(
+        `${chalk.green.bold('Reboil agent skills added for')} ${chalk.green(formatAgentLabels(result.installed))}.`,
+      )
+    } else if (result.ready.length > 0) {
+      console.log(chalk.cyan(`Reboil agent skills are already ready for ${formatAgentLabels(result.ready)}.`))
+    } else {
+      console.log(chalk.yellow('No agent skills were changed.'))
+    }
+    if (result.skipped.length > 0) {
+      console.log(chalk.yellow(`Left existing skills unchanged for ${formatAgentLabels(result.skipped)}.`))
+    }
+    if (available.length > 0) {
+      console.log(`\n${chalk.bold('Try it:')}`)
+      for (const agent of available) console.log(`  ${agent.label.padEnd(12)} ${chalk.cyan(agent.prompt)}`)
+    }
+    console.log(`\n${chalk.bold('Next:')} ${chalk.cyan.underline(agentDocsUrl)}`)
+  } catch (error) {
+    if (spinner) spinner.fail(chalk.red('Could not add agent skills.'))
+    if (isPromptCancelled(error)) {
+      console.log(chalk.cyan('Agent skill setup cancelled.'))
+      return
+    }
+    throw error
+  }
 }
 
 function applyInit(options: CliOptions, spinner: Ora): void {
@@ -566,7 +662,16 @@ async function init(options: CliOptions): Promise<void> {
   }
 }
 
-void init(parseArgs(process.argv.slice(2))).catch((error: unknown) => {
+async function run(): Promise<void> {
+  const command = parseArgs(process.argv.slice(2))
+  if (command.kind === 'prepare-agents') {
+    await prepareAgents()
+    return
+  }
+  await init(command.options)
+}
+
+void run().catch((error: unknown) => {
   console.error(chalk.red(`reboil init failed: ${error instanceof Error ? error.message : String(error)}`))
   process.exitCode = 1
 })

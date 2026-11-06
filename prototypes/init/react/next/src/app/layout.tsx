@@ -1,3 +1,5 @@
+import { ReboilState } from "reboil/next";
+import reboilConfig from "../../reboil.config";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -20,7 +22,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body>{children}</body>
+      <body><ReboilState config={reboilConfig}>{children}</ReboilState></body>
     </html>
   );
 }

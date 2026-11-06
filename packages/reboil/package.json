@@ -37,7 +37,8 @@
     "./package.json": "./package.json"
   },
   "files": [
-    "dist"
+    "dist",
+    "skills"
   ],
   "scripts": {
     "build": "tsup",
@@ -58,6 +59,7 @@
     }
   },
   "dependencies": {
+    "@inquirer/prompts": "^8.7.5",
     "chalk": "^5.6.2",
     "ora": "^8.2.0",
     "use-sync-external-store": "^1.5.0"
