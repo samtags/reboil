@@ -191,7 +191,6 @@ export default function Home(): ReactNode {
                 splitting, and synchronous persistence out of the box. Inspired by Recoil’s principles, Redux’s
                 observability and scalability, and Zustand’s simplicity.
               </p>
-              <p>The core store API is framework agnostic. React bindings are available as an optional integration.</p>
             </div>
             <div className={styles.demo} aria-label="Reboil config registration code example">
               <CodeWindow />

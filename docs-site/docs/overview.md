@@ -7,7 +7,7 @@ slug: /overview
 
 # Reboil
 
-Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box. Inspired by Recoil’s principles, Redux’s observability and scalability, and Zustand’s simplicity.
+Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box.
 
 The core store API is framework agnostic. React bindings are available as an optional integration.
 
