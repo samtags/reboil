@@ -10,7 +10,9 @@ const dtsCompilerOptions =
 export default defineConfig({
   entry: {
     index: 'src/index.ts',
+    native: 'src/native.ts',
     react: 'src/react.ts',
+    'react-native': 'src/react-native.ts',
     next: 'src/next.ts',
     cli: 'src/cli.ts',
   },

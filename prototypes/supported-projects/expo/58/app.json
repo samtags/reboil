@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "Reboil Expo 58 Compatibility",
+    "slug": "reboil-expo-58-compatibility",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "ios": { "supportsTablet": true },
+    "experiments": { "autolinkingModuleResolution": true },
+    "android": { "package": "dev.reboil.compatibility.expo58" }
+  }
+}

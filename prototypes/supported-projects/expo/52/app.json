@@ -1,0 +1,20 @@
+{
+  "expo": {
+    "name": "Reboil Expo 52 Compatibility",
+    "slug": "reboil-expo-52-compatibility",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": false,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "dev.reboil.compatibility.expo52"
+    },
+    "android": {
+      "package": "dev.reboil.compatibility.expo52"
+    },
+    "plugins": [
+      "expo-asset"
+    ]
+  }
+}

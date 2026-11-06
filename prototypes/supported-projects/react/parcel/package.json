@@ -1,0 +1,30 @@
+{
+  "name": "reboil-supported-parcel-react",
+  "private": true,
+  "version": "1.0.0",
+  "source": "src/index.html",
+  "scripts": {
+    "dev": "parcel --no-cache",
+    "build": "tsc --noEmit && parcel build --no-cache",
+    "typecheck": "tsc --noEmit",
+    "reboil:init": "reboil init"
+  },
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "reboil": "file:../../../../packages/reboil"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "parcel": "2.16.4",
+    "typescript": "5.9.3"
+  },
+  "alias": {
+    "react": "./node_modules/react",
+    "react-dom": "./node_modules/react-dom"
+  },
+  "@parcel/resolver-default": {
+    "packageExports": true
+  }
+}

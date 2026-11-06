@@ -1,0 +1,29 @@
+{
+  "name": "reboil-supported-expo-58",
+  "private": true,
+  "version": "1.0.0",
+  "main": "./index.ts",
+  "scripts": {
+    "start": "expo start",
+    "ios": "expo run:ios",
+    "android": "expo run:android",
+    "build:ios": "expo run:ios --configuration Release --no-bundler",
+    "build:android": "expo run:android --variant release --no-bundler",
+    "typecheck": "tsc --noEmit",
+    "doctor": "npx expo-doctor",
+    "reboil:init": "reboil init"
+  },
+  "dependencies": {
+    "expo": "~58.0.23",
+    "react": "19.3.0",
+    "react-native": "0.88.1",
+    "react-native-mmkv": "4.3.2",
+    "react-native-nitro-modules": "0.37.2",
+    "reboil": "file:../../../../packages/reboil",
+    "use-sync-external-store": "1.5.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.3.0",
+    "typescript": "~6.0.3"
+  }
+}

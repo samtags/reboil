@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { configureNativePersistence, createPersistenceAdapter } from '../src/persistence'
 import { createLazyStore, createRegisteredStore, resetRegistryForTests } from '../src/registry'
 import { StoreRuntime } from '../src/runtime'
 import type { StoreBindings } from '../src/types'
@@ -28,7 +29,28 @@ function state() {
 describe('Reboil runtime', () => {
   beforeEach(() => {
     resetRegistryForTests()
+    configureNativePersistence(undefined)
     delete (globalThis as { window?: unknown }).window
+    delete (globalThis as { navigator?: unknown }).navigator
+  })
+
+  it('prefers the configured MMKV adapter when React Native also exposes window', () => {
+    const values = new Map<string, string>()
+    Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { product: 'ReactNative' } })
+    Object.defineProperty(globalThis, 'window', {
+      configurable: true,
+      value: { localStorage: { getItem: vi.fn(), setItem: vi.fn(), removeItem: vi.fn() } },
+    })
+    configureNativePersistence(() => ({
+      read: (key) => values.get(key) ?? null,
+      write: (key, value) => values.set(key, value),
+      remove: (key) => values.delete(key),
+    }))
+
+    const adapter = createPersistenceAdapter(vi.fn(), 'native-adapter')
+    adapter.write('count', '3')
+
+    expect(adapter.read('count')).toBe('3')
   })
 
   it('reads and immutably updates nested object and array paths', () => {

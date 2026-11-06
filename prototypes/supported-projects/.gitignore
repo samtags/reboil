@@ -1,0 +1,18 @@
+**/node_modules/
+**/dist/
+**/.next/
+**/.parcel-cache/
+**/.cache/
+**/*.tsbuildinfo
+
+# Expo Continuous Native Generation output
+expo/*/ios/
+expo/*/android/
+expo/*/.expo/
+
+# Bare React Native build output
+# The bare React Native CLI generates these platform projects from each
+# fixture's pinned version. The bootstrap action recreates them as needed.
+react-native/*/ios/
+react-native/*/android/
+react-native/*/Gemfile

@@ -1,6 +1,6 @@
 'use client'
 
-import { createElement, Fragment, type ReactNode } from 'react'
+import { createElement, Fragment, type ReactElement, type ReactNode } from 'react'
 import type { ReboilConfig } from './config'
 
 export interface ReboilStateProps {
@@ -8,6 +8,6 @@ export interface ReboilStateProps {
   children: ReactNode
 }
 
-export function ReboilState({ children }: ReboilStateProps) {
+export function ReboilState({ children }: ReboilStateProps): ReactElement<{ children?: ReactNode }> {
   return createElement(Fragment, null, children)
 }

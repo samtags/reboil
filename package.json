@@ -19,6 +19,7 @@
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "check:skills": "node scripts/release-reboil-skill.mjs --check",
+    "verify:supported-projects": "npm run verify --prefix prototypes/supported-projects",
     "check:workspaces": "npm run build --workspaces --if-present && npm run typecheck --workspaces --if-present",
     "check:docs": "npm run verify:agents --prefix docs-site && npm run typecheck --prefix docs-site && npm run build --prefix docs-site",
     "check": "npm run format:check && npm run lint && npm run check:workspaces && npm test && npm run test:pr-title && npm run check:skills",

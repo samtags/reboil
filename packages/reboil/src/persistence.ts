@@ -59,6 +59,25 @@ class MMKVAdapter implements PersistenceAdapter {
   }
 }
 
+type MMKVStorage = {
+  getString(key: string): string | undefined
+  set(key: string, value: string): unknown
+  remove(key: string): unknown
+}
+
+let nativeAdapterFactory: ((id: string) => PersistenceAdapter) | undefined
+
+// This is configured by the React Native package entries. Keeping the native
+// imports out of the browser entry lets web projects use Reboil without
+// installing MMKV or Nitro Modules.
+export function configureNativePersistence(factory: ((id: string) => PersistenceAdapter) | undefined): void {
+  nativeAdapterFactory = factory
+}
+
+export function createMMKVAdapter(storage: MMKVStorage): PersistenceAdapter {
+  return new MMKVAdapter(storage)
+}
+
 function isReactNative(): boolean {
   const globalValue = globalThis as Record<string, unknown>
   const navigatorValue = globalValue.navigator as { product?: string } | undefined
@@ -99,6 +118,8 @@ function hasCreateMMKV(value: unknown): value is {
 }
 
 function createNativeAdapter(id: string): PersistenceAdapter {
+  if (nativeAdapterFactory) return nativeAdapterFactory(id)
+
   const mmkvModule = optionalRequire('react-native-mmkv')
   const nitroModule = optionalRequire('react-native-nitro-modules')
   if (!hasCreateMMKV(mmkvModule) || !nitroModule) {
@@ -112,6 +133,11 @@ function createNativeAdapter(id: string): PersistenceAdapter {
 }
 
 export function createPersistenceAdapter(onWarning: (message: string) => void, id = 'reboil'): PersistenceAdapter {
+  // React Native exposes a `window` global for web compatibility. Check it
+  // first so a native app selects synchronous MMKV rather than falling back
+  // to the browser/in-memory branch.
+  if (isReactNative()) return createNativeAdapter(id)
+
   if (typeof window !== 'undefined') {
     const browserStorage = getBrowserStorage()
     if (browserStorage) return new BrowserAdapter(browserStorage)
@@ -119,7 +145,6 @@ export function createPersistenceAdapter(onWarning: (message: string) => void, i
     return new MemoryAdapter()
   }
 
-  if (isReactNative()) return createNativeAdapter(id)
   return new MemoryAdapter()
 }
 

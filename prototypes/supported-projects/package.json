@@ -1,0 +1,9 @@
+{
+  "name": "reboil-supported-projects",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "verify": "node scripts/verify.mjs",
+    "bootstrap:react-native": "node scripts/bootstrap-react-native.mjs"
+  }
+}

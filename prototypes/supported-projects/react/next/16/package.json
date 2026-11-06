@@ -1,0 +1,28 @@
+{
+  "name": "reboil-supported-next-16",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "prepare:reboil": "npm run build --prefix ../../../../../packages/reboil",
+    "predev": "npm run prepare:reboil",
+    "dev": "next dev",
+    "prebuild": "npm run prepare:reboil",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "reboil:init": "reboil init"
+  },
+  "dependencies": {
+    "next": "16.4.5",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "reboil": "file:../../../../../packages/reboil",
+    "use-sync-external-store": "1.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.10.1",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "typescript": "5.9.3"
+  }
+}

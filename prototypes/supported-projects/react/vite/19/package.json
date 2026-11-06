@@ -1,0 +1,24 @@
+{
+  "name": "reboil-supported-vite-react-19",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --force",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "reboil:init": "reboil init"
+  },
+  "dependencies": {
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "reboil": "file:../../../../../packages/reboil"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.1.2",
+    "typescript": "5.9.3",
+    "vite": "8.3.6"
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "name": "reboil-supported-next-13",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "prepare:reboil": "npm run build --prefix ../../../../../packages/reboil",
+    "predev": "npm run prepare:reboil",
+    "dev": "next dev",
+    "prebuild": "npm run prepare:reboil",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "reboil:init": "reboil init"
+  },
+  "dependencies": {
+    "next": "13.5.11",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "reboil": "file:../../../../../packages/reboil",
+    "use-sync-external-store": "1.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.17.57",
+    "@types/react": "18.3.27",
+    "@types/react-dom": "18.3.7",
+    "typescript": "5.9.3"
+  }
+}
