@@ -14,7 +14,7 @@ Each composed store node has its own versioned persistence envelope. A small man
 Pass typed state paths in `persist.exclude`:
 
 ```ts title="src/store.ts"
-import { createStore } from 'reboil'
+import { createStore } from '@reboil/store'
 
 const state = {
   count: 1,

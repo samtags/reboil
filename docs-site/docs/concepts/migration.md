@@ -8,7 +8,7 @@ sidebar_position: 1
 Use a migration when a new release makes a breaking change to the shape of persisted state, such as renaming a field or changing its type. Increment the store version and synchronously convert the older state to the current shape:
 
 ```ts title="src/store.ts"
-import { createStore } from 'reboil'
+import { createStore } from '@reboil/store'
 
 const state = {
   count: 1,

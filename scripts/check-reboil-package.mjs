@@ -23,8 +23,8 @@ for (const file of requiredFiles) {
 }
 
 for (const [file, requiredText] of [
-  ['README.md', 'npm install reboil'],
-  ['AGENTS.md', 'npx reboil init'],
+  ['README.md', 'npm install @reboil/store'],
+  ['AGENTS.md', 'npx @reboil/store init'],
   ['llms.txt', 'createStore(initialState, options?)'],
 ]) {
   const content = readFileSync(join(packageDirectory, file), 'utf8')
@@ -56,7 +56,7 @@ if (!process.argv.includes('--tarball')) {
 }
 
 const packed = JSON.parse(
-  execFileSync('npm', ['pack', '--workspace', 'reboil', '--dry-run', '--json', '--ignore-scripts'], {
+  execFileSync('npm', ['pack', '--workspace', '@reboil/store', '--dry-run', '--json', '--ignore-scripts'], {
     cwd: root,
     encoding: 'utf8',
   }),

@@ -169,9 +169,9 @@ function configSource(root: string, configFile: string, stateFile: string, frame
   const stateImport = relativeImport(configFile, stateFile).replace(/\.tsx?$/, '')
   const stateReference = `./${path.relative(root, stateFile).replaceAll(path.sep, '/')}`
   if (framework === 'next') {
-    return `'use client'\n\nimport { createStore, defineConfig } from 'reboil'\nimport { initialState } from '${stateImport}'\n\ncreateStore(initialState)\n\nexport default defineConfig({\n  stateFile: '${stateReference}',\n})\n\ndeclare module 'reboil' {\n  interface Register {\n    state: typeof initialState\n  }\n}\n`
+  return `'use client'\n\nimport { createStore, defineConfig } from '@reboil/store'\nimport { initialState } from '${stateImport}'\n\ncreateStore(initialState)\n\nexport default defineConfig({\n  stateFile: '${stateReference}',\n})\n\ndeclare module '@reboil/store' {\n  interface Register {\n    state: typeof initialState\n  }\n}\n`
   }
-  return `import { createStore, defineConfig } from 'reboil'\nimport { initialState } from '${stateImport}'\n\ncreateStore(initialState)\n\nexport default defineConfig({\n  stateFile: '${stateReference}',\n})\n\ndeclare module 'reboil' {\n  interface Register {\n    state: typeof initialState\n  }\n}\n`
+  return `import { createStore, defineConfig } from '@reboil/store'\nimport { initialState } from '${stateImport}'\n\ncreateStore(initialState)\n\nexport default defineConfig({\n  stateFile: '${stateReference}',\n})\n\ndeclare module '@reboil/store' {\n  interface Register {\n    state: typeof initialState\n  }\n}\n`
 }
 
 function generatedEntrySource(configFile: string, target: 'router' | 'expo'): string {
@@ -352,7 +352,7 @@ function addNextAppRegistration(
   const body = ast.program.body as AstNode[]
   const legacyComponentName = legacyRegisterImport ? removeImport(body, legacyRegisterImport) : undefined
   const configName = ensureDefaultImport(body, configImport, 'reboilConfig')
-  const componentName = ensureNamedImport(body, 'reboil/next', 'ReboilState', 'ReboilState')
+  const componentName = ensureNamedImport(body, '@reboil/store/next', 'ReboilState', 'ReboilState')
 
   const bodyElement = findJsxElement(ast.program, 'body')
   if (!bodyElement) throw new Error(`Could not find a <body> element in Next.js root layout ${file}`)
@@ -424,7 +424,7 @@ function generatedPagesAppSource(file: string, configFile: string): string {
 
 function showNextStep(): void {
   console.log(
-    `\n${chalk.bold.yellow('Recommended:')} Add agent skills via ${chalk.cyan.bold('npx reboil --prepare agents')}`,
+    `\n${chalk.bold.yellow('Recommended:')} Add agent skills via ${chalk.cyan.bold('npx @reboil/store --prepare agents')}`,
   )
   console.log(`\n${chalk.bold('Next:')} ${chalk.cyan.underline(quickStartUrl)}`)
 }

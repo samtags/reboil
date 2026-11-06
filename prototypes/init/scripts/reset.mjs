@@ -22,7 +22,7 @@ function removeNextLayoutRegistration(file) {
   const source = fs.readFileSync(file, 'utf8')
   const cleaned = source
     .replace(/^import\s+ReboilRegisterState\s+from\s+['"]\.\.\/register-state['"];?\s*\r?\n?/m, '')
-    .replace(/^import\s+\{\s*ReboilState\s*\}\s+from\s+['"]reboil\/next['"];?\s*\r?\n?/m, '')
+    .replace(/^import\s+\{\s*ReboilState\s*\}\s+from\s+['"](?:@reboil\/store|reboil)\/next['"];?\s*\r?\n?/m, '')
     .replace(/^import\s+reboilConfig\s+from\s+['"](?:\.\.\/)+reboil\.config['"];?\s*\r?\n?/m, '')
     .replace(/<\/?ReboilRegisterState>/g, '')
     .replace(/<ReboilState\s+config=\{reboilConfig\}>|<\/ReboilState>/g, '')

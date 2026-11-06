@@ -1,4 +1,4 @@
-import { createStore } from 'reboil'
+import { createStore } from '@reboil/store'
 import './styles.css'
 
 const { store } = createStore(

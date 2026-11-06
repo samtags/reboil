@@ -1,4 +1,4 @@
-import { createStore, defineConfig } from 'reboil'
+import { createStore, defineConfig } from '@reboil/store'
 import { state } from './src/state'
 
 export const app = createStore(state, {
@@ -12,7 +12,7 @@ export default defineConfig({
   stateFile: './src/state.ts',
 })
 
-declare module 'reboil' {
+declare module '@reboil/store' {
   interface Register {
     bindings: typeof app
   }

@@ -5,7 +5,7 @@ import { setStore as setRegisteredStore, useStore as useRegisteredStore } from '
  * The component rerenders only when that selected value changes.
  *
  * ```tsx
- * import { useStore } from 'reboil/react'
+ * import { useStore } from '@reboil/store/react'
  *
  * function Counter() {
  *   const count = useStore('count')

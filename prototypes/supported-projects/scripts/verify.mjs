@@ -91,7 +91,7 @@ if (project.bootstrap) options.unshift({ id: 'bootstrap', label: 'Generate nativ
 const action = await choose(`Choose an action for ${project.label}:`, options)
 if (!action) process.exit(0)
 
-run('npm', ['run', 'build', '--workspace', 'reboil'], repositoryRoot)
+run('npm', ['run', 'build', '--workspace', '@reboil/store'], repositoryRoot)
 const projectRoot = path.join(root, project.directory)
 if (action.id === 'bootstrap') {
   run('node', ['scripts/bootstrap-react-native.mjs', project.id], root)

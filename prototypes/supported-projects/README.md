@@ -26,11 +26,11 @@ The verification state above was last updated on 2026-11-07. A build/type-check 
 
 ### Expo 52 native pins
 
-Expo 52 uses React Native 0.76.9. Its fixture pins `react-native-mmkv@4.0.0-beta.12` with `react-native-nitro-modules@0.29.4`, the matching generated-code pair whose Android `ReactModuleInfo` call remains compatible with that React Native version. Later Nitro releases use a newer Android API and do not compile against React Native 0.76. Expo SDK 52 also requires Metro package-exports support to be enabled explicitly for Reboil's `reboil/react` export.
+Expo 52 uses React Native 0.76.9. Its fixture pins `react-native-mmkv@4.0.0-beta.12` with `react-native-nitro-modules@0.29.4`, the matching generated-code pair whose Android `ReactModuleInfo` call remains compatible with that React Native version. Later Nitro releases use a newer Android API and do not compile against React Native 0.76. Expo SDK 52 also requires Metro package-exports support to be enabled explicitly for Reboil's `@reboil/store/react` export.
 
 ### Native persistence behavior
 
-When Metro resolves Reboil for React Native, the `reboil` and `reboil/react` package entries load the native adapter. It statically imports `react-native-mmkv` and Nitro Modules, then gives MMKV precedence over the `window` global that React Native provides for web compatibility. This means persisted state is stored in the named synchronous MMKV instance (by default, `reboil`) rather than falling back to in-memory storage. The linked local fixtures map these peer packages in `metro.config.js`; an installed published package resolves the peers from the application normally.
+When Metro resolves Reboil for React Native, the `@reboil/store` and `@reboil/store/react` package entries load the native adapter. It statically imports `react-native-mmkv` and Nitro Modules, then gives MMKV precedence over the `window` global that React Native provides for web compatibility. This means persisted state is stored in the named synchronous MMKV instance (by default, `reboil`) rather than falling back to in-memory storage. The linked local fixtures map these peer packages in `metro.config.js`; an installed published package resolves the peers from the application normally.
 
 Native persistence requires a custom development or production build. It cannot run in Expo Go because MMKV includes native code.
 
@@ -85,7 +85,7 @@ Install the local package from each generated project, then initialize it:
 
 ```sh
 npm install <relative-path-to>/packages/reboil
-npx reboil init
+npx @reboil/store init
 ```
 
 The tracked fixture source includes the resulting `reboil.config.ts`, state registration, and a counter with increment, decrement, and reset actions. Web fixtures exercise `localStorage`; native fixtures exercise MMKV after a development or release build.

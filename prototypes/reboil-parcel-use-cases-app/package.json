@@ -12,7 +12,7 @@
     "test:e2e": "start-server-and-test e2e:server http://127.0.0.1:4174 cy:run:e2e"
   },
   "dependencies": {
-    "reboil": "file:../../packages/reboil",
+    "@reboil/store": "file:../../packages/reboil",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

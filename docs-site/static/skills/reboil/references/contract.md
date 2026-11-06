@@ -4,7 +4,7 @@ This reference condenses the agreed v1 contract in `docs/roadmap.md`. That roadm
 
 ## Status and scope
 
-Small, fast, and scalable string-path state access for web applications and React Native, with code splitting, and synchronous persistence out of the box
+Small, fast, and scalable string-path state access for web applications and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box
 
 The core store API is framework agnostic and works with vanilla JavaScript or any web framework. React bindings are available as an optional integration. Reboil uses one composable, client-side application-store tree for web, Expo, and React Native. Many `createStore()` nodes may compose under one unparented root; independent application roots, async persistence, server mutations or per-request SSR stores, dynamic-record-key autocomplete, non-JSON values, and native Expo Go support remain excluded.
 
@@ -16,7 +16,7 @@ The recommended setup is one ordinary TypeScript module. `createStore` infers th
 
 ```ts
 // store.ts
-import { createStore } from 'reboil'
+import { createStore } from '@reboil/store'
 
 const initialState = {
   user: { name: 'Ada' },
@@ -64,7 +64,7 @@ The module must default-export a `createStore()` result. React hooks start the l
 
 ## Config registration
 
-Run `npx reboil init` as part of standard application setup. It is one-time setup, not recurring generation. The generated `reboil.config.ts` creates the store, exports `defineConfig`, and augments `Register` with `typeof initialState`. A customized config that composes eager or lazy stores augments `Register` with `bindings: typeof app` so direct bindings retain resolved root paths and typed lazy load paths. Its import must execute before route or application modules; an Expo Router entry imports the config before `expo-router/entry`.
+Run `npx @reboil/store init` as part of standard application setup. It is one-time setup, not recurring generation. The generated `reboil.config.ts` creates the store, exports `defineConfig`, and augments `Register` with `typeof initialState`. A customized config that composes eager or lazy stores augments `Register` with `bindings: typeof app` so direct bindings retain resolved root paths and typed lazy load paths. Its import must execute before route or application modules; an Expo Router entry imports the config before `expo-router/entry`.
 
 The initializer must parse entries with an AST, be idempotent, preserve existing code and comments, preview writes, support `--state`, `--entry`, and `--dry-run`, and stop with precise manual instructions if detection is ambiguous or unsafe.
 
@@ -80,7 +80,7 @@ The initializer must parse entries with an AST, be idempotent, preserve existing
 | `store.reset(path?)`                  | A path reset restores and returns one value. No-argument reset returns `void`, resets loaded partitions, and invalidates unloaded partitions through the reset epoch.                           |
 | `store.load(path)`                    | Idempotently loads a typed lazy child path for subsequent synchronous vanilla access.                                                                                                           |
 | `useStore(path)`                      | Uses `useSyncExternalStore`; components rerender only when their selected value changes under `Object.is`.                                                                                      |
-| `setStore(path, valueOrUpdater)`      | Config-registered direct binding from `reboil/react`; it writes through the registered runtime.                                                                                                 |
+| `setStore(path, valueOrUpdater)`      | Config-registered direct binding from `@reboil/store/react`; it writes through the registered runtime.                                                                                          |
 
 All paths use dots. Objects use string key segments; arrays use canonical numeric segments such as `todos.0.title`; tuples may expose exact indices. Keys containing `.` are unsupported. Missing intermediate keys and out-of-range indices are runtime errors. Literal invalid paths and value types must fail TypeScript checking.
 

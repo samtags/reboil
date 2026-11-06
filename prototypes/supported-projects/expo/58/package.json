@@ -19,7 +19,7 @@
     "react-native": "0.88.1",
     "react-native-mmkv": "4.3.2",
     "react-native-nitro-modules": "0.37.2",
-    "reboil": "file:../../../../packages/reboil",
+    "@reboil/store": "file:../../../../packages/reboil",
     "use-sync-external-store": "1.5.0"
   },
   "devDependencies": {

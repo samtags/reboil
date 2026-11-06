@@ -8,10 +8,10 @@ const reboilRoot = path.resolve(projectRoot, '../../../../packages/reboil')
 const defaultConfig = getDefaultConfig(projectRoot)
 
 function resolveReboilRequest(context, moduleName, platform) {
-  if (moduleName === 'reboil') {
+  if (moduleName === '@reboil/store') {
     return { type: 'sourceFile', filePath: path.join(reboilRoot, 'dist/native.cjs') }
   }
-  if (moduleName === 'reboil/react') {
+  if (moduleName === '@reboil/store/react') {
     return { type: 'sourceFile', filePath: path.join(reboilRoot, 'dist/react-native.cjs') }
   }
   return context.resolveRequest(context, moduleName, platform)

@@ -13,7 +13,7 @@ Use Reboil’s standard config-registration workflow for application integration
 
 ## Apply the integration standard
 
-- **Standard config registration:** run `reboil init`, keep the generated `reboil.config.ts` and module augmentation, and ensure its entry import runs before application modules. All consumers use direct store bindings from `reboil`; React consumers may additionally use `reboil/react`.
+- **Standard config registration:** run `npx @reboil/store init`, keep the generated `reboil.config.ts` and module augmentation, and ensure its entry import runs before application modules. All consumers use direct store bindings from `@reboil/store`; React consumers may additionally use `@reboil/store/react`.
 - **Local factory bindings:** `createStore()` returns scoped `store` and `useStore` bindings for composition and explicit low-level use cases. Do not present them as a replacement for standard installation and config registration.
 
 Read [the contract](references/contract.md) before implementing or reviewing runtime behavior, types, persistence, migrations, logging, initialization, or public documentation. For a narrow application integration, read the workflow and platform sections first.

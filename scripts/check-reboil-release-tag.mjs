@@ -7,7 +7,7 @@ const tag = process.argv[2]
 const { version } = JSON.parse(readFileSync(join(root, 'packages', 'reboil', 'package.json'), 'utf8'))
 
 if (tag !== `v${version}`) {
-  throw new Error(`Release tag ${tag ?? '<missing>'} must exactly match reboil@${version}.`)
+  throw new Error(`Release tag ${tag ?? '<missing>'} must exactly match @reboil/store@${version}.`)
 }
 
-console.log(`Release tag ${tag} matches reboil@${version}.`)
+console.log(`Release tag ${tag} matches @reboil/store@${version}.`)

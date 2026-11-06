@@ -465,12 +465,12 @@ class LazyStoreNode {
 /**
  * Creates a typed, composable Reboil store node.
  *
- * Standard application setup runs `npx reboil init`, which calls this from
+ * Standard application setup runs `npx @reboil/store init`, which calls this from
  * `reboil.config.ts` and registers direct bindings. The returned local
  * bindings are useful for explicit low-level access and store composition.
  *
  * ```ts
- * import { createStore } from 'reboil'
+ * import { createStore } from '@reboil/store'
  *
  * const { store, useStore } = createStore({ count: 0 })
  * store.set('count', (count) => count + 1)

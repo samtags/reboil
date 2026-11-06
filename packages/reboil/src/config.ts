@@ -24,7 +24,7 @@ export interface ReboilConfig {
 /**
  * Declares the generated Reboil configuration.
  *
- * Run `npx reboil init` to create this file and import it before modules use
+ * Run `npx @reboil/store init` to create this file and import it before modules use
  * the direct `store`, `setStore`, or `useStore` bindings.
  */
 export function defineConfig(config: ReboilConfig): ReboilConfig {
@@ -56,7 +56,7 @@ export const store: Store<RegisteredState, RegisteredPath, RegisteredLoadPath> =
  * The component rerenders only when the selected value changes.
  *
  * ```tsx
- * import { useStore } from 'reboil/react'
+ * import { useStore } from '@reboil/store/react'
  *
  * function Counter() {
  *   const count = useStore('count')

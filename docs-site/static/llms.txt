@@ -23,4 +23,4 @@ Machine-readable resources:
 - /skills/claude-code/reboil/SKILL.md — downloadable Claude Code Reboil skill entrypoint
 - /skills/claude-code/reboil/references/contract.md — Claude Code detailed integration and implementation contract
 
-Install project-local Codex and Claude Code skills with `npx reboil --prepare agents`.
+Install project-local Codex and Claude Code skills with `npx @reboil/store --prepare agents`.

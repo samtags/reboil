@@ -1,4 +1,4 @@
-import { ReboilState } from 'reboil/next'
+import { ReboilState } from '@reboil/store/next'
 import reboilConfig from '../../reboil.config'
 import './styles.css'
 

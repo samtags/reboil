@@ -1,4 +1,4 @@
-import { setStore, useStore } from 'reboil/react'
+import { setStore, useStore } from '@reboil/store/react'
 
 export function Counter() {
   const count = useStore('count')

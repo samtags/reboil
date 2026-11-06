@@ -10,7 +10,7 @@
     "reboil:init": "reboil init"
   },
   "dependencies": {
-    "reboil": "file:../../../packages/reboil"
+    "@reboil/store": "file:../../../packages/reboil"
   },
   "devDependencies": {
     "vite": "^8.3.6"

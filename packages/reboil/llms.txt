@@ -4,11 +4,11 @@ Reboil is typed, framework-agnostic client state for web applications and React 
 
 ## Standard setup
 
-Install the package, run `npx reboil init` once, and keep the generated `reboil.config.ts` import ahead of application modules. The config calls `createStore(initialState)` and augments `Register`, enabling typed direct bindings:
+Install the package, run `npx @reboil/store init` once, and keep the generated `reboil.config.ts` import ahead of application modules. The config calls `createStore(initialState)` and augments `Register`, enabling typed direct bindings:
 
 ```ts
-import { store } from 'reboil'
-import { useStore } from 'reboil/react'
+import { store } from '@reboil/store'
+import { useStore } from '@reboil/store/react'
 
 const count = useStore('count')
 store.set('count', (value) => value + 1)

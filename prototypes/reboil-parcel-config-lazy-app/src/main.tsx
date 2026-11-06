@@ -1,11 +1,11 @@
 import '../reboil.config'
 import { StrictMode, Suspense, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { setStore, useStore } from 'reboil/react'
+import { setStore, useStore } from '@reboil/store/react'
 import './styles.css'
 
 const codeExample = `// src/state.ts
-import { lazy } from 'reboil'
+import { lazy } from '@reboil/store'
 
 export const state = {
   settings: {
@@ -16,14 +16,14 @@ export const state = {
 }
 
 // src/window-state.ts
-import { createStore } from 'reboil'
+import { createStore } from '@reboil/store'
 
 export default createStore({
   count: 0,
 })`
 
 const codeMarkup = `<span class="comment">// src/state.ts</span>
-<span class="keyword">import</span> { <span class="imported">lazy</span> } <span class="keyword">from</span> <span class="string">'reboil'</span>
+<span class="keyword">import</span> { <span class="imported">lazy</span> } <span class="keyword">from</span> <span class="string">'@reboil/store'</span>
 
 <span class="keyword">export</span> <span class="keyword">const</span> <span class="variable">state</span> = {
   <span class="property">settings</span>: {
@@ -34,7 +34,7 @@ const codeMarkup = `<span class="comment">// src/state.ts</span>
 }
 
 <span class="comment">// src/window-state.ts</span>
-<span class="keyword">import</span> { <span class="imported">createStore</span> } <span class="keyword">from</span> <span class="string">'reboil'</span>
+<span class="keyword">import</span> { <span class="imported">createStore</span> } <span class="keyword">from</span> <span class="string">'@reboil/store'</span>
 
 <span class="keyword">export default</span> <span class="function">createStore</span>({
   <span class="property">count</span>: <span class="number">0</span>,

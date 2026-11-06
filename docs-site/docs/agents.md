@@ -14,12 +14,12 @@ Reboil exposes machine-readable documentation surfaces so coding agents can use 
 From a project that uses Reboil, install the maintained local skills with:
 
 ```sh
-npx reboil --prepare agents
+npx @reboil/store --prepare agents
 ```
 
 The interactive installer can add Claude Code at `.claude/skills/reboil/`, Codex at `.agents/skills/reboil/`, or both. It asks before replacing a customized existing skill.
 
-The published npm package also includes package-local `AGENTS.md`, `llms.txt`, and both complete skills so agents inspecting `node_modules/reboil` can follow the same guidance without first visiting this site.
+The published npm package also includes package-local `AGENTS.md`, `llms.txt`, and both complete skills so agents inspecting `node_modules/@reboil/store` can follow the same guidance without first visiting this site.
 
 - [`/llms.txt`](pathname:///llms.txt) — concise project summary, status, and recommended reading order.
 - [`/llms-full.txt`](pathname:///llms-full.txt) — complete public contract in Markdown without presentation markup.

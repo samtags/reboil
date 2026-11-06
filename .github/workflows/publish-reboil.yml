@@ -25,4 +25,4 @@ jobs:
       - run: npm ci --prefix docs-site
       - run: node scripts/check-reboil-release-tag.mjs "$GITHUB_REF_NAME"
       - run: npm run check:release
-      - run: npm publish --workspace reboil
+      - run: npm publish --workspace @reboil/store

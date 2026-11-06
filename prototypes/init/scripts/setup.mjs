@@ -12,7 +12,7 @@ function run(command, args, cwd) {
   if (result.status !== 0) process.exit(result.status ?? 1)
 }
 
-run('npm', ['run', 'build', '--workspace', 'reboil'], repositoryRoot)
+run('npm', ['run', 'build', '--workspace', '@reboil/store'], repositoryRoot)
 for (const project of projects) {
   console.log(`\nInstalling ${project.name} dependencies...`)
   run('npm', ['install'], path.join(fixtureRoot, project.directory))

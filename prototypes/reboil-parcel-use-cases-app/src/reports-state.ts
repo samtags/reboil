@@ -1,4 +1,4 @@
-import { createStore } from 'reboil'
+import { createStore } from '@reboil/store'
 
 // This module is emitted as its own Parcel bundle and is only fetched on demand.
 export default createStore({

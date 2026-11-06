@@ -5,13 +5,13 @@ Typed, synchronous state for web applications and React Native. Reboil provides 
 ## Install
 
 ```sh
-npm install reboil
+npm install @reboil/store
 ```
 
 For Expo and React Native, install the native peer dependencies with Expo's version-aware installer, then create a development or production build:
 
 ```sh
-npx expo install reboil react-native-mmkv react-native-nitro-modules
+npx expo install @reboil/store react-native-mmkv react-native-nitro-modules
 npx expo prebuild
 ```
 
@@ -22,7 +22,7 @@ MMKV has native code and does not run in Expo Go.
 Use the initializer once in an application project:
 
 ```sh
-npx reboil init
+npx @reboil/store init
 ```
 
 It creates `reboil.config.ts`, registers the inferred state type, and wires the config into the application entry point. The config import must run before application modules use the direct `reboil` bindings.
@@ -34,14 +34,14 @@ export const initialState = { count: 0 }
 
 ```ts
 // reboil.config.ts
-import { createStore, defineConfig } from 'reboil'
+import { createStore, defineConfig } from '@reboil/store'
 import { initialState } from './src/state'
 
 createStore(initialState)
 
 export default defineConfig({ stateFile: './src/state.ts' })
 
-declare module 'reboil' {
+declare module '@reboil/store' {
   interface Register {
     state: typeof initialState
   }
@@ -53,8 +53,8 @@ declare module 'reboil' {
 Read and write the registered store with fully typed dot paths:
 
 ```tsx
-import { store } from 'reboil'
-import { useStore } from 'reboil/react'
+import { store } from '@reboil/store'
+import { useStore } from '@reboil/store/react'
 
 export function Counter() {
   const count = useStore('count')
@@ -74,7 +74,7 @@ export function Counter() {
 Coding agents can install the maintained local skills with:
 
 ```sh
-npx reboil --prepare agents
+npx @reboil/store --prepare agents
 ```
 
 This package also ships [`AGENTS.md`](./AGENTS.md), [`llms.txt`](./llms.txt), and complete Codex/Claude Code skills under [`skills/`](./skills). They describe the supported integration workflow and runtime invariants without requiring a website visit.

@@ -6,7 +6,7 @@
     "build": "parcel build src/index.html"
   },
   "dependencies": {
-    "reboil": "file:../../packages/reboil"
+    "@reboil/store": "file:../../packages/reboil"
   },
   "devDependencies": {
     "parcel": "^2.15.4"

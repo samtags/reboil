@@ -267,7 +267,7 @@ Before release, the skill must:
 
 ## Planned Installation
 
-The exact npm package identity must be confirmed before publishing. `reboil` is the current working package and import name.
+The published npm package identity is `@reboil/store`; the installed command remains `reboil`.
 
 For Expo and React Native, the native persistence layer will use `react-native-mmkv` v4 and `react-native-nitro-modules`. Expo consumers must install native dependencies with Expo's version-aware installer and create a native build:
 
@@ -278,12 +278,12 @@ npx expo prebuild
 
 MMKV contains native code, so an Expo development or production build is required. It will not run in Expo Go. See the [official MMKV Expo setup](https://github.com/margelo/react-native-mmkv#expo).
 
-Web applications will use `localStorage` and will not require MMKV. The store API remains framework agnostic; React applications may add the optional bindings from `reboil/react`.
+Web applications will use `localStorage` and will not require MMKV. The store API remains framework agnostic; React applications may add the optional bindings from `@reboil/store/react`.
 
 Every application completes installation with one-time config registration:
 
 ```sh
-npx reboil init
+npx @reboil/store init
 ```
 
 The initializer creates or links the state file, generates `reboil.config.ts`, registers its type, and wires the config into the application entry point.
@@ -293,8 +293,8 @@ The initializer creates or links the state file, generates `reboil.config.ts`, r
 Install Reboil, then register the application state as part of project setup:
 
 ```sh
-npm install reboil
-npx reboil init
+npm install @reboil/store
+npx @reboil/store init
 ```
 
 The initializer creates or links the state file and generates the config:
@@ -311,7 +311,7 @@ export const initialState = {
 
 ```ts
 // reboil.config.ts
-import { createStore, defineConfig } from 'reboil'
+import { createStore, defineConfig } from '@reboil/store'
 import { initialState } from './src/state'
 
 createStore(initialState)
@@ -320,7 +320,7 @@ export default defineConfig({
   stateFile: './src/state.ts',
 })
 
-declare module 'reboil' {
+declare module '@reboil/store' {
   interface Register {
     state: typeof initialState
   }
@@ -330,8 +330,8 @@ declare module 'reboil' {
 The generated entry import runs the config before application modules. Components then use the registered package bindings:
 
 ```tsx
-import { store } from 'reboil'
-import { useStore } from 'reboil/react'
+import { store } from '@reboil/store'
+import { useStore } from '@reboil/store/react'
 
 const name = store.get('user.name')
 //    ^? string
@@ -344,10 +344,10 @@ Editing `initialState` updates the package binding types through ordinary TypeSc
 
 ## Config Registration
 
-Config registration is the standard Reboil setup. It provides direct imports from `reboil` and `reboil/react`:
+Config registration is the standard Reboil setup. It provides direct imports from `@reboil/store` and `@reboil/store/react`:
 
 ```tsx
-import { useStore } from 'reboil/react'
+import { useStore } from '@reboil/store/react'
 
 export function Component() {
   const foo = useStore('foo')
@@ -359,7 +359,7 @@ export function Component() {
 The workflow begins with one command after package installation:
 
 ```sh
-npx reboil init
+npx @reboil/store init
 ```
 
 This is a one-time project setup, not recurring type generation. After initialization, changes to the state file flow into IntelliSense through `typeof initialState`; developers do not run a generator or watcher.
@@ -370,7 +370,7 @@ This is a one-time project setup, not recurring type generation. After initializ
 
 ```ts
 // store.ts
-import { createStore } from 'reboil'
+import { createStore } from '@reboil/store'
 
 const app = {
   foo: 'bar',
@@ -518,7 +518,7 @@ Reboil's `lazy()` accepts a dynamic import whose default export is a `createStor
 export default createStore({ count: 1 })
 
 // store.ts
-import { createStore, lazy } from 'reboil'
+import { createStore, lazy } from '@reboil/store'
 
 export const reports = lazy(() => import('./reports/state'))
 export const { store, useStore } = createStore({ reports })
@@ -538,7 +538,7 @@ React hooks start the loader and suspend on first access. Synchronous vanilla re
 Writes a value at a typed path from React components or other module code. The value may be passed directly or derived from the previous value with an updater function.
 
 ```tsx
-import { setStore } from 'reboil/react'
+import { setStore } from '@reboil/store/react'
 
 setStore('count', 2)
 setStore('nested.key', (previous) => previous)
@@ -571,7 +571,7 @@ Reboil will use a generic factory rather than generated declarations. `createSto
 
 ```ts
 // store.ts
-import { createStore } from 'reboil'
+import { createStore } from '@reboil/store'
 
 const app = {
   user: {
@@ -618,7 +618,7 @@ This local-binding API remains part of the public factory contract for advanced 
 Example interaction:
 
 ```text
-$ npx reboil init
+$ npx @reboil/store init
 
 ✓ Detected Expo Router
 ? Where should the state file live? › src/state.ts
@@ -634,7 +634,7 @@ The generated TypeScript config will connect the runtime state and its static ty
 
 ```ts
 // reboil.config.ts
-import { createStore, defineConfig } from 'reboil'
+import { createStore, defineConfig } from '@reboil/store'
 import { initialState } from './src/state'
 
 createStore(initialState)
@@ -643,14 +643,14 @@ export default defineConfig({
   stateFile: './src/state.ts',
 })
 
-declare module 'reboil' {
+declare module '@reboil/store' {
   interface Register {
     state: typeof initialState
   }
 }
 ```
 
-Reboil will expose an augmentable named `Register` interface. The direct `store` export and the `useStore` and `setStore` exports from `reboil/react` derive their path and value types from `Register['state']`. The augmentation references the state value rather than copying its shape, so ordinary TypeScript analysis updates IntelliSense whenever the state changes.
+Reboil will expose an augmentable named `Register` interface. The direct `store` export and the `useStore` and `setStore` exports from `@reboil/store/react` derive their path and value types from `Register['state']`. The augmentation references the state value rather than copying its shape, so ordinary TypeScript analysis updates IntelliSense whenever the state changes.
 
 When a custom config composes eager or lazy stores, it registers the inferred factory bindings instead. This preserves the resolved root paths and typed lazy load paths for direct package imports:
 
@@ -658,7 +658,7 @@ When a custom config composes eager or lazy stores, it registers the inferred fa
 const reports = lazy(() => import('./src/reports-state'))
 const app = createStore({ ...initialState, reports })
 
-declare module 'reboil' {
+declare module '@reboil/store' {
   interface Register {
     bindings: typeof app
   }
@@ -675,7 +675,7 @@ The initializer will use framework-specific detection rather than blindly search
 
 | Application                      | Entry handling                                                                                                                |
 | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Next.js App Router               | Statically import the client config in the root layout and render it through `ReboilState` from `reboil/next`.                |
+| Next.js App Router               | Statically import the client config in the root layout and render it through `ReboilState` from `@reboil/store/next`.                |
 | Next.js Pages Router             | Import `reboil.config` directly from the custom App, creating `_app` when needed.                                             |
 | Expo Router                      | Create or patch a custom root entry that imports `reboil.config` before `expo-router/entry`, then update `package.json#main`. |
 | Standard Expo                    | Detect `package.json#main` or create a custom entry using `registerRootComponent`.                                            |
@@ -709,7 +709,7 @@ import 'expo-router/entry'
 
 | Workflow                     | Component import            | Setup                  | Type maintenance                          |
 | ---------------------------- | --------------------------- | ---------------------- | ----------------------------------------- |
-| Standard config registration | `reboil` and `reboil/react` | One-time `reboil init` | Automatic `typeof initialState` inference |
+| Standard config registration | `@reboil/store` and `@reboil/store/react` | One-time `reboil init` | Automatic `typeof initialState` inference |
 | Local factory bindings       | Application store module    | Manual `createStore`   | Automatic generic inference               |
 
 Both access patterns use the same runtime store, path types, persistence, logger, and React subscription behavior. Config registration is the installation standard; local bindings support explicit scoping and advanced composition.
@@ -946,7 +946,7 @@ Mutation failures are logged before they throw when development logging is activ
 - Chose development-on, production-off mutation logging modeled after `redux-logger`.
 - Required a direct-binding API with no store parameter.
 - Reviewed the `useProps` consumption pattern in `paaorder` and retained its simple call-site experience.
-- Chose direct imports from `reboil` and `reboil/react` backed by config registration and module augmentation.
+- Chose direct imports from `@reboil/store` and `@reboil/store/react` backed by config registration and module augmentation.
 - Chose MMKV for native synchronous persistence and accepted the Expo development-build requirement.
 - Chose runtime console output: Metro on native and browser developer tools on web.
 - Chose client-side web support rather than full SSR state management.
@@ -964,7 +964,7 @@ Mutation failures are logged before they throw when development logging is activ
 - Replaced direct package-level `store` and `useStore` imports with typed bindings returned by `createStore` and re-exported from the application's store module.
 - Removed mandatory codegen, generated declarations, module augmentation, schema watchers, and stale-generation checks from the default design.
 - Accepted the local application-store import as the tradeoff for immediate, compiler-native IntelliSense with no extra development commands.
-- Added config registration for direct imports from `reboil` and `reboil/react`.
+- Added config registration for direct imports from `@reboil/store` and `@reboil/store/react`.
 - Defined `reboil init` as a one-time setup that creates the state/config bridge, registers its type through module augmentation, and safely wires the application entry point.
 - Made `reboil init` and config registration the standard workflow while retaining local factory bindings for advanced use; excluded recurring generation or watch commands.
 - Added composable `createStore()` nodes under one registered root.

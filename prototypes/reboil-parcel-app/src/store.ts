@@ -1,4 +1,4 @@
-import { createStore } from 'reboil'
+import { createStore } from '@reboil/store'
 
 const initialState = {
   count: 1,

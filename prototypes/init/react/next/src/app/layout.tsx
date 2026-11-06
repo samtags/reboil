@@ -1,4 +1,4 @@
-import { ReboilState } from "reboil/next";
+import { ReboilState } from "@reboil/store/next";
 import reboilConfig from "../../reboil.config";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";

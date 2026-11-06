@@ -1,4 +1,4 @@
-import { lazy } from 'reboil'
+import { lazy } from '@reboil/store'
 
 export const state = {
   settings: {

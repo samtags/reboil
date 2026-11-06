@@ -22,7 +22,7 @@ export const initialState = {
 The initializer ensures the config is registered before application state is used. Use `useStore` in a component; the hook subscribes the component to the selected `count` path and re-renders when it changes:
 
 ```tsx title="src/Counter.tsx"
-import { useStore } from 'reboil/react'
+import { useStore } from '@reboil/store/react'
 
 export function Counter() {
   const count = useStore('count')
@@ -36,7 +36,7 @@ export function Counter() {
 Use the configured package store to update the same path. The updater receives the current value and returns the next one:
 
 ```tsx title="src/IncrementButton.tsx"
-import { store } from 'reboil'
+import { store } from '@reboil/store'
 
 export function IncrementButton() {
   return (

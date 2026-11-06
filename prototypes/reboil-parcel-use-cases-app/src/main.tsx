@@ -1,8 +1,8 @@
 import '../reboil.config'
 import { StrictMode, Suspense, useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { store } from 'reboil'
-import { setStore, useStore } from 'reboil/react'
+import { store } from '@reboil/store'
+import { setStore, useStore } from '@reboil/store/react'
 import './styles.css'
 
 type EventLog = {
@@ -14,7 +14,7 @@ type EventLog = {
 type CodeSection = 'create' | 'values' | 'subscription' | 'reset' | 'persistence' | 'splitting'
 
 const codeSnippets: Record<CodeSection, string> = {
-  create: `<span class="keyword">import</span> { <span class="imported">createStore</span>, <span class="imported">lazy</span> } <span class="keyword">from</span> <span class="string">'reboil'</span>
+  create: `<span class="keyword">import</span> { <span class="imported">createStore</span>, <span class="imported">lazy</span> } <span class="keyword">from</span> <span class="string">'@reboil/store'</span>
 
 <span class="keyword">const</span> <span class="variable">profile</span> = <span class="function">createStore</span>({
   <span class="property">displayName</span>: <span class="string">'Avery'</span>,
@@ -28,8 +28,8 @@ const codeSnippets: Record<CodeSection, string> = {
   <span class="property">profile</span>,
   <span class="property">reports</span>,
 })`,
-  values: `<span class="keyword">import</span> { <span class="imported">store</span> } <span class="keyword">from</span> <span class="string">'reboil'</span>
-<span class="keyword">import</span> { <span class="imported">setStore</span> } <span class="keyword">from</span> <span class="string">'reboil/react'</span>
+  values: `<span class="keyword">import</span> { <span class="imported">store</span> } <span class="keyword">from</span> <span class="string">'@reboil/store'</span>
+<span class="keyword">import</span> { <span class="imported">setStore</span> } <span class="keyword">from</span> <span class="string">'@reboil/store/react'</span>
 
 <span class="comment">// Read the current value from any function.</span>
 <span class="keyword">const</span> <span class="variable">currentCount</span> = <span class="variable">store</span>.<span class="function">get</span>(<span class="string">'count'</span>)

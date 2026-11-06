@@ -8,7 +8,7 @@ sidebar_position: 4
 Use Reboil's `lazy()` to keep a feature's defaults, persistence hydration, and runtime state out of the initial application path.
 
 ```ts title="src/features/reports/state.ts"
-import { createStore } from 'reboil'
+import { createStore } from '@reboil/store'
 
 export default createStore({
   count: 1,
@@ -17,7 +17,7 @@ export default createStore({
 ```
 
 ```ts title="reboil.config.ts"
-import { createStore, defineConfig, lazy } from 'reboil'
+import { createStore, defineConfig, lazy } from '@reboil/store'
 import { initialState } from './src/state'
 
 export const reports = lazy(() => import('./features/reports/state'))
@@ -29,7 +29,7 @@ export const app = createStore({
 
 export default defineConfig({ stateFile: './src/state.ts' })
 
-declare module 'reboil' {
+declare module '@reboil/store' {
   interface Register {
     bindings: typeof app
   }
@@ -39,7 +39,7 @@ declare module 'reboil' {
 The root and scoped bindings share one partition:
 
 ```tsx
-import { useStore } from 'reboil/react'
+import { useStore } from '@reboil/store/react'
 import { reports } from '../../reboil.config'
 
 const count = useStore('reports.count')
@@ -51,12 +51,12 @@ The first React hook access starts the import and suspends. Place a Suspense bou
 Vanilla reads and writes stay synchronous, so load the feature explicitly first:
 
 ```ts
-import { store } from 'reboil'
+import { store } from '@reboil/store'
 
 await store.load('reports')
 store.set('reports.count', 2)
 ```
 
-Use `lazy` from `reboil`, not `React.lazy`. React's helper loads components; Reboil's helper loads a default-exported store node. When both are needed, alias them as `lazyComponent` and `lazyStore`.
+Use `lazy` from `@reboil/store`, not `React.lazy`. React's helper loads components; Reboil's helper loads a default-exported store node. When both are needed, alias them as `lazyComponent` and `lazyStore`.
 
 Lazy stores load once and remain resident until the application session ends. Reboil does not automatically evict an active partition.

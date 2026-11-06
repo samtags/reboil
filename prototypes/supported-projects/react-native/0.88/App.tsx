@@ -1,5 +1,5 @@
 import { Button, SafeAreaView, StyleSheet, Text, View } from 'react-native'
-import { setStore, useStore } from 'reboil/react'
+import { setStore, useStore } from '@reboil/store/react'
 
 export default function App() {
   const count = useStore('count')

@@ -8,7 +8,7 @@
     "init-reboil": "reboil init"
   },
   "dependencies": {
-    "reboil": "file:../../packages/reboil",
+    "@reboil/store": "file:../../packages/reboil",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

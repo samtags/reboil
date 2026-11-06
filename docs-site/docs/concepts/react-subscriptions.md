@@ -20,7 +20,7 @@ For example, a vanilla counter can update the DOM and clean up the listener when
 
 ```js title="src/main.js"
 import '../reboil.config'
-import { store } from 'reboil'
+import { store } from '@reboil/store'
 
 const countElement = document.querySelector('#count')
 

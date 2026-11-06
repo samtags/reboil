@@ -14,4 +14,4 @@ sidebar_position: 3
 
 Native consumers need a development or production build because MMKV contains native code. Expo Go is not supported.
 
-The web store API is framework agnostic. Use `store.subscribe` with vanilla JavaScript or any browser framework, and add `reboil/react` only when React bindings are needed.
+The web store API is framework agnostic. Use `store.subscribe` with vanilla JavaScript or any browser framework, and add `@reboil/store/react` only when React bindings are needed.

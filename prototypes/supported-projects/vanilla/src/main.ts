@@ -1,5 +1,5 @@
 import '../reboil.config'
-import { store } from 'reboil'
+import { store } from '@reboil/store'
 import './styles.css'
 
 const count = document.querySelector<HTMLParagraphElement>('#count')!

@@ -47,10 +47,10 @@ Do not access a child independently before composing it. Once a node has activat
 
 ## Initialization
 
-Run `npx reboil init` after installing Reboil, then use the registered direct imports:
+Run `npx @reboil/store init` after installing Reboil, then use the registered direct imports:
 
 ```tsx
-import { useStore } from 'reboil/react'
+import { useStore } from '@reboil/store/react'
 
 export function Component() {
   const foo = useStore('foo')
@@ -63,7 +63,7 @@ The initializer creates a TypeScript config, links it to the state export, and s
 If that config later composes feature stores, register the inferred bindings so direct imports retain root paths and lazy load paths:
 
 ```ts title="reboil.config.ts"
-import { createStore, defineConfig, lazy } from 'reboil'
+import { createStore, defineConfig, lazy } from '@reboil/store'
 import { initialState } from './src/state'
 
 const reports = lazy(() => import('./src/reports-state'))
@@ -71,7 +71,7 @@ export const app = createStore({ ...initialState, reports })
 
 export default defineConfig({ stateFile: './src/state.ts' })
 
-declare module 'reboil' {
+declare module '@reboil/store' {
   interface Register {
     bindings: typeof app
   }

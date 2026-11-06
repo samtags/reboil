@@ -1,6 +1,6 @@
 import { StrictMode, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { setStore } from 'reboil/react'
+import { setStore } from '@reboil/store/react'
 import { store, useStore } from './store'
 import './styles.css'
 
@@ -8,8 +8,8 @@ type Language = 'javascript' | 'typescript'
 
 const codeExamples = {
   javascript: {
-    source: `import { createStore } from 'reboil'
-import { setStore, useStore } from 'reboil/react'
+    source: `import { createStore } from '@reboil/store'
+import { setStore, useStore } from '@reboil/store/react'
 
 createStore({
   count: 1,
@@ -24,8 +24,8 @@ function Counter() {
     </button>
   )
 }`,
-    markup: `<span class="keyword">import</span> { <span class="imported">createStore</span> } <span class="keyword">from</span> <span class="string">'reboil'</span>
-<span class="keyword">import</span> { <span class="imported">setStore</span>, <span class="imported">useStore</span> } <span class="keyword">from</span> <span class="string">'reboil/react'</span>
+    markup: `<span class="keyword">import</span> { <span class="imported">createStore</span> } <span class="keyword">from</span> <span class="string">'@reboil/store'</span>
+<span class="keyword">import</span> { <span class="imported">setStore</span>, <span class="imported">useStore</span> } <span class="keyword">from</span> <span class="string">'@reboil/store/react'</span>
 
 <span class="function">createStore</span>({
   <span class="property">count</span>: <span class="number">1</span>,
@@ -42,8 +42,8 @@ function Counter() {
 }`,
   },
   typescript: {
-    source: `import { createStore } from 'reboil'
-import { setStore, useStore } from 'reboil/react'
+    source: `import { createStore } from '@reboil/store'
+import { setStore, useStore } from '@reboil/store/react'
 
 type Store = {
   count: number
@@ -62,8 +62,8 @@ function Counter() {
     </button>
   )
 }`,
-    markup: `<span class="keyword">import</span> { <span class="imported">createStore</span> } <span class="keyword">from</span> <span class="string">'reboil'</span>
-<span class="keyword">import</span> { <span class="imported">setStore</span>, <span class="imported">useStore</span> } <span class="keyword">from</span> <span class="string">'reboil/react'</span>
+    markup: `<span class="keyword">import</span> { <span class="imported">createStore</span> } <span class="keyword">from</span> <span class="string">'@reboil/store'</span>
+<span class="keyword">import</span> { <span class="imported">setStore</span>, <span class="imported">useStore</span> } <span class="keyword">from</span> <span class="string">'@reboil/store/react'</span>
 
 <span class="keyword">type</span> <span class="type">Store</span> = {
   <span class="property">count</span>: <span class="type">number</span>

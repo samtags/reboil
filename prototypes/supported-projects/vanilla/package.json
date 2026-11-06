@@ -10,7 +10,7 @@
     "reboil:init": "reboil init"
   },
   "dependencies": {
-    "reboil": "file:../../../packages/reboil"
+    "@reboil/store": "file:../../../packages/reboil"
   },
   "devDependencies": {
     "typescript": "5.9.3",

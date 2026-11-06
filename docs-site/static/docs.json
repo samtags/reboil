@@ -2,7 +2,7 @@
   "schema_version": 1,
   "name": "Reboil",
   "description": "Small, fast, and scalable string-path state access for web applications and React Native, with code splitting, and synchronous persistence out of the box",
-  "package": "reboil",
+  "package": "@reboil/store",
   "version": "1.1.0",
   "status": "stable",
   "canonical_specification": "/docs/overview",

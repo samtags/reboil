@@ -11,14 +11,14 @@ The core store API is framework agnostic and works with vanilla JavaScript or an
 After installing Reboil, run the standard one-time initializer:
 
 ```sh
-npx reboil init
+npx @reboil/store init
 ```
 
 The initializer creates or links the state file, generates `reboil.config.ts`, augments `Register` with `typeof initialState`, and imports the config before application modules. Consumers then use the registered direct package bindings:
 
 ```ts
-import { store } from "reboil";
-import { useStore } from "reboil/react";
+import { store } from "@reboil/store";
+import { useStore } from "@reboil/store/react";
 
 const name = store.get("user.name");
 const selectedName = useStore("user.name");
@@ -26,7 +26,7 @@ const selectedName = useStore("user.name");
 
 Config registration is part of installation and is the standard integration path. It is a one-time setup with no recurring code generator or watcher. A customized config that composes feature stores registers `bindings: typeof app` so direct imports retain resolved root paths and typed lazy load paths. `createStore()` still returns local typed bindings for composition, scoped access, and explicit low-level integrations.
 
-To install project-local skills for coding agents, run `npx reboil --prepare agents` and select Claude Code, Codex, or both. The command installs Claude Code at `.claude/skills/reboil/` and Codex at `.agents/skills/reboil/`; it asks before replacing customized files.
+To install project-local skills for coding agents, run `npx @reboil/store --prepare agents` and select Claude Code, Codex, or both. The command installs Claude Code at `.claude/skills/reboil/` and Codex at `.agents/skills/reboil/`; it asks before replacing customized files.
 
 `createStore()` results may be fields in another store. Exactly one node must remain unparented as the application root. Parent paths and scoped child bindings address the same partition.
 
@@ -34,7 +34,7 @@ Use Reboil's `lazy()` with a dynamic import whose module default-exports a `crea
 
 ## API and paths
 
-`createStore(initialState, options?)` returns `store` and `useStore`. Options are `id`, `version`, `persist.exclude`, `migrate`, and `logger`. `store.get(path)` reads; `store.set(path, valueOrUpdater)` writes; `store.subscribe(path, listener)` listens outside React; `store.reset(path)` restores one value; no-argument `store.reset()` returns `void` and invalidates all partitions; `store.load(path)` loads lazy state; `useStore(path)` subscribes a component with `useSyncExternalStore`; and `setStore` from `reboil/react` writes through the config-registered runtime.
+`createStore(initialState, options?)` returns `store` and `useStore`. Options are `id`, `version`, `persist.exclude`, `migrate`, and `logger`. `store.get(path)` reads; `store.set(path, valueOrUpdater)` writes; `store.subscribe(path, listener)` listens outside React; `store.reset(path)` restores one value; no-argument `store.reset()` returns `void` and invalidates all partitions; `store.load(path)` loads lazy state; `useStore(path)` subscribes a component with `useSyncExternalStore`; and `setStore` from `@reboil/store/react` writes through the config-registered runtime.
 
 Paths use dots. Object keys are segments and arrays use numeric segments such as `todos.0.title`; tuple indices can be precise. Dots in object keys are unsupported. Missing path segments and out-of-range indices throw. Literal invalid paths and values must fail TypeScript checking.
 

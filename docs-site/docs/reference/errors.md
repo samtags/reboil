@@ -18,7 +18,7 @@ Outside React, an unloaded lazy path throws `ReboilStoreNotLoadedError` with the
 In development, the default logger groups each mutation and records the previous state, action, next state, and whether the selected value changed:
 
 ```ts
-import { store } from 'reboil'
+import { store } from '@reboil/store'
 
 store.set('count', (value) => value + 1)
 ```
@@ -38,7 +38,7 @@ The console output is similar to:
 Invalid values are logged and then thrown. The state remains unchanged:
 
 ```ts
-import { store } from 'reboil'
+import { store } from '@reboil/store'
 
 try {
   store.set('count', () => Number.NaN)
@@ -62,7 +62,7 @@ Counter update failed ReboilError: Value at "count" is not JSON-safe.
 Pass a logger function when you want to send structured mutation events to your own logging system:
 
 ```ts
-import { createStore } from 'reboil'
+import { createStore } from '@reboil/store'
 
 const { store } = createStore(
   { count: 1 },

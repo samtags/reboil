@@ -1,4 +1,4 @@
-import { createStore, defineConfig, lazy } from 'reboil'
+import { createStore, defineConfig, lazy } from '@reboil/store'
 
 const profile = createStore({
   displayName: 'Avery',
@@ -35,7 +35,7 @@ export default defineConfig({
   stateFile: './src/state.ts',
 })
 
-declare module 'reboil' {
+declare module '@reboil/store' {
   interface Register {
     bindings: typeof app
   }
