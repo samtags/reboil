@@ -11,3 +11,10 @@ docs-site/static/skills/
 **/*.woff2
 **/*.png
 **/*.svg
+prototypes/init/react/cra/**
+prototypes/init/react/parcel/**
+prototypes/init/react/vite/**
+prototypes/init/react/next/**
+prototypes/init/vanilla/**
+prototypes/init/react-native/**
+prototypes/init/expo/**

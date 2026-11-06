@@ -1,0 +1,18 @@
+{
+  "name": "vanilla",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "reboil:init": "reboil init"
+  },
+  "dependencies": {
+    "reboil": "file:../../../packages/reboil"
+  },
+  "devDependencies": {
+    "vite": "^8.3.6"
+  }
+}

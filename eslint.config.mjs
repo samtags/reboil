@@ -16,6 +16,14 @@ export default tseslint.config(
       '**/.parcel-cache/**',
       'docs-site/.docusaurus/**',
       'docs-site/static/**',
+      '.vercel/**',
+      'prototypes/init/react/cra/**',
+      'prototypes/init/react/parcel/**',
+      'prototypes/init/react/vite/**',
+      'prototypes/init/react/next/**',
+      'prototypes/init/vanilla/**',
+      'prototypes/init/react-native/**',
+      'prototypes/init/expo/**',
     ],
   },
   {
@@ -24,16 +32,16 @@ export default tseslint.config(
   },
   ...tseslint.configs.recommended.map((config) => ({ ...config, files: typescriptFiles })),
   {
-    files: ['scripts/**/*.{js,mjs,cjs}', 'eslint.config.mjs'],
+    files: ['scripts/**/*.{js,mjs,cjs}', 'prototypes/init/scripts/**/*.{js,mjs,cjs}', 'eslint.config.mjs'],
     languageOptions: { globals: globals.node },
   },
   {
-    files: ['examples/reboil-vanilla-app/src/**/*.js'],
+    files: ['prototypes/reboil-vanilla-app/src/**/*.js'],
     languageOptions: { globals: globals.browser },
   },
   {
     ...reactHooks.configs.flat.recommended,
-    files: ['examples/**/*.{jsx,tsx}', 'docs-site/src/**/*.{jsx,tsx}'],
+    files: ['prototypes/**/*.{jsx,tsx}', 'docs-site/src/**/*.{jsx,tsx}'],
   },
   prettier,
 )

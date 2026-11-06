@@ -1,0 +1,11 @@
+{
+  "name": "reboil-init-fixtures",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "init": "node scripts/run-init.mjs",
+    "verify": "node scripts/verify.mjs",
+    "reset": "node scripts/reset.mjs"
+  }
+}

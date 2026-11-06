@@ -3,4 +3,11 @@ dist/
 coverage/
 .parcel-cache/
 *.tsbuildinfo
+
+# Reboil init verification outputs
+prototypes/init/**/reboil.config.ts
+prototypes/init/**/src/state.ts
+prototypes/init/**/index.ts
+prototypes/init/**/register-state.ts
 screenshots/
+.vercel

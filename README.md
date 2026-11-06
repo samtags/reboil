@@ -211,16 +211,14 @@ Mutations are validated and persisted before the in-memory state is committed. F
 | `useStore(path)`                      | Subscribe a React component to one path                   |
 | `setStore(path, valueOrUpdater)`      | Update the registered store through `reboil/react`        |
 
-The complete guides and reference live in [`docs-site/docs`](./docs-site/docs/overview.md). Runnable examples are available for [React with local bindings](./examples/reboil-parcel-app), [React with config registration](./examples/reboil-parcel-config-app), [config-registered code splitting](./examples/reboil-parcel-config-lazy-app), and [vanilla JavaScript](./examples/reboil-vanilla-app).
+The complete guides and reference live in [`docs-site/docs`](./docs-site/docs/overview.md). The [`examples/`](./examples) directory is reserved for public-facing examples. Internal validation apps and initializer fixtures live in [`prototypes/`](./prototypes), including the [`reboil init` verification matrix](./prototypes/init/README.md).
 
 ## Repository layout
 
 ```text
 packages/reboil/                  Package source, tests, and type tests
-examples/reboil-parcel-app/      React example using local bindings
-examples/reboil-parcel-config-app/ React example using `reboil init`
-examples/reboil-parcel-config-lazy-app/ Config-registered lazy-store example
-examples/reboil-vanilla-app/     Browser JavaScript example
+examples/                         Public-facing examples
+prototypes/                       Internal validation apps and initializer fixtures
 docs-site/                        Docusaurus documentation site
 skills/reboil/                   Reboil skill for coding agents
 ```
@@ -236,7 +234,7 @@ npm test
 npm run typecheck
 ```
 
-Start an example with its workspace name:
+Start an internal prototype with its workspace name:
 
 ```sh
 npm run dev --workspace reboil-parcel-app

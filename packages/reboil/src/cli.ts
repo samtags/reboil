@@ -24,6 +24,18 @@ interface CliOptions {
   yes: boolean
 }
 
+type Framework = 'expo-router' | 'expo' | 'next' | 'cra' | 'react-native' | 'generic'
+
+interface AstNode {
+  type?: string
+  name?: string
+  value?: unknown
+  source?: AstNode
+  expression?: AstNode
+  callee?: AstNode
+  arguments?: AstNode[]
+}
+
 function parseArgs(argv: string[]): CliOptions {
   const options: CliOptions = { cwd: process.cwd(), dryRun: false, yes: false }
   for (let index = 0; index < argv.length; index += 1) {
@@ -44,6 +56,25 @@ function parseArgs(argv: string[]): CliOptions {
 
 function readJson(file: string): Record<string, unknown> {
   return JSON.parse(fs.readFileSync(file, 'utf8')) as Record<string, unknown>
+}
+
+function dependenciesOf(packageJson: Record<string, unknown>): Record<string, unknown> {
+  return {
+    ...(packageJson.dependencies as Record<string, unknown> | undefined),
+    ...(packageJson.devDependencies as Record<string, unknown> | undefined),
+  }
+}
+
+function detectFramework(packageJson: Record<string, unknown>): Framework {
+  const dependencies = dependenciesOf(packageJson)
+  if ('expo-router' in dependencies || packageJson.main === 'expo-router/entry') return 'expo-router'
+  if ('expo' in dependencies || (typeof packageJson.main === 'string' && /expo[\\/]AppEntry/.test(packageJson.main))) {
+    return 'expo'
+  }
+  if ('next' in dependencies) return 'next'
+  if ('react-scripts' in dependencies) return 'cra'
+  if ('react-native' in dependencies) return 'react-native'
+  return 'generic'
 }
 
 function relativeImport(fromFile: string, targetFile: string): string {
@@ -69,16 +100,11 @@ function findStateFile(root: string, explicit?: string): string {
 function findEntryFile(root: string, packageJson: Record<string, unknown>, explicit?: string): string | null {
   if (explicit) return path.resolve(root, explicit)
   const main = typeof packageJson.main === 'string' ? packageJson.main : null
-  if (main && main.startsWith('.') && fs.existsSync(path.resolve(root, main))) return path.resolve(root, main)
+  if (main && fs.existsSync(path.resolve(root, main))) return path.resolve(root, main)
   const candidates = [
-    'src/main.tsx',
-    'src/main.ts',
-    'src/index.tsx',
-    'src/index.ts',
-    'src/index.js',
-    'index.tsx',
-    'index.ts',
-    'index.js',
+    ...['tsx', 'jsx', 'ts', 'js', 'mts', 'mjs'].map((extension) => `src/main.${extension}`),
+    ...['tsx', 'jsx', 'ts', 'js', 'mts', 'mjs'].map((extension) => `src/index.${extension}`),
+    ...['tsx', 'jsx', 'ts', 'js', 'mts', 'mjs'].map((extension) => `index.${extension}`),
   ]
   const found = candidates.map((candidate) => path.resolve(root, candidate)).filter(fs.existsSync)
   if (found.length === 1) return found[0]
@@ -89,14 +115,6 @@ function findEntryFile(root: string, packageJson: Record<string, unknown>, expli
   return null
 }
 
-function isExpoRouter(packageJson: Record<string, unknown>): boolean {
-  const dependencies = {
-    ...(packageJson.dependencies as Record<string, unknown> | undefined),
-    ...(packageJson.devDependencies as Record<string, unknown> | undefined),
-  }
-  return 'expo-router' in dependencies || packageJson.main === 'expo-router/entry'
-}
-
 function parseSource(source: string, file: string): ReturnType<typeof recast.parse> {
   const extension = path.extname(file).toLowerCase()
   const parser = extension === '.tsx' ? babelTsParser : extension === '.ts' ? typescriptParser : babelParser
@@ -104,8 +122,24 @@ function parseSource(source: string, file: string): ReturnType<typeof recast.par
 }
 
 function addConfigImport(source: string, file: string, configImport: string): string {
-  if (source.includes(configImport) && /(?:from\s+|import\s*\(|require\s*\()/.test(source)) return source
   const ast = parseSource(source, file)
+  const normalizedImport = configImport.replace(/\.(?:[cm]?[jt]sx?)$/, '')
+  const hasConfigImport = (ast.program.body as AstNode[]).some((node) => {
+    if (node.type === 'ImportDeclaration') {
+      const value = typeof node.source?.value === 'string' ? node.source.value : ''
+      return value.replace(/\.(?:[cm]?[jt]sx?)$/, '') === normalizedImport
+    }
+    if (node.type !== 'ExpressionStatement' || node.expression?.type !== 'CallExpression') return false
+    const callee = node.expression.callee
+    const firstArgument = node.expression.arguments?.[0]
+    const value = typeof firstArgument?.value === 'string' ? firstArgument.value : ''
+    return (
+      ((callee?.type === 'Identifier' && callee.name === 'require') ||
+        (callee?.type === 'Import' && typeof value === 'string')) &&
+      value.replace(/\.(?:[cm]?[jt]sx?)$/, '') === normalizedImport
+    )
+  })
+  if (hasConfigImport) return source
   const importNode = recast.types.builders.importDeclaration([], recast.types.builders.stringLiteral(configImport))
   ast.program.body.unshift(importNode)
   return recast.print(ast).code
@@ -122,6 +156,12 @@ function generatedEntrySource(configFile: string, target: 'router' | 'expo'): st
   return target === 'router'
     ? `import '${configImport}'\nimport 'expo-router/entry'\n`
     : `import '${configImport}'\nimport 'expo/AppEntry'\n`
+}
+
+function nextRegisterStateFile(root: string): string {
+  const srcDirectory = path.resolve(root, 'src')
+  const usesSrc = fs.existsSync(path.resolve(srcDirectory, 'app')) || fs.existsSync(path.resolve(srcDirectory, 'pages'))
+  return path.resolve(usesSrc ? srcDirectory : root, 'register-state.ts')
 }
 
 async function confirmChanges(changes: Change[]): Promise<boolean> {
@@ -142,8 +182,9 @@ async function init(options: CliOptions): Promise<void> {
   const packageFile = path.resolve(root, 'package.json')
   if (!fs.existsSync(packageFile)) throw new Error(`No package.json found in ${root}`)
   const packageJson = readJson(packageFile)
+  const framework = detectFramework(packageJson)
   const stateFile = findStateFile(root, options.state)
-  const configFile = path.resolve(root, 'reboil.config.ts')
+  const configFile = path.resolve(root, framework === 'cra' ? 'src/reboil.config.ts' : 'reboil.config.ts')
   const changes: Change[] = []
 
   if (!fs.existsSync(stateFile)) {
@@ -156,7 +197,7 @@ async function init(options: CliOptions): Promise<void> {
   })
 
   const main = typeof packageJson.main === 'string' ? packageJson.main : ''
-  const routerEntry = isExpoRouter(packageJson) && (main === 'expo-router/entry' || main === '')
+  const routerEntry = framework === 'expo-router' && (main === 'expo-router/entry' || main === '')
   const standardExpoEntry = !routerEntry && /expo[\\/]AppEntry/.test(main)
   let entryFile = findEntryFile(root, packageJson, options.entry)
 
@@ -175,6 +216,15 @@ async function init(options: CliOptions): Promise<void> {
       before: fs.readFileSync(packageFile, 'utf8'),
       after: `${JSON.stringify(packageJson, null, 2)}\n`,
     })
+  } else if (framework === 'next' && !options.entry) {
+    entryFile = nextRegisterStateFile(root)
+    changes.push({
+      file: entryFile,
+      before: fs.existsSync(entryFile) ? fs.readFileSync(entryFile, 'utf8') : null,
+      after: fs.existsSync(entryFile)
+        ? addConfigImport(fs.readFileSync(entryFile, 'utf8'), entryFile, relativeImport(entryFile, configFile))
+        : `import '${relativeImport(entryFile, configFile)}'\n`,
+    })
   } else {
     if (!entryFile) throw new Error('Could not detect an application entry point. Use --entry <path>.')
     const importPath = relativeImport(entryFile, configFile)
@@ -182,7 +232,13 @@ async function init(options: CliOptions): Promise<void> {
     changes.push({ file: entryFile, before, after: addConfigImport(before, entryFile, importPath) })
   }
 
-  const shouldApply = options.dryRun || options.yes || (await confirmChanges(changes))
+  const effectiveChanges = changes.filter((change) => change.before !== change.after)
+  if (effectiveChanges.length === 0) {
+    console.log('Reboil is already initialized; no changes needed.')
+    return
+  }
+
+  const shouldApply = options.dryRun || options.yes || (await confirmChanges(effectiveChanges))
   if (!shouldApply) {
     console.log('No changes applied.')
     return
@@ -191,7 +247,7 @@ async function init(options: CliOptions): Promise<void> {
     console.log('Dry run complete; no files were written.')
     return
   }
-  for (const change of changes) {
+  for (const change of effectiveChanges) {
     fs.mkdirSync(path.dirname(change.file), { recursive: true })
     fs.writeFileSync(change.file, change.after)
   }

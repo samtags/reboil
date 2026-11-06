@@ -25,7 +25,7 @@ The core promise is:
 
 ## Example visual style
 
-Reboil examples should use the supplied brand typography and boil-mark favicon so they feel like one coherent product. The font source paths below are authoring references on the design workstation; projects must copy the files into their own assets directory and reference the copied files at runtime.
+Public Reboil examples should use the supplied brand typography and boil-mark favicon so they feel like one coherent product. The font source paths below are authoring references on the design workstation; projects must copy the files into their own assets directory and reference the copied files at runtime.
 
 | Use                        | Font family       | Source file                                                                                                                              |
 | -------------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
@@ -75,13 +75,13 @@ body {
 }
 ```
 
-Use the boil mark in `examples/reboil-vanilla-app/src/assets/boil.png` as the reference favicon. Copy it into a new project's asset or public directory and add the appropriate bundler-relative link:
+Use the boil mark in `prototypes/reboil-vanilla-app/src/assets/boil.png` as the reference favicon. Copy it into a new project's asset or public directory and add the appropriate bundler-relative link:
 
 ```html
 <link rel="icon" type="image/png" href="./assets/boil.png" />
 ```
 
-For static apps that serve assets from the site root, use `/assets/boil.png` instead. The favicon and fonts are presentation guidance for examples; they do not affect Reboil's runtime API.
+For static apps that serve assets from the site root, use `/assets/boil.png` instead. The favicon and fonts are presentation guidance for public examples; they do not affect Reboil's runtime API.
 
 ## Goals
 
