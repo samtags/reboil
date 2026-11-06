@@ -1,4 +1,7 @@
 import { defineConfig } from 'tsup'
+import * as ts from 'typescript'
+
+const dtsCompilerOptions = Number.parseInt(ts.versionMajorMinor, 10) >= 6 ? { ignoreDeprecations: '6.0' } : {}
 
 export default defineConfig({
   entry: {
@@ -7,7 +10,7 @@ export default defineConfig({
     cli: 'src/cli.ts',
   },
   format: ['esm', 'cjs'],
-  dts: true,
+  dts: { compilerOptions: dtsCompilerOptions },
   clean: true,
   sourcemap: true,
   splitting: false,
