@@ -8,7 +8,7 @@ Each fixture starts as an official project template, installs the local `package
 
 | Project | Directory | Exact framework version | Reboil target | Upstream lifecycle | Verification state |
 | --- | --- | --- | --- | --- | --- |
-| Expo | `expo/52` | Expo 52.0.49 / React Native 0.76.9 | Oldest Expo target | Archived | **Supported for Android development compilation, bundle export, and persistence:** Reboil initialization, TypeScript, Android debug APK compilation/install, Metro Android bundle export, and manual counter persistence verification pass (2026-11-07). Android release remains manual. iOS verification is blocked on this host: Xcode 26.5 / Apple Clang 21 fails while compiling React Native 0.76.9's vendored `fmt` 11.0.2 pod, before Reboil runs. |
+| Expo | `expo/52` | Expo 52.0.49 / React Native 0.76.9 | Oldest Expo target | Archived | **Supported for Android and iOS development, including persistence:** Reboil initialization, TypeScript, Android debug APK compilation/install, Metro Android bundle export, iOS debug compilation/install/simulator launch on Xcode 26.5 with the fixture's generated-Podfile `fmt` compatibility workaround, and manual counter persistence verification on both platforms pass (2026-11-07). Android and iOS release builds remain manual. |
 | Expo | `expo/58` | Expo 58.0.23 / React Native 0.88.1 | Latest Expo target | Current | `reboil init` and TypeScript pass. Expo Doctor reports a duplicate React installation caused by the local `file:` Reboil link; native run/release build is pending. |
 | React Native bare | `react-native/0.75` | React Native 0.75.5 | Historical native boundary | Unsupported | `reboil init` and TypeScript pass, but Android release build fails in Nitro Modules before Reboil runs: Nitro 0.31 requires a newer `ReactModuleInfo` API. Do not support this version. |
 | React Native bare | `react-native/0.77` | React Native 0.77.3 | Lowest current native candidate | Unsupported upstream | Fixture added with MMKV 4.3.2 + Nitro 0.37.2. Install, Android, and iOS checks are pending; the first local install was blocked by host disk exhaustion before compilation began. |
@@ -33,6 +33,10 @@ Expo 52 uses React Native 0.76.9. Its fixture pins `react-native-mmkv@4.0.0-beta
 When Metro resolves Reboil for React Native, the `reboil` and `reboil/react` package entries load the native adapter. It statically imports `react-native-mmkv` and Nitro Modules, then gives MMKV precedence over the `window` global that React Native provides for web compatibility. This means persisted state is stored in the named synchronous MMKV instance (by default, `reboil`) rather than falling back to in-memory storage. The linked local fixtures map these peer packages in `metro.config.js`; an installed published package resolves the peers from the application normally.
 
 Native persistence requires a custom development or production build. It cannot run in Expo Go because MMKV includes native code.
+
+### Expo 52 iOS on Xcode 26.4+
+
+React Native 0.76.9's vendored `fmt` 11.0.2 does not compile with Apple Clang 21. The fixture includes `plugins/with-fmt-consteval-fix.cjs`, an idempotent Expo config plugin that patches the generated Podfile's `fmt` header during each `pod install`. It affects iOS compilation only and must be retained while this fixture uses Expo 52 on Xcode 26.4 or newer. With the patch, the Expo 52 debug app compiled, installed, launched, and passed manual persistence verification in the iOS 26.5 simulator on 2026-11-07; release verification is still required.
 
 ## Verify manually
 

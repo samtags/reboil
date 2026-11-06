@@ -2,7 +2,7 @@
 
 ## Scope
 
-Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box
+Small, fast, and scalable string-path state access for web applications and React Native, with code splitting, and synchronous persistence out of the box
 
 The core store API is framework agnostic and works with vanilla JavaScript or any web framework. React bindings are available as an optional integration. Reboil uses one composable client-side application-store tree with typed dot-separated paths, synchronous partitioned persistence, lazy feature-state loading, path-level subscriptions, and development logging. Independent roots, async persistence, server mutations, dynamic record-key autocomplete, non-JSON state, and native Expo Go support are excluded.
 

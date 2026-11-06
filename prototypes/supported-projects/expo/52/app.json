@@ -14,7 +14,8 @@
       "package": "dev.reboil.compatibility.expo52"
     },
     "plugins": [
-      "expo-asset"
+      "expo-asset",
+      "./plugins/with-fmt-consteval-fix.cjs"
     ]
   }
 }

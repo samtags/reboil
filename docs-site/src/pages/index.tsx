@@ -179,7 +179,7 @@ export default function Home(): ReactNode {
   return (
     <Layout
       title="Typed synchronous state"
-      description="Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box"
+      description="Small, fast, and scalable string-path state access for web applications and React Native, with code splitting, and synchronous persistence out of the box"
     >
       <main>
         <section className={styles.hero}>
@@ -187,9 +187,8 @@ export default function Home(): ReactNode {
             <div className={styles.heroIntro}>
               <Heading as="h1">State Simplified</Heading>
               <p>
-                Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code
-                splitting, and synchronous persistence out of the box. Inspired by Recoil’s principles, Redux’s
-                observability and scalability, and Zustand’s simplicity.
+                Small, fast, and scalable string-path state access for web applications and React Native, with zero
+                boilerplate, code splitting, and synchronous persistence out of the box.
               </p>
             </div>
             <div className={styles.demo} aria-label="Reboil config registration code example">

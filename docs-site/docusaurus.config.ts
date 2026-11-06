@@ -5,7 +5,7 @@ import type * as Preset from '@docusaurus/preset-classic'
 const config: Config = {
   title: 'Reboil',
   tagline:
-    'Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box',
+    'Small, fast, and scalable string-path state access for web applications and React Native, with code splitting, and synchronous persistence out of the box',
   favicon: 'img/boil.png',
   url: process.env.DOCS_SITE_URL || 'http://localhost:3000',
   baseUrl: '/',

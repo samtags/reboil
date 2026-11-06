@@ -5,7 +5,7 @@ description: Implement, integrate, review, or document Reboil framework-agnostic
 
 # Reboil for Claude Code
 
-Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box
+Small, fast, and scalable string-path state access for web applications and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box
 
 The core store API is framework agnostic. React bindings are available as an optional integration.
 
