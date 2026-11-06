@@ -1,7 +1,10 @@
+import { createRequire } from 'node:module'
 import { defineConfig } from 'tsup'
-import * as ts from 'typescript'
+import type * as TypeScript from 'typescript'
 
-const dtsCompilerOptions = Number.parseInt(ts.versionMajorMinor, 10) >= 6 ? { ignoreDeprecations: '6.0' } : {}
+const requireFromTsup = createRequire(createRequire(import.meta.url).resolve('tsup'))
+const tsupTypescript = requireFromTsup('typescript') as typeof TypeScript
+const dtsCompilerOptions = Number.parseInt(tsupTypescript.versionMajorMinor, 10) >= 6 ? { ignoreDeprecations: '6.0' } : {}
 
 export default defineConfig({
   entry: {
