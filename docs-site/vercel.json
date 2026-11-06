@@ -1,5 +1,5 @@
 {
-  "installCommand": "npm ci --include=dev && npm ci --include=dev --prefix ..",
+  "installCommand": "npm install --include=dev --include=optional --package-lock=false && npm install --include=dev --include=optional --package-lock=false --prefix ..",
   "buildCommand": "npm run build --prefix ../packages/reboil && npm run build",
   "outputDirectory": "build"
 }
