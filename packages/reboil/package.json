@@ -1,7 +1,7 @@
 {
   "name": "reboil",
   "version": "0.1.0",
-  "description": "Typed string-path state access with synchronous persistence.",
+  "description": "Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box",
   "license": "MIT",
   "type": "module",
   "bin": {

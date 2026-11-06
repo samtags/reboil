@@ -2,7 +2,9 @@
 
 ## Scope
 
-Reboil is one composable client-side application-store tree for Expo, React Native, Expo Web, and browser React. It uses typed dot-separated paths, synchronous partitioned persistence, lazy feature-state loading, path-level subscriptions, and development logging. It never uses React Context or a Provider. Independent roots, async persistence, server mutations, dynamic record-key autocomplete, non-JSON state, and native Expo Go support are excluded.
+Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box
+
+The core store API is framework agnostic and works with vanilla JavaScript or any web framework. React bindings are available as an optional integration. Reboil uses one composable client-side application-store tree with typed dot-separated paths, synchronous partitioned persistence, lazy feature-state loading, path-level subscriptions, and development logging. Independent roots, async persistence, server mutations, dynamic record-key autocomplete, non-JSON state, and native Expo Go support are excluded.
 
 ## Recommended workflow
 
@@ -22,7 +24,7 @@ const name = store.get("user.name");
 const selectedName = useStore("user.name");
 ```
 
-Config registration is part of installation and is the standard integration path. It needs no Provider, recurring code generator, or watcher. A customized config that composes feature stores registers `bindings: typeof app` so direct imports retain resolved root paths and typed lazy load paths. `createStore()` still returns local typed bindings for composition, scoped access, and explicit low-level integrations.
+Config registration is part of installation and is the standard integration path. It is a one-time setup with no recurring code generator or watcher. A customized config that composes feature stores registers `bindings: typeof app` so direct imports retain resolved root paths and typed lazy load paths. `createStore()` still returns local typed bindings for composition, scoped access, and explicit low-level integrations.
 
 To install project-local skills for coding agents, run `npx reboil --prepare agents` and select Claude Code, Codex, or both. The command installs Claude Code at `.claude/skills/reboil/` and Codex at `.agents/skills/reboil/`; it asks before replacing customized files.
 
@@ -38,7 +40,7 @@ Paths use dots. Object keys are segments and arrays use numeric segments such as
 
 ## Persistence and failure guarantees
 
-Native iOS and Android use synchronous MMKV with Nitro Modules and require an Expo development or production build. Browser React and Expo Web use synchronous `localStorage`; unavailable browser storage falls back to memory with a development warning. Persistence uses a reset-epoch manifest and one versioned envelope per store node. Objects deep-merge over new defaults; arrays replace defaults; excluded paths persist as defaults. Legacy monolithic envelopes convert once without discarding child values.
+Native iOS and Android use synchronous MMKV with Nitro Modules and require an Expo development or production build. Web browsers and Expo Web use synchronous `localStorage`; unavailable browser storage falls back to memory with a development warning. Persistence uses a reset-epoch manifest and one versioned envelope per store node. Objects deep-merge over new defaults; arrays replace defaults; excluded paths persist as defaults. Legacy monolithic envelopes convert once without discarding child values.
 
 Each mutation validates its path and JSON-safe next partition, serializes and persists that partition synchronously, commits memory, notifies changed selections, logs, then returns. Any validation, serialization, migration, or persistence failure preserves the previous memory and stored data, logs the rejection in development, and throws. No-op sets log but do not persist or notify.
 

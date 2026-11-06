@@ -5,33 +5,37 @@
 <h1 align="center">Reboil</h1>
 
 <p align="center">
-  Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box. Inspired by Recoil’s principles, Redux’s observability and scalability, and Zustand’s simplicity.
+  Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box
+</p>
+
+<p align="center">
+  The core store API is framework agnostic. React bindings are available as an optional integration.
 </p>
 
 ## Why Reboil?
 
 - Typed dot-path access such as `settings.theme` and `todos.0.title`
-- Path-level React subscriptions without Context or a Provider
+- Path-level React subscriptions with precise rerenders
 - Synchronous hydration and writes through `localStorage` on the web and MMKV on native
 - Immutable updates with direct values or updater functions
 - Typed persistence exclusions and synchronous schema migrations
 - Vanilla JavaScript subscriptions and development-time mutation logging
+- A framework-agnostic core API with optional React bindings
 - A single application store with a small API
 
 ## Platform support
 
 | Platform                               | Persistence    | Notes                                                           |
 | -------------------------------------- | -------------- | --------------------------------------------------------------- |
-| Browser React and Expo Web             | `localStorage` | Synchronous hydration and writes                                |
+| Web browsers and Expo Web              | `localStorage` | Works with vanilla JavaScript and browser frameworks            |
 | Expo / React Native on iOS and Android | MMKV           | Requires a development or production build                      |
-| Vanilla browser JavaScript             | `localStorage` | Use `store.subscribe` instead of React bindings                 |
 | Server environments                    | In memory      | Persisted hydration and server-side mutations are not supported |
 
 Expo Go is not supported because MMKV contains native code.
 
 ## Installation
 
-For browser React, Expo Web, or vanilla JavaScript:
+For web applications, including vanilla JavaScript and browser frameworks:
 
 ```sh
 npm install reboil

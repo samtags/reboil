@@ -9,7 +9,9 @@ sidebar_position: 3
 | --------------------------- | ------------------ | ---------------------- | ------------------------------- |
 | Expo / React Native iOS     | MMKV               | Synchronous            | Synchronous                     |
 | Expo / React Native Android | MMKV               | Synchronous            | Synchronous                     |
-| Expo Web / browser React    | `localStorage`     | Synchronous            | Synchronous                     |
+| Web browsers / Expo Web     | `localStorage`     | Synchronous            | Synchronous                     |
 | Server environment          | In-memory defaults | No persisted hydration | Not a supported mutation target |
 
 Native consumers need a development or production build because MMKV contains native code. Expo Go is not supported.
+
+The web store API is framework agnostic. Use `store.subscribe` with vanilla JavaScript or any browser framework, and add `reboil/react` only when React bindings are needed.

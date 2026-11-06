@@ -4,7 +4,9 @@ This reference condenses the agreed v1 contract in `docs/roadmap.md`. That roadm
 
 ## Status and scope
 
-Reboil is one composable, client-side application-store tree for Expo, React Native, Expo Web, and browser React. It has no React Context or Provider. Many `createStore()` nodes may compose under one unparented root; independent application roots, async persistence, server mutations or per-request SSR stores, dynamic-record-key autocomplete, non-JSON values, and native Expo Go support remain excluded.
+Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box
+
+The core store API is framework agnostic and works with vanilla JavaScript or any web framework. React bindings are available as an optional integration. Reboil uses one composable, client-side application-store tree for web, Expo, and React Native. Many `createStore()` nodes may compose under one unparented root; independent application roots, async persistence, server mutations or per-request SSR stores, dynamic-record-key autocomplete, non-JSON values, and native Expo Go support remain excluded.
 
 ## Local factory bindings
 
@@ -31,7 +33,7 @@ const name = useStore('user.name')
 store.set('todos.0.completed', true)
 ```
 
-There is no provider, registration import, generator, watch command, or schema file. Editing `initialState` updates ordinary TypeScript inference immediately.
+There is no registration import, generator, watch command, or schema file. Editing `initialState` updates ordinary TypeScript inference immediately.
 
 ## Composed and lazy stores
 
@@ -84,7 +86,7 @@ All paths use dots. Objects use string key segments; arrays use canonical numeri
 
 ## Persistence and mutations
 
-Native iOS and Android use synchronous `react-native-mmkv` v4 with `react-native-nitro-modules`. Users install native dependencies via Expo’s version-aware installer and build a development or production client. Browser React and Expo Web use synchronous `localStorage`; if storage is unavailable, Reboil continues in memory and warns in development. Server environments use in-memory defaults and are not mutation targets.
+Native iOS and Android use synchronous `react-native-mmkv` v4 with `react-native-nitro-modules`. Users install native dependencies via Expo’s version-aware installer and build a development or production client. Web browsers and Expo Web use synchronous `localStorage`; if storage is unavailable, Reboil continues in memory and warns in development. Server environments use in-memory defaults and are not mutation targets.
 
 Persist a small root manifest with a reset epoch and one versioned JSON envelope per store node. Root and child partition keys derive from the root ID and child path. Activation deep-merges persisted plain objects over that partition's defaults; arrays replace defaults. Excluded paths remain reactive in memory but persist as defaults.
 
@@ -116,6 +118,6 @@ Throw descriptive errors for unregistered direct bindings, duplicate production 
 - Verify typed paths, `get`, `set`, subscriptions, reset, arrays/tuples, and direct-binding augmentation with type tests.
 - Verify synchronous hydration, default merging, array replacement, exclusions, migration, storage fallback, and atomic write failure behavior.
 - Verify eager composition, one-root registration, lazy Suspense, explicit vanilla loading, partition-only writes, reset epochs, and legacy conversion.
-- Verify path-level notifications and React rendering behavior without Context.
+- Verify path-level notifications and React rendering behavior.
 - Keep the Codex and Claude Code contracts byte-identical. Run `node scripts/release-reboil-skill.mjs` to publish both release copies, then run `node scripts/release-reboil-skill.mjs --check`.
 - Update the website’s `llms.txt`, `llms-full.txt`, `docs.json`, and agent page when contract-facing resources change.

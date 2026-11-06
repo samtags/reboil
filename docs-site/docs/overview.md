@@ -9,13 +9,16 @@ slug: /overview
 
 Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box. Inspired by Recoil’s principles, Redux’s observability and scalability, and Zustand’s simplicity.
 
+The core store API is framework agnostic. React bindings are available as an optional integration.
+
 ## The core features
 
 - String-path access for reads and writes.
 - Full TypeScript autocomplete for the state paths.
 - Synchronous hydration and persistence.
 - Composable eager stores and code-split lazy feature stores.
-- Expo native and React web compatibility.
+- Framework-agnostic web support with optional React bindings.
+- Expo and React Native support.
 - State observability out of the box.
 
 ## Where to go next

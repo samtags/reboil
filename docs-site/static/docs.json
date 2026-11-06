@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "name": "Reboil",
+  "description": "Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box",
   "package": "reboil",
   "version": "0.1.0",
   "status": "specification",
@@ -19,7 +20,7 @@
     {
       "id": "installation",
       "url": "/docs/getting-started/installation",
-      "summary": "Browser, Expo, and React Native installation plus required one-time config registration."
+      "summary": "Framework-agnostic web, Expo, and React Native installation plus required one-time config registration."
     },
     {
       "id": "quick-start",
@@ -44,7 +45,7 @@
     {
       "id": "react-subscriptions",
       "url": "/docs/concepts/react-subscriptions",
-      "summary": "Path-level React and vanilla subscriptions without Context."
+      "summary": "Path-level React and vanilla subscriptions with precise change notifications."
     },
     {
       "id": "lazy-stores",

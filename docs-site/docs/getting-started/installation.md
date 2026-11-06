@@ -5,7 +5,7 @@ sidebar_position: 1
 
 # Installation
 
-## Browser React and Expo Web
+## Web and Expo Web
 
 Install the package:
 
@@ -26,7 +26,7 @@ MMKV contains native code, so Reboil requires an Expo development or production 
 
 See the [platform support guide](./platform-support) for adapter and hydration behavior.
 
-Browser consumers use `localStorage`.
+Web consumers use `localStorage`. The core store API works with vanilla JavaScript and browser frameworks; React applications can additionally use the bindings from `reboil/react`.
 
 ## Boil the project
 

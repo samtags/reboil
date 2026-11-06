@@ -1,6 +1,8 @@
 # Reboil documentation
 
-Reboil is a TypeScript state library for Expo, React Native, and browser React. It provides composable and lazy feature stores, typed dot-path reads and writes, synchronous partitioned persistence, path-level subscriptions, and development logging without React Context or a Provider.
+Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box
+
+The core store API is framework agnostic and works with vanilla JavaScript or any web framework. React bindings are available as an optional integration.
 
 Recommended reading:
 - /docs/overview

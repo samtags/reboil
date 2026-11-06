@@ -1,8 +1,8 @@
 # Reboil
 
-> String-path state access with zero boilerplate and synchronous persistence out of the box.
+Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box
 
-Reboil is a TypeScript state library for Expo, React Native, and client-side React web applications. It provides one composable application-store tree, typed string paths, synchronous partitioned persistence, lazy feature-state loading, path-level React subscriptions, and development-time mutation logging without exposing a React Context or requiring a Provider.
+The core store API is framework agnostic and works with vanilla JavaScript or any web framework. React bindings are available as an optional integration.
 
 ## Project Status
 
@@ -12,15 +12,16 @@ The package, developer documentation website, and Reboil agent skill are impleme
 
 ## Positioning
 
-Reboil is designed for developers who want persisted application state without reducers, actions, providers, hydration gates, or manually threading a store through components.
+Reboil is designed for developers who want persisted application state without reducers, actions, hydration gates, or manually threading a store through components.
 
 The core promise is:
 
 - String-path access for reads and writes.
 - Full TypeScript autocomplete for valid paths and their values.
 - Synchronous hydration and persistence.
-- One Provider-free application store.
-- Expo native and React web compatibility.
+- One composable application store.
+- Framework-agnostic web support with optional React bindings.
+- Expo and React Native support.
 - Redux-style observability during development.
 
 ## Example visual style
@@ -88,7 +89,7 @@ For static apps that serve assets from the site root, use `/assets/boil.png` ins
 - Make persisted state available synchronously as soon as the store is registered.
 - Provide path autocomplete while a developer types expressions such as `store.get('settings.`.
 - Infer the return and mutation value type from the selected path.
-- Let components subscribe with `useStore(path)` and no Context, Provider, or store argument.
+- Let components subscribe with `useStore(path)` and receive precise updates for the selected value.
 - Persist all state by default while supporting typed exclusions.
 - Log every attempted mutation in development and remain silent by default in production.
 - Make one-time config registration through `reboil init` part of the standard installation and quick-start workflow.
@@ -123,7 +124,7 @@ The documentation website will provide:
 - A guide to config registration, generated files, entry-point wiring, and customization.
 - API reference pages for `createStore`, `store.get`, `store.set`, `store.subscribe`, `store.reset`, `useStore`, and `setStore`.
 - Guides for typed paths, arrays, persistence, exclusions, migrations, logging, errors, and Fast Refresh.
-- Expo, React Native, Expo Web, and browser React compatibility notes.
+- Web, Expo, and React Native compatibility notes, including optional React bindings.
 - Copyable TypeScript examples with clear expected types.
 - Search, stable section URLs, responsive navigation, and accessible keyboard behavior.
 - Readable code blocks and visible focus states.
@@ -141,7 +142,7 @@ Overview
 Core concepts
 ├── Store creation
 ├── Typed string paths
-├── React subscriptions
+├── Subscriptions
 ├── Synchronous persistence
 └── Development logging
 
@@ -224,19 +225,18 @@ skills/reboil/
 The skill will be named `reboil` and allow normal implicit invocation. Its description will target requests that involve:
 
 - Implementing or reviewing the Reboil package.
-- Adding Reboil to an Expo, React Native, or browser React application.
+- Adding Reboil to a web, Expo, or React Native application.
 - Using typed Reboil paths and hooks correctly.
 - Configuring persistence, migrations, exclusions, or logging.
 - Running or maintaining the standard `reboil init` behavior.
 - Updating Reboil documentation or examples.
 
-It should not activate for unrelated state libraries or generic React state questions that do not involve Reboil.
+It should not activate for unrelated state libraries or generic state questions that do not involve Reboil.
 
 ### Skill responsibilities
 
 The skill will instruct agents to preserve these invariants:
 
-- No React Context or Provider in Reboil's store architecture.
 - The standard workflow runs `reboil init`, registers the application state through `reboil.config.ts`, and uses direct package imports.
 - Config registration requires one-time module augmentation and entry-point wiring, with no recurring generation.
 - Type inference must work without recurring generation or watch commands.
@@ -261,7 +261,7 @@ Before release, the skill must:
 - Pass the Codex skill validator for frontmatter, naming, metadata, and unfinished placeholders.
 - Be tested against realistic integration, implementation, review, and documentation prompts.
 - Apply standard config registration for integrations and reserve local factory bindings for explicit low-level or composition use cases.
-- Avoid suggesting Expo Go, asynchronous hydration, React Context, or recurring code generation.
+- Avoid suggesting Expo Go, asynchronous hydration, or recurring code generation.
 - Point agents to the current contract instead of embedding stale duplicated specifications.
 - Verify both website release copies match their canonical repository folders and that the Codex and Claude Code contracts remain byte-identical.
 
@@ -278,7 +278,7 @@ npx expo prebuild
 
 MMKV contains native code, so an Expo development or production build is required. It will not run in Expo Go. See the [official MMKV Expo setup](https://github.com/margelo/react-native-mmkv#expo).
 
-Browser React applications will use `localStorage` and will not require MMKV.
+Web applications will use `localStorage` and will not require MMKV. The store API remains framework agnostic; React applications may add the optional bindings from `reboil/react`.
 
 Every application completes installation with one-time config registration:
 
@@ -344,7 +344,7 @@ Editing `initialState` updates the package binding types through ordinary TypeSc
 
 ## Config Registration
 
-Config registration is the standard Reboil setup. It provides direct imports from `reboil` and `reboil/react` without a Provider or store argument:
+Config registration is the standard Reboil setup. It provides direct imports from `reboil` and `reboil/react`:
 
 ```tsx
 import { useStore } from 'reboil/react'
@@ -396,7 +396,7 @@ export function Component() {
 }
 ```
 
-Importing the application store module initializes it through normal JavaScript module evaluation. There is no separate registration import, generation command, React Context, Provider, store prop, or store parameter.
+Importing the application store module initializes it through normal JavaScript module evaluation. There is no separate registration import, generation command, store prop, or store parameter.
 
 ## Public API
 
@@ -722,7 +722,7 @@ Persistence is synchronous on every supported client platform.
 | ------------------------- | ------------------ | ---------------------- | ------------------------------- |
 | Expo/React Native iOS     | MMKV               | Synchronous            | Synchronous                     |
 | Expo/React Native Android | MMKV               | Synchronous            | Synchronous                     |
-| Expo Web/browser React    | `localStorage`     | Synchronous            | Synchronous                     |
+| Web browsers/Expo Web     | `localStorage`     | Synchronous            | Synchronous                     |
 | Server environment        | In-memory defaults | No persisted hydration | Not a supported mutation target |
 
 Reboil stores a small manifest with a reset epoch plus one versioned JSON envelope per mounted store node. The root uses the configured ID and child partition keys derive from their dot paths. On activation, persisted plain objects are deeply merged over that partition's defaults; persisted arrays replace default arrays rather than merging by index.
@@ -823,10 +823,11 @@ Example development output:
 
 On native, runtime console output appears through Metro. On web, it appears in browser developer tools. Applications may explicitly disable logging or provide a custom logger callback.
 
-## React and Web Behavior
+## Framework and Platform Behavior
 
-- React integration uses an external store and `useSyncExternalStore`, never React Context.
-- Reboil targets client-side React applications and Expo Web.
+- The core store API is framework agnostic and supports vanilla JavaScript or any web framework through direct store methods and subscriptions.
+- React integration uses an external store and `useSyncExternalStore`.
+- Reboil targets client-side web applications, Expo, and React Native.
 - Server rendering may read initial defaults through the hook's server snapshot, but server mutations and per-request stores are outside v1.
 - Browser persistence activates only where `localStorage` is available.
 - Importing the application store module creates the store before its exported bindings can be used.
@@ -901,16 +902,17 @@ Mutation failures are logged before they throw when development logging is activ
 - `--state`, `--entry`, and `--dry-run` behavior.
 - TypeScript inclusion when root config files are excluded by the original project configuration.
 
-### React and platforms
+### Framework integrations and platforms
 
-- Provider-free hook usage.
+- Framework-agnostic store reads, writes, and subscriptions.
+- Hook usage through direct bindings.
 - Rerenders only for changed selected values.
 - Safe subscription cleanup.
 - Suspense on first lazy hook access and explicit vanilla preloading.
 - Expo iOS development build.
 - Expo Android development build.
-- Expo Web.
-- Client-side browser React.
+- Expo Web and browser applications.
+- Optional React integration.
 
 ## Technical Decisions
 
@@ -927,7 +929,6 @@ Mutation failures are logged before they throw when development logging is activ
 - Native persistence uses MMKV; browser persistence uses `localStorage`.
 - Persistence completes before a successful mutation returns.
 - Runtime-invalid mutations are logged and throw without changing state.
-- React Context is not part of either the public API or internal architecture.
 - A dedicated documentation website will serve developers while preserving this README as the canonical specification during development.
 - Docusaurus is the selected framework for the documentation website.
 - The website will provide matching human-readable pages and agent-ready resources such as `llms.txt`, `llms-full.txt`, `docs.json`, and stable semantic anchors.
@@ -940,15 +941,15 @@ Mutation failures are logged before they throw when development logging is activ
 
 - Established `README.md` as the living source of truth.
 - Defined the positioning around typed string paths, zero-boilerplate access, and synchronous persistence.
-- Chose Expo native and client-side React web as v1 platforms.
+- Chose web, Expo, and React Native as v1 platforms with a framework-agnostic core API.
 - Required path-aware autocomplete and value inference.
 - Chose development-on, production-off mutation logging modeled after `redux-logger`.
-- Required a Provider-free API with no Context or store parameter.
-- Reviewed the `useProps` consumption pattern in `paaorder` and retained its simple call-site experience without its Context-backed implementation.
+- Required a direct-binding API with no store parameter.
+- Reviewed the `useProps` consumption pattern in `paaorder` and retained its simple call-site experience.
 - Chose direct imports from `reboil` and `reboil/react` backed by config registration and module augmentation.
 - Chose MMKV for native synchronous persistence and accepted the Expo development-build requirement.
 - Chose runtime console output: Metro on native and browser developer tools on web.
-- Chose client-side React support rather than full SSR state management.
+- Chose client-side web support rather than full SSR state management.
 - Added typed object and numeric array paths.
 - Selected one global store with Fast Refresh-safe re-registration.
 - Added optional versioned migrations and strict invalid-path failures.
@@ -979,7 +980,7 @@ Mutation failures are logged before they throw when development logging is activ
 ## Next Steps
 
 1. Review and approve this specification.
-2. Scaffold the TypeScript package, platform adapters, React integration, and generic path types.
+2. Scaffold the TypeScript package, platform adapters, framework integrations, and generic path types.
 3. Implement the runtime and typed package bindings against this contract.
 4. Implement the standard initializer and framework-aware entry-point handling.
 5. Add type, initializer, runtime, React, persistence, and platform verification.

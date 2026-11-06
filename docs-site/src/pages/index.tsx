@@ -177,7 +177,10 @@ function CounterCard(): ReactNode {
 
 export default function Home(): ReactNode {
   return (
-    <Layout title="Typed synchronous state" description="Developer documentation for Reboil.">
+    <Layout
+      title="Typed synchronous state"
+      description="Small, fast, and scalable string-path state access for web and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box"
+    >
       <main>
         <section className={styles.hero}>
           <div className="container">
@@ -188,6 +191,7 @@ export default function Home(): ReactNode {
                 splitting, and synchronous persistence out of the box. Inspired by Recoil’s principles, Redux’s
                 observability and scalability, and Zustand’s simplicity.
               </p>
+              <p>The core store API is framework agnostic. React bindings are available as an optional integration.</p>
             </div>
             <div className={styles.demo} aria-label="Reboil config registration code example">
               <CodeWindow />
