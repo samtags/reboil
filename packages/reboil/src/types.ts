@@ -86,6 +86,18 @@ export interface Store<
   LoadPath extends string = never,
 > {
   get<PathName extends ValidPath>(path: PathName): PathValue<State, PathName>
+  /**
+   * Validates, synchronously persists, and commits a value at a typed path.
+   * Pass a value directly or derive the next value from the previous value.
+   *
+   * ```ts
+   * store.set('count', 1)
+   * store.set('count', (count) => count + 1)
+   * ```
+   *
+   * If validation or persistence fails, the previous in-memory and stored
+   * state remain authoritative and the call throws.
+   */
   set<PathName extends ValidPath>(
     path: PathName,
     value: PathUpdater<PathValue<State, PathName>>,
@@ -108,6 +120,14 @@ export interface StoreBindings<
   readonly [storePathType]: ValidPath
   readonly [lazyPathType]: LoadPath
   store: Store<State, ValidPath, LoadPath>
+  /**
+   * Selects one path in a React component using `useSyncExternalStore`.
+   * The component rerenders only when that selected value changes.
+   *
+   * ```tsx
+   * const count = useStore('count')
+   * ```
+   */
   useStore<PathName extends ValidPath>(path: PathName): PathValue<State, PathName>
 }
 

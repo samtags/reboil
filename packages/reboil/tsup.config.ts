@@ -19,7 +19,7 @@ export default defineConfig({
   format: ['esm', 'cjs'],
   dts: { compilerOptions: dtsCompilerOptions },
   clean: true,
-  sourcemap: true,
+  sourcemap: false,
   splitting: false,
   outExtension({ format }) {
     return { js: format === 'cjs' ? '.cjs' : '.mjs' }

@@ -1,0 +1,41 @@
+# Reboil package guide
+
+Reboil is typed, framework-agnostic client state for web applications and React Native. It provides synchronous persistence, dot-path access, optional React subscriptions, and code-split stores.
+
+## Standard setup
+
+Install the package, run `npx reboil init` once, and keep the generated `reboil.config.ts` import ahead of application modules. The config calls `createStore(initialState)` and augments `Register`, enabling typed direct bindings:
+
+```ts
+import { store } from 'reboil'
+import { useStore } from 'reboil/react'
+
+const count = useStore('count')
+store.set('count', (value) => value + 1)
+```
+
+## Public API
+
+- `createStore(initialState, options?)` creates a composable store node with typed local bindings.
+- `lazy(loader)` creates a code-split store; the loaded module must default-export a `createStore()` result.
+- `store.get`, `store.set`, `store.subscribe`, `store.reset`, and `store.load` access the registered store.
+- `useStore(path)` selects one path in React and rerenders only when that selected value changes.
+- `setStore(path, valueOrUpdater)` writes through the registered React binding.
+
+Use dot paths such as `todos.0.completed`. Values must be JSON-safe. A mutation validates, synchronously persists the next partition, then commits memory and notifies affected subscribers. Failed writes leave the previous state authoritative and throw.
+
+## Constraints
+
+- One unparented `createStore()` root may be active; compose child stores into it.
+- Browser persistence uses synchronous `localStorage`; native persistence uses synchronous MMKV and requires a native development or production build, not Expo Go.
+- Do not substitute React's component-only `lazy()` for Reboil's `lazy()`.
+- Server-side mutations and asynchronous persistence are out of scope.
+
+## Detailed guidance
+
+Read [`AGENTS.md`](./AGENTS.md) first. Complete package-local skills and contracts are available at:
+
+- `skills/codex/reboil/SKILL.md`
+- `skills/codex/reboil/references/contract.md`
+- `skills/claude-code/reboil/SKILL.md`
+- `skills/claude-code/reboil/references/contract.md`

@@ -19,10 +19,12 @@
     "format": "prettier . --write",
     "format:check": "prettier . --check",
     "check:skills": "node scripts/release-reboil-skill.mjs --check",
+    "check:package": "npm run build --workspace reboil && node scripts/check-reboil-package.mjs --tarball",
+    "check:release": "npm run typecheck --workspace reboil && npm test --workspace reboil && npm run check:skills && npm run check:package && npm run check:docs",
     "verify:supported-projects": "npm run verify --prefix prototypes/supported-projects",
     "check:workspaces": "npm run build --workspaces --if-present && npm run typecheck --workspaces --if-present",
     "check:docs": "npm run verify:agents --prefix docs-site && npm run typecheck --prefix docs-site && npm run build --prefix docs-site",
-    "check": "npm run format:check && npm run lint && npm run check:workspaces && npm test && npm run test:pr-title && npm run check:skills",
+    "check": "npm run format:check && npm run lint && npm run check:workspaces && npm test && npm run test:pr-title && npm run check:skills && npm run check:package",
     "check:all": "npm run check && npm run check:docs"
   },
   "@parcel/resolver-default": {

@@ -3,8 +3,8 @@
   "name": "Reboil",
   "description": "Small, fast, and scalable string-path state access for web applications and React Native, with code splitting, and synchronous persistence out of the box",
   "package": "reboil",
-  "version": "0.1.0",
-  "status": "specification",
+  "version": "1.1.0",
+  "status": "stable",
   "canonical_specification": "/docs/overview",
   "resources": {
     "summary": "/llms.txt",
@@ -16,7 +16,7 @@
     "claude_code_skill_contract": "/skills/claude-code/reboil/references/contract.md"
   },
   "topics": [
-    { "id": "overview", "url": "/docs/overview", "summary": "Positioning, scope, and specification-stage status." },
+    { "id": "overview", "url": "/docs/overview", "summary": "Positioning, scope, and stable release status." },
     {
       "id": "installation",
       "url": "/docs/getting-started/installation",

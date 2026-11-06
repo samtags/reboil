@@ -19,6 +19,8 @@ npx reboil --prepare agents
 
 The interactive installer can add Claude Code at `.claude/skills/reboil/`, Codex at `.agents/skills/reboil/`, or both. It asks before replacing a customized existing skill.
 
+The published npm package also includes package-local `AGENTS.md`, `llms.txt`, and both complete skills so agents inspecting `node_modules/reboil` can follow the same guidance without first visiting this site.
+
 - [`/llms.txt`](pathname:///llms.txt) — concise project summary, status, and recommended reading order.
 - [`/llms-full.txt`](pathname:///llms-full.txt) — complete public contract in Markdown without presentation markup.
 - [`/docs.json`](pathname:///docs.json) — schema version, release status, stable topic identifiers, URLs, summaries, and resource locations.
