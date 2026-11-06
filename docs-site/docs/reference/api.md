@@ -7,7 +7,7 @@ sidebar_position: 1
 
 ## `createStore(initialState, options?)`
 
-Creates a composable store node and returns typed `store` and `useStore` bindings. See [store creation](../concepts/store-creation) for options.
+Creates a composable store node and returns typed `store` and `useStore` bindings. See [Stores](../concepts/store-creation) for options.
 
 ```ts title="reboil.config.ts"
 import { createStore } from 'reboil'

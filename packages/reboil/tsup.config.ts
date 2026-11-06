@@ -4,12 +4,14 @@ import type * as TypeScript from 'typescript'
 
 const requireFromTsup = createRequire(createRequire(import.meta.url).resolve('tsup'))
 const tsupTypescript = requireFromTsup('typescript') as typeof TypeScript
-const dtsCompilerOptions = Number.parseInt(tsupTypescript.versionMajorMinor, 10) >= 6 ? { ignoreDeprecations: '6.0' } : {}
+const dtsCompilerOptions =
+  Number.parseInt(tsupTypescript.versionMajorMinor, 10) >= 6 ? { ignoreDeprecations: '6.0' } : {}
 
 export default defineConfig({
   entry: {
     index: 'src/index.ts',
     react: 'src/react.ts',
+    next: 'src/next.ts',
     cli: 'src/cli.ts',
   },
   format: ['esm', 'cjs'],

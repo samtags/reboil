@@ -1,9 +1,9 @@
 ---
-title: Synchronous persistence
+title: Persistence
 sidebar_position: 4
 ---
 
-# Synchronous persistence
+# Persistence
 
 All state persists by default. A path excluded with `persist.exclude` remains usable and reactive during the current session but returns to its initial default after reload.
 
@@ -11,30 +11,26 @@ Each composed store node has its own versioned persistence envelope. A small man
 
 ## Exclude state from persistence
 
-Pass typed state paths in `persist.exclude`. The excluded values still update and notify subscribers, but Reboil does not restore them from storage after a reload:
+Pass typed state paths in `persist.exclude`:
 
 ```ts title="src/store.ts"
 import { createStore } from 'reboil'
 
-const { store } = createStore(
-  {
-    count: 1,
-    session: {
-      transientValue: 0,
-    },
+const state = {
+  count: 1,
+  settings: {
+    runtimeVersion: '3.14.15',
   },
-  {
-    persist: {
-      exclude: ['session.transientValue'],
-    },
-  },
-)
+}
 
-store.set('count', (value) => value + 1) // persisted
-store.set('session.transientValue', (value) => value + 1) // session only
+createStore(state, {
+  persist: {
+    exclude: ['count'],
+  },
+})
 ```
 
-After a reload, `count` restores its latest value, while `session.transientValue` returns to `0`. Paths in `persist.exclude` must exist in the initial state and are checked against the inferred state shape.
+Here, `count` is never persisted, so it always resets to `1` after a reload. Other state, such as `settings.runtimeVersion`, continues to persist normally. Paths in `persist.exclude` must exist in the initial state and are checked against the inferred state shape.
 
 ## Atomic mutations
 

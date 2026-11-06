@@ -13,7 +13,7 @@ import typescriptParser from 'recast/parsers/typescript'
 interface Change {
   file: string
   before: string | null
-  after: string
+  after: string | null
 }
 
 interface CliOptions {
@@ -28,13 +28,21 @@ type Framework = 'expo-router' | 'expo' | 'next' | 'cra' | 'react-native' | 'gen
 
 interface AstNode {
   type?: string
-  name?: string
+  name?: string | AstNode
   value?: unknown
   source?: AstNode
+  imported?: AstNode
+  local?: AstNode
+  specifiers?: AstNode[]
   expression?: AstNode
   callee?: AstNode
   arguments?: AstNode[]
+  openingElement?: AstNode
+  attributes?: AstNode[]
+  children?: AstNode[]
 }
+
+const sourceExtensions = ['tsx', 'jsx', 'ts', 'js', 'mts', 'mjs'] as const
 
 function parseArgs(argv: string[]): CliOptions {
   const options: CliOptions = { cwd: process.cwd(), dryRun: false, yes: false }
@@ -102,9 +110,9 @@ function findEntryFile(root: string, packageJson: Record<string, unknown>, expli
   const main = typeof packageJson.main === 'string' ? packageJson.main : null
   if (main && fs.existsSync(path.resolve(root, main))) return path.resolve(root, main)
   const candidates = [
-    ...['tsx', 'jsx', 'ts', 'js', 'mts', 'mjs'].map((extension) => `src/main.${extension}`),
-    ...['tsx', 'jsx', 'ts', 'js', 'mts', 'mjs'].map((extension) => `src/index.${extension}`),
-    ...['tsx', 'jsx', 'ts', 'js', 'mts', 'mjs'].map((extension) => `index.${extension}`),
+    ...sourceExtensions.map((extension) => `src/main.${extension}`),
+    ...sourceExtensions.map((extension) => `src/index.${extension}`),
+    ...sourceExtensions.map((extension) => `index.${extension}`),
   ]
   const found = candidates.map((candidate) => path.resolve(root, candidate)).filter(fs.existsSync)
   if (found.length === 1) return found[0]
@@ -145,9 +153,12 @@ function addConfigImport(source: string, file: string, configImport: string): st
   return recast.print(ast).code
 }
 
-function configSource(root: string, configFile: string, stateFile: string): string {
+function configSource(root: string, configFile: string, stateFile: string, framework: Framework): string {
   const stateImport = relativeImport(configFile, stateFile).replace(/\.tsx?$/, '')
   const stateReference = `./${path.relative(root, stateFile).replaceAll(path.sep, '/')}`
+  if (framework === 'next') {
+    return `'use client'\n\nimport { createStore, defineConfig } from 'reboil'\nimport { initialState } from '${stateImport}'\n\ncreateStore(initialState)\n\nexport default defineConfig({\n  stateFile: '${stateReference}',\n})\n\ndeclare module 'reboil' {\n  interface Register {\n    state: typeof initialState\n  }\n}\n`
+  }
   return `import { createStore, defineConfig } from 'reboil'\nimport { initialState } from '${stateImport}'\n\ncreateStore(initialState)\n\nexport default defineConfig({\n  stateFile: '${stateReference}',\n})\n\ndeclare module 'reboil' {\n  interface Register {\n    state: typeof initialState\n  }\n}\n`
 }
 
@@ -164,12 +175,248 @@ function nextRegisterStateFile(root: string): string {
   return path.resolve(usesSrc ? srcDirectory : root, 'register-state.ts')
 }
 
+function findSourceFile(directory: string, basename: string): string | null {
+  for (const extension of sourceExtensions) {
+    const candidate = path.resolve(directory, `${basename}.${extension}`)
+    if (fs.existsSync(candidate)) return candidate
+  }
+  return null
+}
+
+function findFiles(directory: string, basename: string): string[] {
+  if (!fs.existsSync(directory)) return []
+  const found: string[] = []
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    const target = path.resolve(directory, entry.name)
+    if (entry.isDirectory()) found.push(...findFiles(target, basename))
+    else if (sourceExtensions.some((extension) => entry.name === `${basename}.${extension}`)) found.push(target)
+  }
+  return found
+}
+
+function nextAppLayouts(root: string): string[] {
+  const appDirectories = [path.resolve(root, 'src/app'), path.resolve(root, 'app')].filter(fs.existsSync)
+  const layouts = appDirectories.flatMap((directory) => findFiles(directory, 'layout'))
+  return layouts.filter(
+    (layout) =>
+      !layouts.some(
+        (other) => other !== layout && path.dirname(layout).startsWith(`${path.dirname(other)}${path.sep}`),
+      ),
+  )
+}
+
+function nextPagesApps(root: string): Array<{ file: string; source: string | null }> {
+  const pageDirectories = [path.resolve(root, 'src/pages'), path.resolve(root, 'pages')].filter(fs.existsSync)
+  return pageDirectories.map((directory) => {
+    const existing = findSourceFile(directory, '_app')
+    if (existing) return { file: existing, source: fs.readFileSync(existing, 'utf8') }
+    const usesTypeScript =
+      fs.existsSync(path.resolve(root, 'tsconfig.json')) ||
+      findFiles(directory, 'index').some((file) => /\.tsx?$/.test(file))
+    return { file: path.resolve(directory, usesTypeScript ? '_app.tsx' : '_app.js'), source: null }
+  })
+}
+
+function normalizedImport(value: string): string {
+  return value.replace(/\.(?:[cm]?[jt]sx?)$/, '')
+}
+
+function importDeclaration(body: AstNode[], source: string): AstNode | undefined {
+  const normalizedSource = normalizedImport(source)
+  return body.find(
+    (node) =>
+      node.type === 'ImportDeclaration' &&
+      typeof node.source?.value === 'string' &&
+      normalizedImport(node.source.value) === normalizedSource,
+  )
+}
+
+function removeImport(body: AstNode[], source: string): string | undefined {
+  const declaration = importDeclaration(body, source)
+  if (!declaration) return undefined
+  const defaultName = declaration.specifiers?.find((specifier) => specifier.type === 'ImportDefaultSpecifier')?.local
+    ?.name
+  const index = body.indexOf(declaration)
+  body.splice(index, 1)
+  return typeof defaultName === 'string' ? defaultName : undefined
+}
+
+function ensureDefaultImport(body: AstNode[], source: string, preferredName: string): string {
+  let declaration = importDeclaration(body, source)
+  const defaultName = declaration?.specifiers?.find((specifier) => specifier.type === 'ImportDefaultSpecifier')?.local
+    ?.name
+  if (typeof defaultName === 'string') return defaultName
+
+  const specifier = recast.types.builders.importDefaultSpecifier(recast.types.builders.identifier(preferredName))
+  if (declaration) {
+    declaration.specifiers = [specifier as unknown as AstNode, ...(declaration.specifiers ?? [])]
+  } else {
+    declaration = recast.types.builders.importDeclaration(
+      [specifier],
+      recast.types.builders.stringLiteral(source),
+    ) as unknown as AstNode
+    body.unshift(declaration)
+  }
+  return preferredName
+}
+
+function ensureNamedImport(body: AstNode[], source: string, importedName: string, preferredName: string): string {
+  let declaration = importDeclaration(body, source)
+  const existing = declaration?.specifiers?.find(
+    (specifier) =>
+      specifier.type === 'ImportSpecifier' &&
+      (specifier.imported?.name === importedName || specifier.imported?.value === importedName),
+  )?.local?.name
+  if (typeof existing === 'string') return existing
+
+  const specifier = recast.types.builders.importSpecifier(
+    recast.types.builders.identifier(importedName),
+    recast.types.builders.identifier(preferredName),
+  )
+  if (declaration) {
+    declaration.specifiers = [...(declaration.specifiers ?? []), specifier as unknown as AstNode]
+  } else {
+    declaration = recast.types.builders.importDeclaration(
+      [specifier],
+      recast.types.builders.stringLiteral(source),
+    ) as unknown as AstNode
+    body.unshift(declaration)
+  }
+  return preferredName
+}
+
+function findJsxElement(node: unknown, name: string): AstNode | null {
+  if (Array.isArray(node)) {
+    for (const child of node) {
+      const found = findJsxElement(child, name)
+      if (found) return found
+    }
+    return null
+  }
+  if (typeof node !== 'object' || node === null) return null
+  const astNode = node as AstNode
+  if (
+    astNode.type === 'JSXElement' &&
+    astNode.openingElement?.type === 'JSXOpeningElement' &&
+    typeof astNode.openingElement.name === 'object' &&
+    astNode.openingElement.name !== null &&
+    astNode.openingElement.name.name === name
+  ) {
+    return astNode
+  }
+  for (const [key, value] of Object.entries(node)) {
+    if (key === 'loc' || key === 'comments' || key === 'tokens') continue
+    const found = findJsxElement(value, name)
+    if (found) return found
+  }
+  return null
+}
+
+function sourceContainsJsxElement(source: string, file: string, name: string): boolean {
+  return findJsxElement(parseSource(source, file).program, name) !== null
+}
+
+function jsxElementName(node: AstNode): string | undefined {
+  const name = node.openingElement?.name
+  return typeof name === 'object' && name !== null && typeof name.name === 'string' ? name.name : undefined
+}
+
+function unwrapDirectJsxElement(parent: AstNode, name: string): void {
+  const children = parent.children ?? []
+  const index = children.findIndex((child) => child.type === 'JSXElement' && jsxElementName(child) === name)
+  if (index < 0) return
+  const wrapper = children[index]
+  children.splice(index, 1, ...(wrapper.children ?? []))
+  parent.children = children
+}
+
+function addNextAppRegistration(
+  source: string,
+  file: string,
+  configImport: string,
+  legacyRegisterImport?: string,
+): string {
+  const ast = parseSource(source, file)
+  const body = ast.program.body as AstNode[]
+  const legacyComponentName = legacyRegisterImport ? removeImport(body, legacyRegisterImport) : undefined
+  const configName = ensureDefaultImport(body, configImport, 'reboilConfig')
+  const componentName = ensureNamedImport(body, 'reboil/next', 'ReboilState', 'ReboilState')
+
+  const bodyElement = findJsxElement(ast.program, 'body')
+  if (!bodyElement) throw new Error(`Could not find a <body> element in Next.js root layout ${file}`)
+  if (legacyComponentName) unwrapDirectJsxElement(bodyElement, legacyComponentName)
+  if (
+    !(bodyElement.children ?? []).some(
+      (child) => child.type === 'JSXElement' && jsxElementName(child) === componentName,
+    )
+  ) {
+    const existingChildren = (bodyElement.children ?? []) as unknown as Parameters<
+      typeof recast.types.builders.jsxElement
+    >[2]
+    const registrationElement = recast.types.builders.jsxElement(
+      recast.types.builders.jsxOpeningElement(
+        recast.types.builders.jsxIdentifier(componentName),
+        [
+          recast.types.builders.jsxAttribute(
+            recast.types.builders.jsxIdentifier('config'),
+            recast.types.builders.jsxExpressionContainer(recast.types.builders.identifier(configName)),
+          ),
+        ],
+        false,
+      ),
+      recast.types.builders.jsxClosingElement(recast.types.builders.jsxIdentifier(componentName)),
+      existingChildren,
+    ) as unknown as AstNode
+    bodyElement.children = [registrationElement]
+  }
+
+  return recast.print(ast).code
+}
+
+function legacyNextRegisterStateSource(registerFile: string, configFile: string): string {
+  return `'use client'\n\nimport { Fragment, createElement, type ReactNode } from 'react'\nimport '${relativeImport(registerFile, configFile)}'\n\nexport default function ReboilRegisterState({ children }: { children: ReactNode }) {\n  return createElement(Fragment, null, children)\n}\n`
+}
+
+function isGeneratedRegisterState(source: string, registerFile: string, configFile: string): boolean {
+  if (source === legacyNextRegisterStateSource(registerFile, configFile)) return true
+  const ast = parseSource(source, registerFile)
+  const body = ast.program.body as AstNode[]
+  return (
+    body.length === 1 &&
+    body[0].type === 'ImportDeclaration' &&
+    (body[0].specifiers?.length ?? 0) === 0 &&
+    typeof body[0].source?.value === 'string' &&
+    normalizedImport(body[0].source.value) === normalizedImport(relativeImport(registerFile, configFile))
+  )
+}
+
+function removeImportFromSource(source: string, file: string, importPath: string): string {
+  const ast = parseSource(source, file)
+  const body = ast.program.body as AstNode[]
+  if (!importDeclaration(body, importPath)) return source
+  removeImport(body, importPath)
+  return recast.print(ast).code
+}
+
+function sourceImports(source: string, file: string, importPath: string): boolean {
+  const ast = parseSource(source, file)
+  return importDeclaration(ast.program.body as AstNode[], importPath) !== undefined
+}
+
+function generatedPagesAppSource(file: string, configFile: string): string {
+  const configImport = relativeImport(file, configFile)
+  const typeImport = /\.tsx?$/.test(file) ? "import type { AppProps } from 'next/app'\n" : ''
+  const parameterType = /\.tsx?$/.test(file) ? ': AppProps' : ''
+  return `${typeImport}import '${configImport}'\n\nexport default function App({ Component, pageProps }${parameterType}) {\n  return <Component {...pageProps} />\n}\n`
+}
+
 async function confirmChanges(changes: Change[]): Promise<boolean> {
   console.log('Reboil will apply these changes:')
   for (const change of changes) {
     console.log(`\n--- ${change.file} ---`)
     if (change.before === null) console.log('(new file)')
-    console.log(change.after)
+    if (change.after === null) console.log('(delete file)')
+    else console.log(change.after)
   }
   const prompt = readline.createInterface({ input, output })
   const answer = await prompt.question('\nApply these changes? [y/N] ')
@@ -193,7 +440,7 @@ async function init(options: CliOptions): Promise<void> {
   changes.push({
     file: configFile,
     before: fs.existsSync(configFile) ? fs.readFileSync(configFile, 'utf8') : null,
-    after: configSource(root, configFile, stateFile),
+    after: configSource(root, configFile, stateFile, framework),
   })
 
   const main = typeof packageJson.main === 'string' ? packageJson.main : ''
@@ -216,15 +463,74 @@ async function init(options: CliOptions): Promise<void> {
       before: fs.readFileSync(packageFile, 'utf8'),
       after: `${JSON.stringify(packageJson, null, 2)}\n`,
     })
-  } else if (framework === 'next' && !options.entry) {
-    entryFile = nextRegisterStateFile(root)
+  } else if (framework === 'next' && options.entry) {
+    if (!entryFile || !fs.existsSync(entryFile)) {
+      throw new Error(`Next.js entry file not found: ${options.entry}`)
+    }
+    const before = fs.readFileSync(entryFile, 'utf8')
     changes.push({
       file: entryFile,
-      before: fs.existsSync(entryFile) ? fs.readFileSync(entryFile, 'utf8') : null,
-      after: fs.existsSync(entryFile)
-        ? addConfigImport(fs.readFileSync(entryFile, 'utf8'), entryFile, relativeImport(entryFile, configFile))
-        : `import '${relativeImport(entryFile, configFile)}'\n`,
+      before,
+      after: sourceContainsJsxElement(before, entryFile, 'body')
+        ? addNextAppRegistration(before, entryFile, relativeImport(entryFile, configFile))
+        : addConfigImport(before, entryFile, relativeImport(entryFile, configFile)),
     })
+  } else if (framework === 'next') {
+    const registerFile = nextRegisterStateFile(root)
+    const appLayouts = nextAppLayouts(root)
+    const pagesApps = nextPagesApps(root)
+    if (appLayouts.length === 0 && pagesApps.length === 0) {
+      throw new Error('Could not detect a Next.js root layout or pages directory. Use --entry <path>.')
+    }
+
+    const registerSource = fs.existsSync(registerFile) ? fs.readFileSync(registerFile, 'utf8') : null
+    const registerIsImported =
+      appLayouts.some((layout) =>
+        sourceImports(fs.readFileSync(layout, 'utf8'), layout, relativeImport(layout, registerFile)),
+      ) ||
+      pagesApps.some(
+        ({ file, source }) => source !== null && sourceImports(source, file, relativeImport(file, registerFile)),
+      )
+    if (
+      registerSource !== null &&
+      registerIsImported &&
+      !isGeneratedRegisterState(registerSource, registerFile, configFile)
+    ) {
+      throw new Error(
+        `Custom Next.js registration file detected at ${registerFile}. Remove its layout/_app integration before running reboil init.`,
+      )
+    }
+    if (registerSource !== null && isGeneratedRegisterState(registerSource, registerFile, configFile)) {
+      changes.push({ file: registerFile, before: registerSource, after: null })
+    }
+
+    for (const layout of appLayouts) {
+      const before = fs.readFileSync(layout, 'utf8')
+      changes.push({
+        file: layout,
+        before,
+        after: addNextAppRegistration(
+          before,
+          layout,
+          relativeImport(layout, configFile),
+          relativeImport(layout, registerFile),
+        ),
+      })
+    }
+    for (const pagesApp of pagesApps) {
+      const withoutLegacyImport =
+        pagesApp.source === null
+          ? null
+          : removeImportFromSource(pagesApp.source, pagesApp.file, relativeImport(pagesApp.file, registerFile))
+      changes.push({
+        file: pagesApp.file,
+        before: pagesApp.source,
+        after:
+          withoutLegacyImport === null
+            ? generatedPagesAppSource(pagesApp.file, configFile)
+            : addConfigImport(withoutLegacyImport, pagesApp.file, relativeImport(pagesApp.file, configFile)),
+      })
+    }
   } else {
     if (!entryFile) throw new Error('Could not detect an application entry point. Use --entry <path>.')
     const importPath = relativeImport(entryFile, configFile)
@@ -248,8 +554,12 @@ async function init(options: CliOptions): Promise<void> {
     return
   }
   for (const change of effectiveChanges) {
-    fs.mkdirSync(path.dirname(change.file), { recursive: true })
-    fs.writeFileSync(change.file, change.after)
+    if (change.after === null) {
+      if (fs.existsSync(change.file)) fs.rmSync(change.file)
+    } else {
+      fs.mkdirSync(path.dirname(change.file), { recursive: true })
+      fs.writeFileSync(change.file, change.after)
+    }
   }
   console.log('Reboil initialized successfully.')
 }

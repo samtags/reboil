@@ -95,10 +95,21 @@ npm run build --prefix prototypes/init/react/next
 Generated or changed files:
 
 - `src/state.ts`
-- `reboil.config.ts`
-- `src/register-state.ts`, containing `import '../reboil.config'`
+- `reboil.config.ts`, a client-loaded config created with the standard `defineConfig`
+- `src/app/layout.tsx` statically imports the config and wraps `{children}` with `<ReboilState>`
 
-The generated `register-state.ts` is a custom registration module. It is not a Next.js filename convention; import it from the client entry used by the application when runtime registration is needed.
+The generated App Router integration looks like this (the relative config path depends on the layout location):
+
+```tsx
+import { ReboilState } from 'reboil/next'
+import reboilConfig from '../../reboil.config'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return <ReboilState config={reboilConfig}>{children}</ReboilState>
+}
+```
+
+The root layout remains a Server Component. `ReboilState` is the client boundary, and its statically imported config keeps custom composed stores and lazy loaders in the browser bundle without an additional `register-state.ts` file. A string path such as `config="../../reboil.config"` is not supported because Next.js cannot statically bundle that module. Pages Router projects import `reboil.config.ts` directly from `pages/_app`; if `_app` does not exist, the initializer creates the standard pass-through custom App.
 
 ### Vanilla JavaScript / Vite
 
@@ -169,7 +180,7 @@ Reset all fixtures after inspecting them:
 npm run reset --prefix prototypes/init
 ```
 
-Reset removes generated state/config/registration files and restores Expo Router’s original `package.json#main`. It does not remove installed dependencies or build caches.
+Reset removes generated state/config wiring and restores Expo Router’s original `package.json#main`. It does not remove installed dependencies or build caches.
 
 ## Compatibility coverage
 

@@ -36,4 +36,73 @@ Config registration is part of the standard installation. From the application p
 npx reboil init
 ```
 
-The initializer creates or links `src/state.ts`, generates `reboil.config.ts`, registers the state type, and wires the config into the application entry point. Run it once during setup; state edits do not require regeneration or a watcher.
+The initializer creates a default `src/state.ts` when one does not already exist, generates `reboil.config.ts`, registers the state type, and wires the config into the application entry point. If you already have a state file, it links to that instead.
+
+You do not need to create or copy either file manually. Run the command once during setup; state edits do not require regeneration or a watcher.
+
+The generated state file starts empty:
+
+```ts title="src/state.ts"
+export const initialState = {}
+```
+
+The generated config creates the store and registers the state type:
+
+```ts title="reboil.config.ts"
+import { createStore, defineConfig } from 'reboil'
+import { initialState } from './src/state'
+
+createStore(initialState)
+
+export default defineConfig({
+  stateFile: './src/state.ts',
+})
+
+declare module 'reboil' {
+  interface Register {
+    state: typeof initialState
+  }
+}
+```
+
+## Next.js App Router
+
+For Next.js, the generated config uses the standard `defineConfig` API and is loaded through the `ReboilState` client boundary:
+
+```ts title="reboil.config.ts"
+'use client'
+
+import { createStore, defineConfig } from 'reboil'
+import { initialState } from './src/state'
+
+createStore(initialState)
+
+export default defineConfig({
+  stateFile: './src/state.ts',
+})
+
+declare module 'reboil' {
+  interface Register {
+    state: typeof initialState
+  }
+}
+```
+
+The initializer statically imports it into the root layout:
+
+```tsx title="src/app/layout.tsx"
+import { ReboilState } from 'reboil/next'
+import reboilConfig from '../../reboil.config'
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <ReboilState config={reboilConfig}>{children}</ReboilState>
+      </body>
+    </html>
+  )
+}
+```
+
+The layout remains a Server Component. No `register-state.ts` file is generated. The config must be statically imported rather than supplied as a path string so Next.js can include it and any lazy state modules in the client bundle.

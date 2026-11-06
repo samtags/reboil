@@ -154,6 +154,7 @@ html[data-theme='dark'] .navbar {
 }
 .theme-code-block > div:first-child {
   border-bottom: 1px solid #4a4a4a;
+  color: #f0eee6;
 }
 .theme-code-block pre {
   color: #f0eee6 !important;

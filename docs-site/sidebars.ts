@@ -17,6 +17,7 @@ const sidebars: SidebarsConfig = {
         'concepts/react-subscriptions',
         'concepts/lazy-stores',
         'concepts/persistence',
+        'concepts/migration',
       ],
     },
     { type: 'category', label: 'Reference', items: ['reference/api', 'reference/errors'] },

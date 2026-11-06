@@ -1,9 +1,9 @@
 ---
-title: Lazy feature stores
+title: Code Splitting
 sidebar_position: 4
 ---
 
-# Lazy feature stores
+# Code Splitting
 
 Use Reboil's `lazy()` to keep a feature's defaults, persistence hydration, and runtime state out of the initial application path.
 

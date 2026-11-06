@@ -1,9 +1,9 @@
 ---
-title: React subscriptions
+title: Subscriptions
 sidebar_position: 3
 ---
 
-# React subscriptions
+# Subscriptions
 
 `useStore(path)` uses `useSyncExternalStore` to subscribe a component to one selected value:
 

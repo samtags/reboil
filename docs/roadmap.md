@@ -675,6 +675,8 @@ The initializer will use framework-specific detection rather than blindly search
 
 | Application                      | Entry handling                                                                                                                |
 | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Next.js App Router               | Statically import the client config in the root layout and render it through `ReboilState` from `reboil/next`.                |
+| Next.js Pages Router             | Import `reboil.config` directly from the custom App, creating `_app` when needed.                                             |
 | Expo Router                      | Create or patch a custom root entry that imports `reboil.config` before `expo-router/entry`, then update `package.json#main`. |
 | Standard Expo                    | Detect `package.json#main` or create a custom entry using `registerRootComponent`.                                            |
 | React Native CLI                 | Patch the root or platform-specific `index` entry before the application import.                                              |

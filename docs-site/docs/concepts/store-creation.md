@@ -1,9 +1,9 @@
 ---
-title: Store creation
+title: Stores
 sidebar_position: 1
 ---
 
-# Store creation
+# Stores
 
 `createStore(initialState, options?)` creates a composable store node and returns typed `store` and `useStore` bindings. A standalone root restores persistence synchronously on first access; an eager child restores when its parent mounts it.
 
@@ -27,7 +27,7 @@ export const { store, useStore } = createStore(app, {
 | `persist.exclude` | `[]`               | Typed paths that remain reactive but are not persisted. |
 | `logger`          | Development logger | Enables, disables, or replaces mutation logging.        |
 
-## Compose eager stores
+## Combine stores
 
 A `createStore()` result is a valid field in another store. Reboil identifies the single unparented node as the application root and gives every child its own persistence partition.
 
@@ -47,7 +47,7 @@ Do not access a child independently before composing it. Once a node has activat
 
 ## Initialization
 
-Config registration is the standard workflow. Run `npx reboil init` after installing Reboil, then use the registered direct imports:
+Run `npx reboil init` after installing Reboil, then use the registered direct imports:
 
 ```tsx
 import { useStore } from 'reboil/react'
@@ -77,5 +77,3 @@ declare module 'reboil' {
   }
 }
 ```
-
-The generated `state: typeof initialState` registration remains sufficient until the config composes another store.

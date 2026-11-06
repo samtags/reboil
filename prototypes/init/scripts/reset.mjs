@@ -17,6 +17,18 @@ function removeConfigImport(file) {
   if (cleaned !== source) fs.writeFileSync(file, cleaned)
 }
 
+function removeNextLayoutRegistration(file) {
+  if (!fs.existsSync(file)) return
+  const source = fs.readFileSync(file, 'utf8')
+  const cleaned = source
+    .replace(/^import\s+ReboilRegisterState\s+from\s+['"]\.\.\/register-state['"];?\s*\r?\n?/m, '')
+    .replace(/^import\s+\{\s*ReboilState\s*\}\s+from\s+['"]reboil\/next['"];?\s*\r?\n?/m, '')
+    .replace(/^import\s+reboilConfig\s+from\s+['"](?:\.\.\/)+reboil\.config['"];?\s*\r?\n?/m, '')
+    .replace(/<\/?ReboilRegisterState>/g, '')
+    .replace(/<ReboilState\s+config=\{reboilConfig\}>|<\/ReboilState>/g, '')
+  if (cleaned !== source) fs.writeFileSync(file, cleaned)
+}
+
 for (const project of projects) {
   const directory = path.join(fixtureRoot, project.directory)
   removeIfPresent(path.join(directory, 'reboil.config.ts'))
@@ -45,9 +57,8 @@ for (const project of projects) {
 
   if (project.directory === 'react/next') {
     const registerState = path.join(directory, 'src/register-state.ts')
-    if (fs.existsSync(registerState) && fs.readFileSync(registerState, 'utf8').trim() === '') {
-      removeIfPresent(registerState)
-    }
+    removeIfPresent(registerState)
+    removeNextLayoutRegistration(path.join(directory, 'src/app/layout.tsx'))
   }
 }
 

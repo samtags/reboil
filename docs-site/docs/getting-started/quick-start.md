@@ -5,11 +5,11 @@ sidebar_position: 2
 
 # Quick start
 
-After installation and config registration, use a small counter to see the core Reboil workflow: define state, subscribe to a path, and update it through the store.
+After installation and config registration, use a small counter to see the core Reboil workflow: update the generated state, subscribe to a path, and update it through the store.
 
-## Define the application state
+## Add fields to the state
 
-Keep the initial state in `src/state.ts`:
+Add a `count` field for this example:
 
 ```ts title="src/state.ts"
 export const initialState = {
@@ -17,22 +17,9 @@ export const initialState = {
 }
 ```
 
-Register the state. `npx reboil init` generates this config and wires it into the application entry point:
-
-```ts title="reboil.config.ts"
-import { createStore, defineConfig } from 'reboil'
-import { initialState } from './src/state'
-
-createStore(initialState)
-
-export default defineConfig({
-  stateFile: './src/state.ts',
-})
-```
-
 ## Subscribe to state changes
 
-The initializer imports the config before application modules. Use `useStore` in a component; the hook subscribes the component to the selected `count` path and re-renders when it changes:
+The initializer ensures the config is registered before application state is used. Use `useStore` in a component; the hook subscribes the component to the selected `count` path and re-renders when it changes:
 
 ```tsx title="src/Counter.tsx"
 import { useStore } from 'reboil/react'
@@ -59,5 +46,3 @@ export function IncrementButton() {
   )
 }
 ```
-
-Because `Counter` subscribes with `useStore('count')`, it updates immediately after `store.set` commits the new value. Reboil persists the state synchronously by default.

@@ -27,6 +27,13 @@
       "require": "./dist/react.cjs",
       "default": "./dist/react.mjs"
     },
+    "./next": {
+      "types": "./dist/next.d.ts",
+      "browser": "./dist/next.mjs",
+      "import": "./dist/next.mjs",
+      "require": "./dist/next.cjs",
+      "default": "./dist/next.mjs"
+    },
     "./package.json": "./package.json"
   },
   "files": [

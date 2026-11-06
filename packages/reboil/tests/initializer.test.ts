@@ -16,9 +16,9 @@ function fixture() {
   return root
 }
 
-function runInit(root: string) {
+function runInit(root: string, args: string[] = []) {
   const cli = path.resolve(__dirname, '../dist/cli.cjs')
-  execFileSync(process.execPath, [cli, 'init', '--yes'], { cwd: root })
+  execFileSync(process.execPath, [cli, 'init', '--yes', ...args], { cwd: root })
 }
 
 function writeFixture(packageJson: Record<string, unknown>, files: Record<string, string>): string {
@@ -72,14 +72,106 @@ describe('reboil init', () => {
     expect(fs.readFileSync(path.join(root, 'src/index.js'), 'utf8')).toContain('import "./reboil.config"')
   })
 
-  it('creates a Next.js register-state entry', () => {
+  it('wires a Next.js App Router layout through ReboilState', () => {
     const root = writeFixture(
       { name: 'next', dependencies: { next: '^16.0.0', react: '^19.0.0' } },
-      { 'src/app/page.tsx': 'export default function Page() { return null }\n' },
+      {
+        'src/app/page.tsx': 'export default function Page() { return null }\n',
+        'src/app/layout.tsx':
+          'export default function Layout({ children }: { children: React.ReactNode }) {\n  return <html><body>{children}</body></html>\n}\n',
+      },
     )
     runInit(root)
-    expect(fs.readFileSync(path.join(root, 'src/register-state.ts'), 'utf8')).toContain("import '../reboil.config'")
+    expect(fs.existsSync(path.join(root, 'src/register-state.ts'))).toBe(false)
+    const config = fs.readFileSync(path.join(root, 'reboil.config.ts'), 'utf8')
+    expect(config).toContain("'use client'")
+    expect(config).toContain("import { createStore, defineConfig } from 'reboil'")
+    expect(config).toContain('export default defineConfig({')
+    const layout = fs.readFileSync(path.join(root, 'src/app/layout.tsx'), 'utf8')
+    expect(layout).toContain('import { ReboilState } from "reboil/next"')
+    expect(layout).toContain('import reboilConfig from "../../reboil.config"')
+    expect(layout).toContain('<ReboilState config={reboilConfig}>')
+    expect(layout).toContain('</ReboilState>')
     expect(fs.readFileSync(path.join(root, 'src/state.ts'), 'utf8')).toContain('initialState')
+
+    runInit(root)
+    expect(fs.readFileSync(path.join(root, 'src/app/layout.tsx'), 'utf8')).toBe(layout)
+    expect(fs.readFileSync(path.join(root, 'reboil.config.ts'), 'utf8')).toBe(config)
+  })
+
+  it('wires an existing Next.js Pages Router custom App directly to the config', () => {
+    const root = writeFixture(
+      { name: 'next-pages', dependencies: { next: '^16.0.0', react: '^19.0.0' } },
+      {
+        'pages/_app.tsx':
+          "import type { AppProps } from 'next/app'\nexport default function App({ Component, pageProps }: AppProps) {\n  return <Component {...pageProps} />\n}\n",
+        'pages/index.tsx': 'export default function Page() { return null }\n',
+      },
+    )
+    runInit(root)
+    expect(fs.readFileSync(path.join(root, 'pages/_app.tsx'), 'utf8')).toMatch(/import ["']\.\.\/reboil\.config["'];?/)
+    expect(fs.existsSync(path.join(root, 'register-state.ts'))).toBe(false)
+  })
+
+  it('creates a Next.js Pages Router custom App when one does not exist', () => {
+    const root = writeFixture(
+      { name: 'next-pages', dependencies: { next: '^16.0.0', react: '^19.0.0' } },
+      {
+        'pages/index.jsx': 'export default function Page() { return null }\n',
+      },
+    )
+    runInit(root)
+    const app = fs.readFileSync(path.join(root, 'pages/_app.js'), 'utf8')
+    expect(app).toContain("import '../reboil.config'")
+    expect(app).toContain('return <Component {...pageProps} />')
+    expect(fs.existsSync(path.join(root, 'register-state.ts'))).toBe(false)
+  })
+
+  it('migrates the generated Next.js register-state bridge', () => {
+    const root = writeFixture(
+      { name: 'next', dependencies: { next: '^16.0.0', react: '^19.0.0' } },
+      {
+        'src/app/page.tsx': 'export default function Page() { return null }\n',
+        'src/app/layout.tsx':
+          'import ReboilRegisterState from "../register-state";\nexport default function Layout({ children }: { children: React.ReactNode }) {\n  return <html><body><ReboilRegisterState>{children}</ReboilRegisterState></body></html>\n}\n',
+        'src/register-state.ts':
+          "'use client'\n\nimport { Fragment, createElement, type ReactNode } from 'react'\nimport '../reboil.config'\n\nexport default function ReboilRegisterState({ children }: { children: ReactNode }) {\n  return createElement(Fragment, null, children)\n}\n",
+      },
+    )
+    runInit(root)
+    expect(fs.existsSync(path.join(root, 'src/register-state.ts'))).toBe(false)
+    const layout = fs.readFileSync(path.join(root, 'src/app/layout.tsx'), 'utf8')
+    expect(layout).not.toContain('ReboilRegisterState')
+    expect(layout).toContain('<ReboilState config={reboilConfig}>')
+  })
+
+  it('does not replace a customized Next.js register-state bridge', () => {
+    const root = writeFixture(
+      { name: 'next', dependencies: { next: '^16.0.0', react: '^19.0.0' } },
+      {
+        'src/app/page.tsx': 'export default function Page() { return null }\n',
+        'src/app/layout.tsx':
+          'import CustomRegistration from "../register-state"\nexport default function Layout({ children }: { children: React.ReactNode }) {\n  return <html><body><CustomRegistration>{children}</CustomRegistration></body></html>\n}\n',
+        'src/register-state.ts':
+          "'use client'\nexport default function CustomRegistration({ children }: { children: React.ReactNode }) { return children }\n",
+      },
+    )
+    expect(() => runInit(root)).toThrow(/Custom Next\.js registration file detected/)
+    expect(fs.existsSync(path.join(root, 'src/register-state.ts'))).toBe(true)
+  })
+
+  it('uses ReboilState for an explicit Next.js layout entry', () => {
+    const root = writeFixture(
+      { name: 'next', dependencies: { next: '^16.0.0', react: '^19.0.0' } },
+      {
+        'src/custom-layout.tsx':
+          'export default function Layout({ children }: { children: React.ReactNode }) {\n  return <html><body>{children}</body></html>\n}\n',
+      },
+    )
+    runInit(root, ['--entry', 'src/custom-layout.tsx'])
+    const layout = fs.readFileSync(path.join(root, 'src/custom-layout.tsx'), 'utf8')
+    expect(layout).toContain('import { ReboilState } from "reboil/next"')
+    expect(layout).toContain('<ReboilState config={reboilConfig}>')
   })
 
   it('creates an Expo Router custom entry before expo-router/entry', () => {
