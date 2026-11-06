@@ -16,9 +16,9 @@ function fixture() {
   return root
 }
 
-function runInit(root: string, args: string[] = []) {
+function runInit(root: string, args: string[] = []): string {
   const cli = path.resolve(__dirname, '../dist/cli.cjs')
-  execFileSync(process.execPath, [cli, 'init', '--yes', ...args], { cwd: root })
+  return execFileSync(process.execPath, [cli, 'init', ...args], { cwd: root, encoding: 'utf8' })
 }
 
 function writeFixture(packageJson: Record<string, unknown>, files: Record<string, string>): string {
@@ -35,13 +35,17 @@ function writeFixture(packageJson: Record<string, unknown>, files: Record<string
 describe('reboil init', () => {
   it('creates config and inserts an idempotent config import', () => {
     const root = fixture()
-    runInit(root)
+    const output = runInit(root)
+    expect(output).toContain('Project successfully boiled! Reboil is initialized.')
+    expect(output).toContain('https://reboil.vercel.app/docs/getting-started/quick-start#subscribe-to-state-changes')
+    expect(output).not.toContain('Apply these changes?')
     const entry = fs.readFileSync(path.join(root, 'src/main.tsx'), 'utf8')
     expect(entry).toContain('import "../reboil.config"')
     expect(fs.existsSync(path.join(root, 'reboil.config.ts'))).toBe(true)
 
     const beforeSecondRun = fs.readFileSync(path.join(root, 'src/main.tsx'), 'utf8')
-    runInit(root)
+    const secondOutput = runInit(root, ['--yes'])
+    expect(secondOutput).toContain('Reboil is already boiled—no changes needed.')
     expect(fs.readFileSync(path.join(root, 'src/main.tsx'), 'utf8')).toBe(beforeSecondRun)
     expect(beforeSecondRun.match(/reboil\.config/g)).toHaveLength(1)
   })

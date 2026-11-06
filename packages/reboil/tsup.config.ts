@@ -25,5 +25,6 @@ export default defineConfig({
   banner: {
     js: '',
   },
+  noExternal: ['chalk', 'ora'],
   external: ['react', 'react-native-mmkv', 'react-native-nitro-modules'],
 })

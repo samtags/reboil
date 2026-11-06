@@ -104,5 +104,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   )
 }
 ```
-
-The layout remains a Server Component. No `register-state.ts` file is generated. The config must be statically imported rather than supplied as a path string so Next.js can include it and any lazy state modules in the client bundle.

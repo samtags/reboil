@@ -3,8 +3,8 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import process from 'node:process'
-import readline from 'node:readline/promises'
-import { stdin as input, stdout as output } from 'node:process'
+import chalk from 'chalk'
+import ora, { type Ora } from 'ora'
 import * as recast from 'recast'
 import babelParser from 'recast/parsers/babel'
 import babelTsParser from 'recast/parsers/babel-ts'
@@ -21,7 +21,6 @@ interface CliOptions {
   state?: string
   entry?: string
   dryRun: boolean
-  yes: boolean
 }
 
 type Framework = 'expo-router' | 'expo' | 'next' | 'cra' | 'react-native' | 'generic'
@@ -43,17 +42,18 @@ interface AstNode {
 }
 
 const sourceExtensions = ['tsx', 'jsx', 'ts', 'js', 'mts', 'mjs'] as const
+const quickStartUrl = 'https://reboil.vercel.app/docs/getting-started/quick-start#subscribe-to-state-changes'
 
 function parseArgs(argv: string[]): CliOptions {
-  const options: CliOptions = { cwd: process.cwd(), dryRun: false, yes: false }
+  const options: CliOptions = { cwd: process.cwd(), dryRun: false }
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index]
     if (argument === '--state') options.state = argv[++index]
     else if (argument === '--entry') options.entry = argv[++index]
     else if (argument === '--dry-run') options.dryRun = true
-    else if (argument === '--yes') options.yes = true
+    else if (argument === '--yes') continue
     else if (argument === '--help' || argument === '-h') {
-      console.log('Usage: reboil init [--state <path>] [--entry <path>] [--dry-run] [--yes]')
+      console.log('Usage: reboil init [--state <path>] [--entry <path>] [--dry-run]')
       process.exit(0)
     } else if (argument !== 'init') {
       throw new Error(`Unknown argument: ${argument}`)
@@ -410,21 +410,11 @@ function generatedPagesAppSource(file: string, configFile: string): string {
   return `${typeImport}import '${configImport}'\n\nexport default function App({ Component, pageProps }${parameterType}) {\n  return <Component {...pageProps} />\n}\n`
 }
 
-async function confirmChanges(changes: Change[]): Promise<boolean> {
-  console.log('Reboil will apply these changes:')
-  for (const change of changes) {
-    console.log(`\n--- ${change.file} ---`)
-    if (change.before === null) console.log('(new file)')
-    if (change.after === null) console.log('(delete file)')
-    else console.log(change.after)
-  }
-  const prompt = readline.createInterface({ input, output })
-  const answer = await prompt.question('\nApply these changes? [y/N] ')
-  prompt.close()
-  return answer.trim().toLowerCase() === 'y'
+function showNextStep(): void {
+  console.log(`\n${chalk.bold('Next:')} ${chalk.cyan.underline(quickStartUrl)}`)
 }
 
-async function init(options: CliOptions): Promise<void> {
+function applyInit(options: CliOptions, spinner: Ora): void {
   const root = options.cwd
   const packageFile = path.resolve(root, 'package.json')
   if (!fs.existsSync(packageFile)) throw new Error(`No package.json found in ${root}`)
@@ -540,17 +530,13 @@ async function init(options: CliOptions): Promise<void> {
 
   const effectiveChanges = changes.filter((change) => change.before !== change.after)
   if (effectiveChanges.length === 0) {
-    console.log('Reboil is already initialized; no changes needed.')
+    spinner.info(chalk.cyan('Reboil is already boiled—no changes needed.'))
+    showNextStep()
     return
   }
 
-  const shouldApply = options.dryRun || options.yes || (await confirmChanges(effectiveChanges))
-  if (!shouldApply) {
-    console.log('No changes applied.')
-    return
-  }
   if (options.dryRun) {
-    console.log('Dry run complete; no files were written.')
+    spinner.info(chalk.yellow('Dry run complete—no files were written.'))
     return
   }
   for (const change of effectiveChanges) {
@@ -561,10 +547,26 @@ async function init(options: CliOptions): Promise<void> {
       fs.writeFileSync(change.file, change.after)
     }
   }
-  console.log('Reboil initialized successfully.')
+  spinner.succeed(`${chalk.green.bold('Project successfully boiled!')} ${chalk.green('Reboil is initialized.')}`)
+  showNextStep()
+}
+
+async function init(options: CliOptions): Promise<void> {
+  const spinner = ora({
+    text: chalk.cyan('Boiling Reboil into your project...'),
+    color: 'yellow',
+    stream: process.stdout,
+  }).start()
+
+  try {
+    applyInit(options, spinner)
+  } catch (error) {
+    spinner.fail(chalk.red('Could not boil the project.'))
+    throw error
+  }
 }
 
 void init(parseArgs(process.argv.slice(2))).catch((error: unknown) => {
-  console.error(`reboil init failed: ${error instanceof Error ? error.message : String(error)}`)
+  console.error(chalk.red(`reboil init failed: ${error instanceof Error ? error.message : String(error)}`))
   process.exitCode = 1
 })

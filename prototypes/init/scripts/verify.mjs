@@ -14,8 +14,8 @@ function run(command, args, cwd) {
 
 try {
   run('node', ['scripts/reset.mjs'], fixtureRoot)
-  run('node', ['scripts/run-init.mjs', '--yes'], fixtureRoot)
-  run('node', ['scripts/run-init.mjs', '--yes'], fixtureRoot)
+  run('node', ['scripts/run-init.mjs'], fixtureRoot)
+  run('node', ['scripts/run-init.mjs'], fixtureRoot)
 
   const webBuilds = ['react/cra', 'react/parcel', 'react/vite', 'react/next', 'vanilla']
   for (const directory of webBuilds) run('npm', ['run', 'build'], path.join(fixtureRoot, directory))

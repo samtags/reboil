@@ -14,16 +14,10 @@ The setup step should be repeated after changing Reboil’s package build or a f
 
 ## Run the complete matrix
 
-The interactive flow initializes all projects and leaves generated files in place for inspection:
+The init flow initializes all projects immediately and leaves generated files in place for inspection. It does not require confirmation:
 
 ```sh
 npm run init --prefix prototypes/init
-```
-
-For a non-interactive run, pass `--yes` through to each fixture:
-
-```sh
-npm run init --prefix prototypes/init -- --yes
 ```
 
 The automated verification command initializes every fixture twice, builds/bundles each project, and resets the generated files in a `finally` block:
@@ -32,18 +26,18 @@ The automated verification command initializes every fixture twice, builds/bundl
 npm run verify --prefix prototypes/init
 ```
 
-Expected initializer output is `Reboil initialized successfully.` on the first run and `Reboil is already initialized; no changes needed.` on the second run.
+Expected initializer output is `Project successfully boiled! Reboil is initialized.` on the first run and `Reboil is already boiled—no changes needed.` on the second run. Both outcomes link to the quick-start documentation.
 
 ## Verify one project at a time
 
-The commands below can be run from the repository root; `--prefix` selects the project directory. Omit `-- --yes` to review the proposed changes interactively. If you prefer to `cd` first, run the same commands without the `--prefix <directory>` portion.
+The commands below can be run from the repository root; `--prefix` selects the project directory. If you prefer to `cd` first, run the same commands without the `--prefix <directory>` portion.
 
 ### React / Create React App
 
 Directory: `prototypes/init/react/cra`
 
 ```sh
-npm run reboil:init --prefix prototypes/init/react/cra -- --yes
+npm run reboil:init --prefix prototypes/init/react/cra
 npm run build --prefix prototypes/init/react/cra
 ```
 
@@ -58,7 +52,7 @@ Generated or changed files:
 Directory: `prototypes/init/react/parcel`
 
 ```sh
-npm run reboil:init --prefix prototypes/init/react/parcel -- --yes
+npm run reboil:init --prefix prototypes/init/react/parcel
 npm run build --prefix prototypes/init/react/parcel
 ```
 
@@ -73,7 +67,7 @@ Generated or changed files:
 Directory: `prototypes/init/react/vite`
 
 ```sh
-npm run reboil:init --prefix prototypes/init/react/vite -- --yes
+npm run reboil:init --prefix prototypes/init/react/vite
 npm run build --prefix prototypes/init/react/vite
 ```
 
@@ -88,7 +82,7 @@ Generated or changed files:
 Directory: `prototypes/init/react/next`
 
 ```sh
-npm run reboil:init --prefix prototypes/init/react/next -- --yes
+npm run reboil:init --prefix prototypes/init/react/next
 npm run build --prefix prototypes/init/react/next
 ```
 
@@ -116,7 +110,7 @@ The root layout remains a Server Component. `ReboilState` is the client boundary
 Directory: `prototypes/init/vanilla`
 
 ```sh
-npm run reboil:init --prefix prototypes/init/vanilla -- --yes
+npm run reboil:init --prefix prototypes/init/vanilla
 npm run build --prefix prototypes/init/vanilla
 ```
 
@@ -131,7 +125,7 @@ Generated or changed files:
 Directory: `prototypes/init/react-native`
 
 ```sh
-npm run reboil:init --prefix prototypes/init/react-native -- --yes
+npm run reboil:init --prefix prototypes/init/react-native
 tmpdir="$(mktemp -d)"
 npx react-native bundle \
   --platform android \
@@ -154,7 +148,7 @@ The fixture’s `metro.config.js` maps the local workspace copy of Reboil. Publi
 Directory: `prototypes/init/expo`
 
 ```sh
-npm run reboil:init --prefix prototypes/init/expo -- --yes
+npm run reboil:init --prefix prototypes/init/expo
 tmpdir="$(mktemp -d)"
 npx expo export --platform android --output-dir "$tmpdir"
 ```
