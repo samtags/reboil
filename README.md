@@ -5,7 +5,7 @@
 <h1 align="center">Reboil</h1>
 
 <p align="center">
-  Small, fast, and scalable string-path state access for web applications and React Native, with zero boilerplate, code splitting, and synchronous persistence out of the box
+  Small, fast, and scalable string-path state access for web applications and React Native, with code splitting, and synchronous persistence out of the box
 </p>
 
 <p align="center">

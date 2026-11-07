@@ -1,0 +1,19 @@
+{
+  "name": "reboil-production-vanilla",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "reboil:init": "reboil init"
+  },
+  "dependencies": {
+    "@reboil/store": "1.1.0"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "vite": "8.3.6"
+  }
+}
